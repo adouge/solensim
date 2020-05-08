@@ -1,0 +1,2 @@
+# solsim
+Solenoid simulation project
