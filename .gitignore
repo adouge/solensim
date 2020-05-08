@@ -1,0 +1,10 @@
+# ignore .pdf files and potential LaTeX outputs
+*.cfg
+*.pdf
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
