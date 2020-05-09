@@ -1,10 +1,26 @@
-# ignore .pdf files and potential LaTeX outputs
-*.cfg
-*.pdf
+# ignore .pdf files and potential LaTeX outputs:
+#*.pdf
 *.aux
-*.fdb_latexmk
+*.bbl
+*.blg
+*.idx
+*.ind
+*.lof
+*.lot
+*.out
+*.toc
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
 *.fls
 *.log
-*.out
+*.fdb_latexmk
+*.bcf
 *.synctex.gz
-*.toc
+*.run.xml
+*.snm
+*.nav

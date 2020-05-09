@@ -1,0 +1,57 @@
+\documentclass{beamer}
+%\usepackage{ngerman}
+\usepackage{soul}
+\usepackage{mathtools}
+\usepackage{amssymb,amsmath,amsfonts}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[autostyle=true,german=quotes]{csquotes}
+\usepackage{gensymb}
+\usepackage{units}
+\usepackage{fancyhdr}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{cite}
+
+\graphicspath{ {figures/} }
+
+\title{TITLE}
+\subtitle{Subtitle}
+\author{Author 1 \and Author 2}
+\date{DATE \today}
+
+\begin{document}
+%Title slide:
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+%TOC slide:
+\begin{frame}
+  \frametitle{Structure}
+  \tableofcontents%[currentsection]
+\end{frame}
+
+\section{Section 1}
+\begin{frame}
+  \frametitle{Title}
+  \framesubtitle{Subtitle}
+  This is how one cites. \footnote{Sad But True}
+
+\end{frame}
+
+\section{Section 2}
+\begin{frame}
+  \frametitle{Title}
+  \framesubtitle{Subtitle}
+\end{frame}
+
+\begin{frame}
+  \frametitle{References}
+  \begin{thebibliography}{9}
+    \bibitem{format} https://e-publishing.cern.ch/index.php/CYR/pages/view/bib\_references, \\ last accessed May 9th 2020
+    \bibitem{present} https://en.wikibooks.org/wiki/LaTeX/Presentations, \\ last accessed May 9th 2020
+  \end{thebibliography}
+\end{frame}
+
+\end{document}
