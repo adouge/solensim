@@ -17,3 +17,12 @@
 #########################################################################
 
 # test matlab python wrapper with Kamps's code
+
+from oct2py import Oct2Py
+testpath = "mcode/doNewCoil.m"
+
+if __name__ == '__main__':
+    o = Oct2Py()
+    o.run(testpath)
+    input("Press enter to continue...")
+    o.restart()
