@@ -24,5 +24,4 @@ testpath = "mcode/doNewCoil.m"
 if __name__ == '__main__':
     o = Oct2Py()
     o.run(testpath)
-    input("Press enter to continue...")
     o.restart()
