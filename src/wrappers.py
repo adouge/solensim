@@ -16,31 +16,16 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# main program script
+import oct2py
 
-import numpy as np
-from wrappers import Wrapper
+class Wrapper(oct2py.Oct2Py):
+    def __init__(self):
+        oct2py.Oct2Py.__init__(self)
+        self.addpath("mcode")
 
-def wrapper_test():
-    o = Wrapper()
-    print("Testing Kamps's script:")
-    o.run("doNewCoil")
-    input("Press Enter to continue...")
-    o.restart()
-    print("done. \n Testing wraptest.m:")
-    A = np.random.rand(5,5)
-    B = np.random.rand(5,5)
-    C = o.wraptest(A,B)
-    print(A,B)
-    print("product:")
-    print(C)
+    def restart(self):
+        oct2py.Oct2Py.restart(self)
+        self.addpath("mcode")
 
-def main():
-    print("solensim v0.0.0 Solenoid simulation tool")
-    print("========================================")
-    print("Nothing to see here yet! \n Here's a wrapper test:")
-    wrapper_test()
-
-
-if __name__ == '__main__':
-    main()
+class MWrapper():
+    pass

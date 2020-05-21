@@ -1,4 +1,5 @@
 % copyright Dr. Thorsten Kamps, 2020
+% All rights reserved.
 
 % with beam pipe diameter 108 mm
 % radius beam pipe = 108/2 mm = 54 mm
