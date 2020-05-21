@@ -17,6 +17,8 @@
 #########################################################################
 
 import oct2py
+import matlab.engine
+import os
 
 class Wrapper(oct2py.Oct2Py):
     def __init__(self):
@@ -28,4 +30,7 @@ class Wrapper(oct2py.Oct2Py):
         self.addpath("mcode")
 
 class MWrapper():
-    pass
+    mcode_path = os.path.dirname(os.path.realpath(__file__)) + "/mcode"
+    def __init__(self):
+        self.e = matlab.engine.start_matlab()
+        self.e.cd(self.mcode_path, nargout=0)
