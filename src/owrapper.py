@@ -25,7 +25,8 @@ import oct2py
 import os
 
 class Wrapper(oct2py.Oct2Py):
-    mcode_path = os.path.dirname(os.path.realpath(__file__)) + "/mcode"
+    work_dir = os.path.dirname(os.path.realpath(__file__))
+    mcode_path = work_dir  + "/mcode"
     def __init__(self):
         oct2py.Oct2Py.__init__(self)
         self.addpath(self.mcode_path)

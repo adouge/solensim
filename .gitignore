@@ -25,3 +25,4 @@
 *.snm
 *.nav
 octave-workspace
+*.pyc
