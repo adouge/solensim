@@ -1,5 +1,5 @@
 # solensim
-Solenoid simulation project
+Solenoid simulation project - DEV branch
 
 ### TODO:
  - Plan
