@@ -18,11 +18,23 @@
 # main program script
 
 import numpy as np
-from wrappers import Wrapper
+from owrapper import Wrapper
+import matlab.engine
+
+def matlab_test(engine):
+    print("Testing Matlab interface:\nRunning Kamp's script:")
+    engine.run("doNewCoil.m", nargout=0)
+    print("done. \n Testing mwraptest.m:")
+    A = engine.magic(5)
+    B = engine.magic(5,5)
+    C = engine.mwraptest(A,B)
+    print(A,B)
+    print("product:")
+    print(C)
 
 def wrapper_test():
     o = Wrapper()
-    print("Testing Kamps's script:")
+    print("Testing Oct2Py Wrapper:\nRunning Kamps's script:")
     o.run("doNewCoil")
     input("Press Enter to continue...")
     o.restart()
@@ -39,7 +51,9 @@ def main():
     print("========================================")
     print("Nothing to see here yet! \n Here's a wrapper test:")
     wrapper_test()
-
+    print("----------------------------------------")
+    m = matlab.engine.start_matlab()
+    matlab_test(m)
 
 if __name__ == '__main__':
     main()

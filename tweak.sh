@@ -1,5 +1,7 @@
 # tweak the matlab python interface installer into accepting python 3.8
 MATLABROOT="/home/anton/pfiles/MATLAB"
+echo "Assuming MATLABROOT to be $MATLABROOT."
+echo "run matlab -nodesktop -nosplash -nojvm -batch matlabroot to obtain matlab root directory."
 # run matlab -nodesktop -nosplash -nojvm -batch matlabroot to obtain matlab root directory.
 INSTALLER_PATH="$MATLABROOT/extern/engines/python"
 
@@ -15,3 +17,5 @@ cd $INSTALLER_PATH
 cd dist/matlab/engine
 sed -i.bak s/"'2_7', '3_6', '3_7'"/"'2_7', '3_6', '3_7', '3_8'"/g __init__.py
 sed -i s/"_PYTHONVERSION = _version"/"_PYTHONVERSION = '3_7'"/g __init__.py
+
+echo "done. Run undo_tweak.sh after running setup.py install to revert the installer to its original state."
