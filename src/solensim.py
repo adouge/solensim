@@ -18,8 +18,8 @@
 # main program script
 
 import numpy as np
-from owrapper import Wrapper
-import matlab.engine
+import wrapper
+
 
 def matlab_test(engine):
     print("Testing Matlab interface:\nRunning Kamp's script:")
@@ -33,7 +33,7 @@ def matlab_test(engine):
     print(C)
 
 def wrapper_test():
-    o = Wrapper()
+    o = wrapper.OWrapper()
     print("Testing Oct2Py Wrapper:\nRunning Kamps's script:")
     o.run("doNewCoil")
     input("Press Enter to continue...")
@@ -47,12 +47,12 @@ def wrapper_test():
     print(C)
 
 def main():
-    print("solensim v0.0.0 Solenoid simulation tool")
+    print("solensim v0.0.1 Solenoid simulation tool")
     print("========================================")
     print("Nothing to see here yet! \n Here's a wrapper test:")
     wrapper_test()
     print("----------------------------------------")
-    m = matlab.engine.start_matlab()
+    m = wrapper.mWrapper()
     matlab_test(m)
 
 if __name__ == '__main__':

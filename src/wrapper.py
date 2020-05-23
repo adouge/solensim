@@ -16,15 +16,17 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# provide a tweakable interface to Octave.
-# works faster, and much more flexibly, than the MATLAB interface.
-# moved to a separate file to make the oct2py/GNU Octave dependency optional,
-# should MATLAB interface be chosen, in the end.
+# Wrapper code segment
 
 import oct2py
 import os
+import matlab.engine
 
-class Wrapper(oct2py.Oct2Py):
+class OWrapper(oct2py.Oct2Py):
+    """
+    wrapper class for Oct2Py
+    Octave instances start with mcode in PATH
+    """
     work_dir = os.path.dirname(os.path.realpath(__file__))
     mcode_path = work_dir  + "/mcode"
     def __init__(self):
@@ -34,3 +36,13 @@ class Wrapper(oct2py.Oct2Py):
     def restart(self):
         oct2py.Oct2Py.restart(self)
         self.addpath(self.mcode_path)
+
+def mWrapper():
+    """
+    Returns a MATLAB engine instance, with mcode in PATH
+    """
+    engine = matlab.engine.start_matlab()
+    work_dir = os.path.dirname(os.path.realpath(__file__))
+    mcode_path = work_dir  + "/mcode"
+    engine.addpath(mcode_path)
+    return engine
