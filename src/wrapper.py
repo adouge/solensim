@@ -22,12 +22,16 @@ import oct2py
 import os
 import matlab.engine
 
+def workdir():
+    work_dir = os.path.dirname(os.path.realpath(__file__))
+    return work_dir
+
 class OWrapper(oct2py.Oct2Py):
     """
     wrapper class for Oct2Py
     Octave instances start with mcode in PATH
     """
-    work_dir = os.path.dirname(os.path.realpath(__file__))
+    work_dir = workdir()
     mcode_path = work_dir  + "/mcode"
     def __init__(self):
         oct2py.Oct2Py.__init__(self)
@@ -42,7 +46,14 @@ def mWrapper():
     Returns a MATLAB engine instance, with mcode in PATH
     """
     engine = matlab.engine.start_matlab()
-    work_dir = os.path.dirname(os.path.realpath(__file__))
+    work_dir = workdir()
     mcode_path = work_dir  + "/mcode"
     engine.addpath(mcode_path)
     return engine
+
+def stop(Wrapper):
+    """
+    Stop the engine, delete handle
+    """
+    Wrapper.exit()
+    del(Wrapper)

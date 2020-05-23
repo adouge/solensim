@@ -19,41 +19,18 @@
 
 import numpy as np
 import wrapper
-
-
-def matlab_test(engine):
-    print("Testing Matlab interface:\nRunning Kamp's script:")
-    engine.run("doNewCoil.m", nargout=0)
-    print("done. \n Testing mwraptest.m:")
-    A = engine.magic(5)
-    B = engine.magic(5,5)
-    C = engine.mwraptest(A,B)
-    print(A,B)
-    print("product:")
-    print(C)
-
-def wrapper_test():
-    o = wrapper.OWrapper()
-    print("Testing Oct2Py Wrapper:\nRunning Kamps's script:")
-    o.run("doNewCoil")
-    input("Press Enter to continue...")
-    o.restart()
-    print("done. \n Testing wraptest.m:")
-    A = np.random.rand(5,5)
-    B = np.random.rand(5,5)
-    C = o.wraptest(A,B)
-    print(A,B)
-    print("product:")
-    print(C)
+import frontend as fe
 
 def main():
-    print("solensim v0.0.1 Solenoid simulation tool")
+    [vstring] = fe.load_conf()
+    print("solensim %s Solenoid simulation tool"%vstring)
     print("========================================")
-    print("Nothing to see here yet! \n Here's a wrapper test:")
-    wrapper_test()
+    print("Nothing to see here yet! \n Here are some wrapper tests:")
+    fe.test_octave()
     print("----------------------------------------")
-    m = wrapper.mWrapper()
-    matlab_test(m)
+    fe.test_matlab()
+    print("========================================")
 
+    fe.demo("Some Parameters")
 if __name__ == '__main__':
     main()
