@@ -17,7 +17,6 @@
 
 # main program script
 
-import numpy as np
 import wrapper
 import frontend as fe
 

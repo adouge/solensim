@@ -1,6 +1,7 @@
 # A piece of code demonstrating a potential UI basis
 # Also try nubia!
-# copyright click team - see repo
+# Copyright 2014 Palllets
+# https://github.com/pallets/click
 import click
 import requests
 

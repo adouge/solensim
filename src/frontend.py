@@ -19,21 +19,18 @@
 # frontend code segment
 
 import wrapper as wrap
-
-def workdir():
-    work_dir = os.path.dirname(os.path.realpath(__file__))
-    return work_dir
+import numpy as np
 
 def load_conf():
     """
     Rudimentary configuration, possibly replace with regexp
     """
-    work_dir = workdir()
+    work_dir = wrap.workdir()
     config = open(wrap.workdir()+"/solensim.cfg", "r")
     config.readline()
     vstring = config.readline().split("=")[1].strip()
     config.close()
-    return [vsring]
+    return [vstring]
 
 def test_matlab():
     M = wrap.mWrapper()
