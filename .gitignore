@@ -24,5 +24,13 @@
 *.run.xml
 *.snm
 *.nav
+
+# latex library file backups
+*.bib.bak
+*.bib.sav
+
+# procedural octave remains
 octave-workspace
+
+# compiled python code
 *.pyc

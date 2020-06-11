@@ -33,8 +33,9 @@ def load_conf():
     return [vstring]
 
 def test_matlab():
+    print("Testing Matlab interface:")
     M = wrap.mWrapper()
-    print("Testing Matlab interface:\nRunning Kamp's script:")
+    print("\nRunning Kamp's script:")
     M.run("doNewCoil.m", nargout=0)
     print("done. \n Testing mwraptest.m:")
     A = M.magic(5)
@@ -43,6 +44,7 @@ def test_matlab():
     print(A,B)
     print("product:")
     print(C)
+    input("Press Enter to continue...")
     wrap.stop(M)
 
 def test_octave():

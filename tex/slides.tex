@@ -11,9 +11,15 @@
 \usepackage{units}
 \usepackage{fancyhdr}
 \usepackage[font=small,labelfont=bf]{caption}
-\usepackage{cite}
+\usepackage{biblatex}
 
 \graphicspath{ {figures/} }
+
+\addbibresource{lib/lib.bib}
+
+%\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{section in toc}[square]
 
 \title{TITLE}
 \subtitle{Subtitle}
@@ -36,7 +42,7 @@
 \begin{frame}
   \frametitle{Title}
   \framesubtitle{Subtitle}
-  This is how one cites. \footnote{Sad But True}
+  This is how one cites. \footfullcite{Blobel1998}
 
 \end{frame}
 
@@ -46,12 +52,15 @@
   \framesubtitle{Subtitle}
 \end{frame}
 
+\section{Summary}
 \begin{frame}
+  \frametitle{Summary}
+  \framesubtitle{Subtitle}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
   \frametitle{References}
-  \begin{thebibliography}{9}
-    \bibitem{format} https://e-publishing.cern.ch/index.php/CYR/pages/view/bib\_references, \\ last accessed May 9th 2020
-    \bibitem{present} https://en.wikibooks.org/wiki/LaTeX/Presentations, \\ last accessed May 9th 2020
-  \end{thebibliography}
+  \printbibliography
 \end{frame}
 
 \end{document}
