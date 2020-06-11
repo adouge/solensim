@@ -1,8 +1,6 @@
 # solensim
 Solenoid simulation project
 
-### Development branch
-
 ### TODO:
  * General:
   - Разделение работы
@@ -37,3 +35,7 @@ Solenoid simulation project
    - frontend.py - user-side functionality handles, link to mcode
    - mdoce - backend (possibly some python)
    - wrapper.py - Oc2Py/MATLAB interfaces, I/O wrappers, plotter?
+
+### Branches:
+ - master - main branch - only chunk in "done" fragments, no more merging master-->dev
+ - dev - development branch
