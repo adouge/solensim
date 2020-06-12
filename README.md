@@ -5,11 +5,11 @@ Solenoid simulation project
 - General:
    - Разделение работы
    - **Антон прочитать теорию**
-   - Прлписать концепт работы, от указанных параметров до результата *Антон*
-   - Чё там Кампс по нужным параметрам ответит, какая форма катушки? *Aндрій*
-   - *TBA* Нічого не забув такого, що ми говорили по плануванню? *Aндрій*
+   - Прописать концепт работы, от указанных параметров до результата *Антон*
+   - ~Форма катушки~ AREAL (see notes)
+   - *To Be Added* Нічого не забув такого, що ми говорили по плануванню? *Aндрій*
  
-- Präsentation *TODO*:
+- Präsentation:
    -  Plan
  
 - Software:
@@ -20,10 +20,14 @@ Solenoid simulation project
    - *TBA* *(Антон)*
 
 ### Notes:
- - Oct2Py seems to work fine for simpler scripts. It is also much faster, surprisingly, than the MATLAB interface.
- - there is no apparent slowdown from calling Octave through Python, as long as same session objects are used (no Python object recreation/redeletion); also, passing a lot of data through the interface causes slowdowns - might be better to use file buffers for large amounts of num. data?
- - might have to do a simple interactive looping CLI myself.
- - *А не проще ли всё запитонить?*
+ - Parameters:
+   - Geometry: М слоёв по N витков, abstand d, первый слой на радиусе R
+ - Backends:
+   - Oct2Py seems to work fine for simpler scripts. It is also much faster, surprisingly, than the MATLAB interface.
+   - there is no apparent slowdown from calling Octave through Python, as long as same session objects are used (no Python object recreation/redeletion); also, passing a lot of data through the interface causes slowdowns - might be better to use file buffers for large amounts of num. data?
+   - *А не проще ли всё запитонить?*
+ - Interface:
+   - rudimentary looping CLI
 
 
 ### Dependencies:
