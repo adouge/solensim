@@ -21,6 +21,7 @@
 import oct2py
 import os
 import matlab.engine
+import pycode.backend
 
 def workdir():
     work_dir = os.path.dirname(os.path.realpath(__file__))
@@ -57,3 +58,10 @@ def stop(Wrapper):
     """
     Wrapper.exit()
     del(Wrapper)
+
+def pyWrapper():
+    """
+    returns a handle to a py Backend object
+    """
+    handle = pycode.backend.Backend()
+    return handle

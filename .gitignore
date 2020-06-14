@@ -34,3 +34,5 @@ octave-workspace
 
 # compiled python code
 *.pyc
+
+.ipynb_checkpoints/*
