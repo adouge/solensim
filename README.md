@@ -11,13 +11,13 @@ Solenoid simulation project
  
 - Präsentation:
    -  Plan
- 
+
 - Software:
    - Концепт работы --> общий алгоритм *Антон*
    - **mcode:** *(Андрій)*
-     - Implement ß(z) как функц катушки, векторно (linspace in, beta value vector out)
      - *TBA* *(Антон)*
    - *TBA* *(Антон)*
+
 
 ### Notes:
  - Parameters:
