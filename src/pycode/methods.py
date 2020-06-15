@@ -30,7 +30,7 @@ from scipy.misc import derivative
 def parse_geometry(geometry):
     [r, a, b] = geometry
     Rsq = r*(1 + a**2/(24*r**2))
-    c = np.sqrt((a**2 + b**2)/12)
+    c = np.sqrt((a**2 - b**2)/12)
     return [Rsq, c]
 
 def impuls(E):
