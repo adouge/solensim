@@ -17,6 +17,7 @@ Solenoid simulation project
    - mcode *(Андрій)*
    - pycode *(Антон)*
      - ~backend base~
+     - get rid of bloat in backend
      - review parameter model 
      - Constraints definition
      - Optimization
