@@ -59,9 +59,44 @@ def stop(Wrapper):
     Wrapper.exit()
     del(Wrapper)
 
-def pyWrapper():
-    """
-    returns a handle to a py Backend object
-    """
-    handle = pycode.backend.Backend()
-    return handle
+class PWrapper(pycode.backend.Core):
+    def __init__(self):
+        pycode.backend.Core.__init__(self)
+        self.result = "None"
+        self.p = {
+            "g":"Not set",
+            "gp": "Not set",
+            "s":"Not set",
+            "E":"Not set",
+            "R":"Not set"
+        }
+
+    def set(self, key, value):
+        self.p[key] = value
+
+    def set_geomp(self):
+        self.p["gp"] = parse_geometry(self.p["g"])
+
+    def set_all(self, g, s, E, R):
+        self.p = {
+            "g": g,
+            "gp": "Not set",
+            "s": s,
+            "E": E,
+            "R": R
+        }
+        self.set_geomp()
+
+    def settings(self):
+        for key in self.p.keys():
+            print(key,":",self.p[key])
+
+    def exit(self):
+        pass  # let the wrapper's del(self) handle it
+
+    def show(self):
+        (B0, l, f, cs) = self.result
+        print("Peak axial field:", B0*1000, "mT")
+        print("Effective field length:", l*1000,"mm")
+        print("Focal distance for given E:", f*100,"cm")
+        print("Spherical aberration for given E:", cs)

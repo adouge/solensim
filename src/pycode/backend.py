@@ -25,43 +25,11 @@ from pycode.methods import *
 import scipy.constants as const
 import numpy as np
 
-class Backend():
+class Core():
     def __init__(self):
-        self.result = "None"
-        self.p = {
-            "g":"Not set",
-            "gp": "Not set",
-            "s":"Not set",
-            "E":"Not set",
-            "R":"Not set"
-        }
+        pass
 
-    def set(self, key, value):
-        self.p[key] = value
-
-    def set_geomp(self):
-        self.p["gp"] = parse_geometry(self.p["g"])
-
-    def set_all(self, g, s, E, R):
-        self.p = {
-            "g": g,
-            "gp": "Not set",
-            "s": s,
-            "E": E,
-            "R": R
-        }
-        self.set_geomp()
-
-    def settings(self):
-        for key in self.p.keys():
-            print(key,":",self.p[key])
-
-    def exit(self):
-        pass  # let the wrapper's del(self) handle it
-        
- # # # # # # # # # # # # # # # # # # # # # #
-
-    def calc(self):
+    def scalc(self):
         geometry = self.p["g"]
         scaling = self.p["s"]
         E = self.p["E"]
@@ -84,9 +52,24 @@ class Backend():
         self.result = returns
         return returns
 
-    def show(self):
-        (B0, l, f, cs) = self.result
+    def calc(self, geometry, scaling, E, R):
+        geomp = parse_geometry(geometry)
+        p = impuls(E)
+
+        f1 = F1(scaling, geomp)
+        f2 = F2(scaling, geomp)
+        f3 = F3(scaling, geomp)
+        f4 = F4(scaling, geomp)
+
+        f = focal(f2, p)
+        cs = aberr(f3, f4, p, R)
+        l = l_eff(scaling, geomp)
+        B0 = peak_B(scaling, geomp)
+
         print("Peak axial field:", B0*1000, "mT")
         print("Effective field length:", l*1000,"mm")
         print("Focal distance for given E:", f*100,"cm")
         print("Spherical aberration for given E:", cs)
+
+
+        return (B0, l, f, cs)
