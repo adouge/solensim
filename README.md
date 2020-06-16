@@ -7,7 +7,8 @@ Solenoid simulation project
     - Problem, model, design Zusammenfassung
     - Прописать концепт работы, от указанных параметров до результата:
       - цільові характеристики, відносні ваги обмежень --> оптимізація --> аналіз (чутливість, характеристики солющн), презентація характ, чутливості
-    - implement backend
+    - replace NonlinearConstraint with LinearConstraint where possible
+    - finish backend
     - bridge backend to wrapper
     - iPython API, frontend (output)
   - **Андрій**:
