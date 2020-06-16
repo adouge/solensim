@@ -4,9 +4,9 @@ Solenoid simulation project
 ### TODO:
 - General:
    - **Разделение работы?**
-   - *Антон прочитать теорию* -> Problem, model, design Zusammenfassung 
+   - *Антон прочитать теорию* -> Problem, model, design Zusammenfassung
    - Прописать концепт работы, от указанных параметров до результата
- 
+
 - Präsentation:
    - Теор. выкладка
    - Выжимка см. выше
@@ -17,21 +17,22 @@ Solenoid simulation project
    - mcode *(Андрій)*
    - pycode *(Антон)*
      - ~backend base~
-     - get rid of bloat in backend
-     - review parameter model 
-     - Constraints definition
+     - ~get rid of bloat in backend~
+     - review parameter model
+     - ~Constraints definition~
      - Optimization
      - Output
    - Wrapper: *(Aнтон)*
+     - **iPython API**
      - flexible interface for iPython integration --> don't overcomplicate; provide both wrapped API for future CLI, as well as a more pythonic, naked user-facing methods for iPython
 
 
 ### Notes:
 ### Problem:
  - Parameters:
-   - Geometry: mean radius r, radial width a, axial width b; 
+   - Geometry: mean radius r, radial width a, axial width b;
    - I*N scaling factor
- - Constraints: 
+ - Constraints:
    - FWHM L ~50 mm
    - focal distance f > 50 cm
    - Peak field on axis ~100 mT
