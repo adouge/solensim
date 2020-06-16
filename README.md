@@ -3,25 +3,34 @@ Solenoid simulation project
 
 ### TODO:
 - General:
-   - **Разделение работы?**
+   - Разделение работы:
+      - *TODO*
    - *Антон прочитать теорию* -> Problem, model, design Zusammenfassung
    - Прописать концепт работы, от указанных параметров до результата
 
 - Präsentation:
-   - Теор. выкладка
-   - Выжимка см. выше
-   - *TBA*
+   - Общая теория e в соленоїдах, aберрації
+   - Цель, target Parameters
+   - Phys. model (формули, інтеграли)
+   - present software:
+      - Example - calc with AREAL params
+      - Implementation
+      - Optimization
+      - Results
 
 - Software:
-   - Концепт работы --> общий алгоритм *Антон*
+   - Концепт работы --> outline общий алгоритм *Антон*
    - mcode *(Андрій)*
    - pycode *(Антон)*
      - ~backend base~
      - ~get rid of bloat in backend~
      - review parameter model
      - ~Constraints definition~
-     - Optimization
+     - Optimization:
+        - ctr
+        - COBYLA, SLSQP
      - Output
+     - *Documentation!*
    - Wrapper: *(Aнтон)*
      - **iPython API**
      - flexible interface for iPython integration --> don't overcomplicate; provide both wrapped API for future CLI, as well as a more pythonic, naked user-facing methods for iPython
@@ -32,6 +41,7 @@ Solenoid simulation project
  - Parameters:
    - Geometry: mean radius r, radial width a, axial width b;
    - I*N scaling factor
+   - Alt. geometry: **optimize in Rsq, c?**
  - Constraints:
    - FWHM L ~50 mm
    - focal distance f > 50 cm
@@ -54,7 +64,7 @@ Solenoid simulation project
 
 ### Dependencies:
  - *oct2py package, MATLAB Python interface (optional, doubted)*
- - numpy, scipy
+ - numpy, scipy (found in e.g. Conda)
 
 ### Structure:
  - User <-CLI, data in/out, plots out-> [Frontend,Wrappers] <--> Backend (mcode, python?)
@@ -62,8 +72,8 @@ Solenoid simulation project
    - solensim.py - interface and main script
    - frontend.py - user-side functionality handles, link to mcode
    - mdoce/pycode - backend
-   - wrapper.py - Oc2Py/MATLAB interfaces, I/O wrappers, plotter?
+   - wrapper.py - Oc2Py/MATLAB interfaces, pycode handle, I/O wrappers, plotter?
 
-### Branches: *(fucked here up)*
+### Branches: *Неактуально*
  - master - main branch - only chunk in "done" fragments, no more merging master-->dev
  - dev - development branch
