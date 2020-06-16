@@ -28,6 +28,13 @@ Solenoid simulation project
 
 
 ### Notes:
+Optimization:
+ - https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html
+ - https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html#optimize-minimize-cobyla
+ - https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html#optimize-minimize-slsqp
+ - https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
+ - https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.NonlinearConstraint.html#scipy.optimize.NonlinearConstraint
+
 ### Problem:
  - Parameters:
    - Geometry: mean radius r, radial width a, axial width b;
