@@ -16,12 +16,12 @@ Solenoid simulation project
     - код з матлабу - а воно надо? мені це потім ще інтегрувати в інтерфєйс, або окремо для матлаба робити інтерфєйс
       - (Принцип: юзер грузить программу, і вона дає команди, котрими можна зручно викликати функції і процедури бекенду)
     - додай ще, як щось забув
-    
+
 - Präsentation:
-   - 1) Общая теория e в соленоїдах, aберрації
-   - 2) Цель, target Parameters
-   - 3) Phys. model (формули, інтеграли)
-   - 4) present software:
+   1. Общая теория e в соленоїдах, aберрації
+   2. Цель, target Parameters
+   3. Phys. model (формули, інтеграли)
+   4. present software:
       - Example - calc with AREAL params
       - Implementation
       - Optimization
