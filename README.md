@@ -3,32 +3,44 @@ Solenoid simulation project
 
 ### TODO:
 - General:
-   - Разделение работы:
-      - *TODO*
-   - *Антон прочитать теорию* -> Problem, model, design Zusammenfassung
-   - Прописать концепт работы, от указанных параметров до результата
-
+  - **Антон**:
+    - Problem, model, design Zusammenfassung
+    - Прописать концепт работы, от указанных параметров до результата:
+      - цільові характеристики, відносні ваги обмежень --> оптимізація --> аналіз (чутливість, характеристики солющн), презентація характ, чутливості
+    - implement backend
+    - bridge backend to wrapper
+    - iPython API, frontend (output)
+  - **Андрій**:
+    - Формула beam R @ Focus
+    - Слайди: пункти 1,3
+    - код з матлабу - а воно надо? мені це потім ще інтегрувати в інтерфєйс, або окремо для матлаба робити інтерфєйс
+      - (Принцип: юзер грузить программу, і вона дає команди, котрими можна зручно викликати функції і процедури бекенду)
+    - додай ще, як щось забув
+    
 - Präsentation:
-   - Общая теория e в соленоїдах, aберрації
-   - Цель, target Parameters
-   - Phys. model (формули, інтеграли)
-   - present software:
+   - 1) Общая теория e в соленоїдах, aберрації
+   - 2) Цель, target Parameters
+   - 3) Phys. model (формули, інтеграли)
+   - 4) present software:
       - Example - calc with AREAL params
       - Implementation
       - Optimization
       - Results
 
 - Software:
-   - Концепт работы --> outline общий алгоритм *Антон*
-   - mcode *(Андрій)*
+   - mcode *(Андрій)* - *а надо?*
    - pycode *(Антон)*
      - ~backend base~
      - ~get rid of bloat in backend~
-     - review parameter model
-     - ~Constraints definition~
+     - review parameter model?
+     - Flexible constraints definition - they influence CTR output strongly:
+        - Individual target margins
+        - starting parameter values from bounds
      - Optimization:
+        - **Optimize in focal spot size?**
         - ctr
-        - COBYLA, SLSQP
+        - COBYLA, SLSQP?
+        - try Rsq, c instead of r, a, b?
      - Output
      - *Documentation!*
    - Wrapper: *(Aнтон)*
@@ -48,7 +60,7 @@ Optimization:
  - Parameters:
    - Geometry: mean radius r, radial width a, axial width b;
    - I*N scaling factor
-   - Alt. geometry: **optimize in Rsq, c?**
+   - Alt. geometry: *optimize in Rsq, c?*
  - Constraints:
    - FWHM L ~50 mm
    - focal distance f > 50 cm
