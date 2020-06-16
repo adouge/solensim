@@ -22,6 +22,7 @@ import oct2py
 import os
 import matlab.engine
 import pycode.backend
+import numpy as np
 
 def workdir():
     work_dir = os.path.dirname(os.path.realpath(__file__))
@@ -60,43 +61,50 @@ def stop(Wrapper):
     del(Wrapper)
 
 class PWrapper(pycode.backend.Core):
-    def __init__(self):
-        pycode.backend.Core.__init__(self)
-        self.result = "None"
-        self.p = {
-            "g":"Not set",
-            "gp": "Not set",
-            "s":"Not set",
-            "E":"Not set",
-            "R":"Not set"
-        }
+    """
+    User-facing methods of the python backend
+    """
+    def __init__(self, E, R):
+        pycode.backend.Core.__init__(self, E, R)
+        self.g = "Not set",
+        self.s = "Not set"
+        self.sg = self.g
+        self.ss = self.s
 
-    def set(self, key, value):
-        self.p[key] = value
+    def show_settings(self):
+        print("g: Geomtery [mm]:", self.g)
+        print("s: Ampere-turns [A*N]:", self.s)
+        print("E: Electron energy [MeV]:", self.E)
+        print("R: RMS Beam radius [mm]:", self.R_mm)
 
-    def set_geomp(self):
-        self.p["gp"] = parse_geometry(self.p["g"])
-
-    def set_all(self, g, s, E, R):
-        self.p = {
-            "g": g,
-            "gp": "Not set",
-            "s": s,
-            "E": E,
-            "R": R
-        }
-        self.set_geomp()
-
-    def settings(self):
-        for key in self.p.keys():
-            print(key,":",self.p[key])
+    def show_target(self):
+        print("Target peak B [mT]:",self.target_Bpeak*1000)
+        print("Target FWHM [mm]:", self.target_l*1000)
+        print("Target f [cm]:",self.target_f*100)
 
     def exit(self):
         pass  # let the wrapper's del(self) handle it
 
-    def show(self):
-        (B0, l, f, cs) = self.result
+    def describe(self, result):
+        (B0, l, f, cs) = result
         print("Peak axial field:", B0*1000, "mT")
         print("Effective field length:", l*1000,"mm")
         print("Focal distance for given E:", f*100,"cm")
         print("Spherical aberration for given E:", cs)
+
+    def scalc(self):  # placeholder output
+        geometry = self.g
+        scaling = self.s
+        result = self.calc(scaling, geometry)
+        return result
+
+    def run_ctr(self, target_margin=0.0499, bind_f=False, geom_lb=[0,0,0], geom_ub=[1000,1000,1000], maxiter=1000, ptol=6, verbose=2):
+        constraints = self.define_ctr_constraints(self.target_Bpeak, self.target_l, self.target_f,
+            target_margin=target_margin, bounded_f=bind_f,
+            geom_lb=geom_lb, geom_ub=geom_ub)
+        out = self.ctr_minimize(self.s, self.g, constraints, max_iter=maxiter, ptol=ptol, verbose=verbose)
+        self.s_opt = out.x[0]
+        self.g_opt = out.x[1:]
+        result = self.calc(self.s_opt, self.g_opt)
+        self.describe(result)
+        return out

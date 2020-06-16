@@ -35,4 +35,8 @@ octave-workspace
 # compiled python code
 *.pyc
 
+# jupyter trash
 .ipynb_checkpoints/*
+
+# helper dev scripts
+src/dev.py

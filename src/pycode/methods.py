@@ -23,46 +23,45 @@
 
 import scipy.constants as const
 import numpy as np
+from numpy.lib.scimath import sqrt as csqrt
+from numpy.lib.scimath import power as cpow
 from scipy.integrate import quad as integral
 from scipy.misc import derivative
 
+from pysnooper import snoop as debug
+
+mm = 10**(-3)
+MeV = 10**6
 
 def parse_geometry(geometry):
-    [r, a, b] = geometry
-    Rsq = r*(1 + a**2/(24*r**2))
-    c = np.sqrt((a**2 - b**2)/12)
+    r, a, b = np.array(geometry, dtype=np.complex128)*mm
+    Rsq = r + a**2/24/r
+    c = csqrt((b**2 - a**2)/12)
     return [Rsq, c]
 
-def impuls(E):
-    return np.sqrt(2*const.m_e*(E*const.e - const.m_e*const.c**2))
+def impuls(E):  # [MeV]
+    return np.sqrt(2*const.m_e*(E*const.e*MeV - const.m_e*const.c**2))
 
 # # # # #
 
-# axial field:
-def get_Bz(z, NI, Rsq, c):
-    pterm = (Rsq + c)**2/(z**2+(Rsq+c)**2)**(3/2)
-    mterm = (Rsq - c)**2/(z**2+(Rsq-c)**2)**(3/2)
-    B = const.mu_0*NI*(pterm + mterm)
-    return B
-
-def unscaled_Bz(z, Rsq, c):
-    pterm = (Rsq + c)**2/(z**2+(Rsq+c)**2)**(3/2)
-    mterm = (Rsq - c)**2/(z**2+(Rsq-c)**2)**(3/2)
-    B = const.mu_0*(pterm + mterm)
-    return B
+def get_Bz(z, scaling, Rsq, c):
+    pterm = (Rsq + c)**2/(z**2+(Rsq+c)**2)**(1.5)
+    mterm = (Rsq - c)**2/(z**2+(Rsq-c)**2)**(1.5)
+    B = 1/4*const.mu_0*scaling*(pterm + mterm)
+    return np.real(B)  # complex part is 0 anyways
 
 # Field integrals:
 def F1(scaling, geomp):
     def integrand(z, scaling, Rsq, c):
         return get_Bz(z, scaling, Rsq, c)**1
     I, dI = integral(integrand, -np.inf, np.inf, args=(scaling, *geomp))
-    return I
+    return I, dI
 
 def F2(scaling, geomp):
     def integrand(z, scaling, Rsq, c):
         return get_Bz(z, scaling, Rsq, c)**2
     I, dI = integral(integrand, -np.inf, np.inf, args=(scaling, *geomp))
-    return I
+    return I, dI
 
 def F3(scaling, geomp):
     def integrand(z, scaling, Rsq, c):
@@ -70,14 +69,13 @@ def F3(scaling, geomp):
         ddBz = derivative(get_Bz, z, n=2, args=(scaling, Rsq, c))
         return -ddBz*Bz/2
     I, dI = integral(integrand, -np.inf, np.inf, args=(scaling, *geomp))
-    return I
+    return I, dI
 
 def F4(scaling, geomp):
     def integrand(z, scaling, Rsq, c):
         return get_Bz(z, scaling, Rsq, c)**4
     I, dI = integral(integrand, -np.inf, np.inf, args=(scaling, *geomp))
-    return I
-
+    return I, dI
 
 # Resulting values:
 def focal(f2, p):
@@ -95,4 +93,4 @@ def l_eff(scaling, geomp, decimal_places=3):
     return fwhm  # l_eff at fwhm +- 1/10^decimal_places
 
 def peak_B(scaling, geomp):
-    return np.max(get_Bz(0, scaling, *geomp))
+    return get_Bz(0, scaling, *geomp)
