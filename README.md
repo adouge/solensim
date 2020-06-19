@@ -3,22 +3,16 @@ Solenoid simulation project
 
 ### TODO:
 - General:
-  - **Антон**:
-    - Problem, model, design Zusammenfassung
-    - Прописать концепт работы, от указанных параметров до результата:
-      - цільові характеристики, відносні ваги обмежень --> оптимізація --> аналіз (чутливість, характеристики солющн), презентація характ, чутливості
-    - replace NonlinearConstraint with LinearConstraint where possible
-    - finish backend
-    - bridge backend to wrapper
-    - iPython API, frontend (output)
-  - **Андрій**:
-    - Формула beam R @ Focus
-    - Слайди: пункти 1,3
-    - код з матлабу - а воно надо? мені це потім ще інтегрувати в інтерфєйс, або окремо для матлаба робити інтерфєйс
-      - (Принцип: юзер грузить программу, і вона дає команди, котрими можна зручно викликати функції і процедури бекенду)
-    - додай ще, як щось забув
+  - Problem, model, design Zusammenfassung
+  - Прописать концепт работы, от указанных параметров до результата:
+    - цільові характеристики, відносні ваги обмежень --> оптимізація --> аналіз (чутливість, характеристики солющн), презентація характ, чутливості
+  - replace NonlinearConstraint with LinearConstraint where possible
+  - finish backend
+  - bridge backend to wrapper
+  - iPython API, frontend (output)
 
-- Präsentation:
+
+- Präsentation: **Формули у model.tex, потім переведу у слайди**
    1. Общая теория e в соленоїдах, aберрації
    2. Цель, target Parameters
    3. Phys. model (формули, інтеграли)
