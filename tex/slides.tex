@@ -11,15 +11,17 @@
 \usepackage{units}
 \usepackage{fancyhdr}
 \usepackage[font=small,labelfont=bf]{caption}
-\usepackage{biblatex}
-
-\graphicspath{ {figures/} }
+\usepackage[
+citestyle=authortitle
+]{biblatex}
 
 \addbibresource{lib/lib.bib}
 
-%\setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{navigation symbols}{}
+%\setbeamertemplate{bibliography item}{\insertbiblabel}
 \setbeamertemplate{section in toc}[square]
+\setbeamertemplate{subsection in toc}[square]
+\setbeamertemplate{footline}[frame number]
 
 \title{TITLE}
 \subtitle{Subtitle}
@@ -42,7 +44,7 @@
 \begin{frame}
   \frametitle{Title}
   \framesubtitle{Subtitle}
-  This is how one cites. \footfullcite{Blobel1998}
+  This is how one cites. \footcite{Blobel1998}
 
 \end{frame}
 
