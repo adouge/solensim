@@ -20,6 +20,7 @@
 
 import wrapper as wrap
 import numpy as np
+from pycode.methods import impuls
 
 mm = 10**(-3)
 
@@ -65,54 +66,54 @@ def test_octave():
     wrap.stop(O)
 
 class API_iPython(wrap.PWrapper):
+
+    def process_E_R(self):
+        self.P = impuls(self.E)
+        self.R = self.R_mm*mm
+
     def __init__(self, E, R):
         wrap.PWrapper.__init__(self, E, R)
-        self.g = "Not set",
-        self.s = "Not set"
-        self.sg = self.g
-        self.ss = self.s
-        self.target_Bpeak = 100*mm
-        self.target_l = 50*mm
-        self.target_f = 500*mm
+        self.g = "None"
+        self.s = "None"
+        self.target_Bpeak = 0.1
+        self.target_l = 0.05
+        self.target_f = 0.5
+        self.target_g = "None"
+        self.target_s = "None"
+        self.process_E_R()
 
     def help(self):
         """
         Print some helpful info !WIP!
         """
-        pass
+        print("To view settings: handle.settings()")
+        print("To view set targets: handle.targets()")
+        print("To set targets, initial parameter X:"")
+        print("handle.target_x = new value / interval")
+        print("handle.x = new value")
+        print("Parameters: g (Rmean, a, b) [mm], s [Ampere-Turns]")
+        print("Targets: Bpeak [mT], l [mm], f [mm], g, s as above.")
+        print("To disable constraints in a parameter, set to \"None\".")
 
-    def show_settings(self):
-        print("g: Geomtery [mm]:", self.g)
-        print("s: Ampere-turns [A*N]:", self.s)
+    def settings(self):
         print("E: Electron energy [MeV]:", self.E)
         print("R: RMS Beam radius [mm]:", self.R_mm)
+        print("g: Geomtery [mm]:", self.g)
+        print("s: Ampere-turns [A*N]:", self.s)
 
-    def show_targets(self):
-        print("Target peak B [mT]:",self.target_Bpeak*1000)
-        print("Target FWHM [mm]:", self.target_l*1000)
-        print("Target f [cm]:",self.target_f*100)
+    def targets(self):
+        print("Target peak B [mT]:",self.target_Bpeak)
+        print("Target FWHM [mm]:", self.target_l)
+        print("Target f [mm]:",self.target_f)
 
     def describe(self, result):
         (B0, l, f, cs) = result
-        print("Peak axial field:", B0*1000, "mT")
-        print("Effective field length:", l*1000,"mm")
-        print("Focal distance for given E:", f*100,"cm")
+        print("Peak axial field:", B0/mm, "mT")
+        print("Effective field length:", l/mm,"mm")
+        print("Focal distance for given E:", f/mm,"mm")
         print("Spherical aberration for given E:", cs)
 
-    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2,
-        target_Bpeak = "None",
-        target_l = "None",
-        target_f = "None",
-        target_p = "None"
-        ):
-        if type(target_p) != np.array: target_p = np.array(target_p)
-        wrap.PWrapper.run_ctr(self,
-            margin=margin, maxiter=maxiter, ptol=ptol, verbose=verbose,
-            # units conversion: mT, mm, cm, mm
-            target_Bpeak = target_Bpeak*mm,
-            target_l = target_l*mm,
-            target_f = target_f*mm*10,
-            target_p = target_p*mm
-            )
-        result = self.calc(self.p_opt[0], self.p_opt[1:])
+    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2):
+        wrap.PWrapper.run_ctr(self, margin=margin, maxiter=maxiter, ptol=ptol, verbose=verbose)
+        result = self.calc(self.s_opt, self.g_opt)
         self.describe(result)

@@ -78,29 +78,9 @@ class PWrapper(pycode.backend.Core):
         result = self.calc(scaling, geometry)
         return result
 
-    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2,
-        target_Bpeak = "None",
-        target_l = "None",
-        target_f = "None",
-        target_p = "None"
-        ):
-        # IS THIS NECESSARY? unconstrained should be allowed
-        if target_Bpeak == "None": t_Bpeak = self.target_Bpeak
-        else: t_Bpeak = target_Bpeak
-        if target_l == "None": t_l = self.target_l
-        else: t_l = target_l
-        if target_f == "None": t_f = self.target_f
-        else: t_f = target_f
-        if target_p == "None": t_p = [self.s,*self.g]
-        else: t_p = target_p
-
-        constraints = self.define_ctr_constraints(
-            t_Bpeak = t_Bpeak,
-            t_l = t_l,
-            t_f = t_f,
-            t_p = t_p,
-            margin=margin)
-        out = self.ctr_minimize((self.s, *self.g), constraints, max_iter=maxiter, ptol=ptol, verbose=verbose)
+    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2):
+        constraints = self.define_ctr_constraints(margin=margin)
+        out = self.ctr_minimize(constraints, max_iter=maxiter, ptol=ptol, verbose=verbose)
         self.s_opt = out.x[0]
         self.g_opt = out.x[1:]
         self.last_message = out.message

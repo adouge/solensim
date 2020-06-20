@@ -29,14 +29,9 @@ import numpy as np
 mm = 10**(-3)
 
 class Core():
-    def update_settings(self):
-        self.P = impuls(self.E)
-        self.R = self.R_mm*mm
-
     def __init__(self, E, R):
         self.E = E
         self.R_mm = R
-        self.update_settings()
 
     # descriptive method:
     def calc(self, scaling, geometry):
@@ -92,7 +87,7 @@ class Core():
     #####
         # constrained trust region algorithm:
 
-    def define_ctr_constraints(self, margin=5, t_Bpeak="None", t_l="None", t_f="None", t_p="None"):
+    def define_ctr_constraints(self, margin=5):
         """
         Define constraints. Defaults to unconstrained.
         B, l: [lower, upper] or target (margin of X% (def. 5%) assumed)
@@ -101,6 +96,11 @@ class Core():
             supply (lb, ub) as [Rmean, a, b] in m;
             or target list +- margin
         """
+
+        t_Bpeak = np.array(self.target_Bpeak)*mm
+        t_l = np.array(self.target_l)*mm
+        t_f = np.array(self.target_f)*mm
+        t_p = np.array((self.target_s, *self.target_g))
 
         t_margin = margin/100
         # target constraints:
@@ -133,12 +133,14 @@ class Core():
         # parameter bounds:
         A = np.array([[1,0,0,0],[0,1,-1/2,0],[0,0,1,0],[0,0,0,1]])  # lin abb to verify p
         lower_bound = np.array([0,self.R*5,0,0])
-        if t_p != "None":
+        if t_p[0] != "None":
             if len(t_p)==4:  # anticipating a target parameter setting
                 if type(t_p) != np.array: t_p = np.array(t_p)
                 if not (A.dot(t_p)>lower_bound).all(): raise ValueError("Negative a,b, or inner radius below 5x beam radius provided")
                 con_p = opt.LinearConstraint(np.identity(4),t_p*(1-t_margin),t_p*(1+t_margin))
             elif len(t_p)==2:
+                if type(t_p[0]) != np.array: t_p[0] = np.array(t_p[0])
+                if type(t_p[1]) != np.array: t_p[1] = np.array(t_p[1])
                 if not (A.dot(t_p[0])>lower_bound).all(): raise ValueError("Negative a,b, or inner radius below 5x beam radius provided")
                 if not (A.dot(t_p[1])>lower_bound).all(): raise ValueError("Negative a,b, or inner radius below 5x beam radius provided")
                 con_p = opt.LinearConstraint(np.identity(4),t_p[0],t_p[1])
@@ -150,8 +152,8 @@ class Core():
 
         return constraints
 
-    def ctr_minimize(self, start_p, constraints, max_iter=1000, ptol=6, verbose=2):
-        opt_out = opt.minimize(self.opt_cs, start_p,
+    def ctr_minimize(self, constraints, max_iter=1000, ptol=6, verbose=2):
+        opt_out = opt.minimize(self.opt_cs, (self.s, *self.g),
             constraints=constraints,
             options={"maxiter":max_iter, "verbose":verbose, "xtol":np.power(10.,-ptol)},
             method="trust-constr")
