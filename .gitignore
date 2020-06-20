@@ -25,6 +25,9 @@
 *.snm
 *.nav
 
+# release .zip
+*.zip
+
 # latex library file backups
 *.bib.bak
 *.bib.sav
