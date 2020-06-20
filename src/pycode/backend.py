@@ -102,21 +102,62 @@ class Core():
     #####
         # constrained trust region algorithm:
 
-    def define_ctr_constraints(self, target_Bpeak, target_l, target_f, target_margin=0.0499, bounded_f=False, geom_lb=[0,0,0], geom_ub=[1000, 1000,1000]):
+    def define_ctr_constraints(self, margin=5, t_Bpeak="None", t_l="None", t_f="None", t_p="None"):
+        """
+        Define constraints. Defaults to unconstrained.
+        B, l: [lower, upper] or target (margin of X% (def. 5%) assumed)
+        f: target - lower fixed, upper unbounded; or [lower, upper]
+        Geometry: defaults to unconstrained;
+            supply (lb, ub) as [Rmean, a, b] in m;
+            or target list +- margin
+        """
+
+        t_margin = margin/100
         # target constraints:
-        l_con = opt.NonlinearConstraint(self.get_l, target_l*(1-target_margin), target_l*(1+target_margin))
-        Bpeak_con = opt.NonlinearConstraint(self.get_Bpeak, target_Bpeak*(1-target_margin), target_Bpeak*(1+target_margin))
-        if bounded_f: f_con = opt.NonlinearConstraint(self.get_f, target_f, target_f*(1+target_margin))
-        else: f_con = opt.NonlinearConstraint(self.get_f, target_f, np.inf)
-        # geometric constraints:
-        ir = lambda r,a : r-a/2
-        glb = geom_lb.copy()
-        gub = geom_ub.copy()
-        glb.append(ir(*glb[:2]))
-        gub.append(ir(*gub[:2]))
-        glb[-1] += self.R*5  # inserting 5 sigmas of beam radius
-        geometry_con = opt.NonlinearConstraint(self.verify_geometry, glb, gub)
-        constraints = [Bpeak_con, f_con, l_con, geometry_con]
+        constraints = []
+        # peak B:
+        if t_Bpeak != "None":
+            if type(t_Bpeak) in [np.float64, float]:
+                con_Bpeak = opt.NonlinearConstraint(self.get_Bpeak, t_Bpeak*(1-t_margin), t_Bpeak*(1+t_margin))
+            elif type(t_Bpeak) in [np.array, list]:
+                con_Bpeak = opt.NonlinearConstraint(self.get_Bpeak, t_Bpeak[0], t_Bpeak[1])
+            else: raise ValueError("Incorrect maxB constraint provided.")
+            constraints.append(con_Bpeak)
+        # FWHM:
+        if t_l != "None":
+            if type(t_l) in [np.float64, float]:
+                con_l = opt.NonlinearConstraint(self.get_l, t_l*(1-t_margin), t_l*(1+t_margin))
+            elif type(t_l) in [np.array, list]:
+                con_l = opt.NonlinearConstraint(self.get_l, t_l[0], t_l[1])
+            else: raise ValueError("Incorrect FWHM constraint provided.")
+            constraints.append(con_l)
+        # focal length:
+        if t_f != "None":
+            if type(t_f) in [np.float64, float]:
+                con_f = opt.NonlinearConstraint(self.get_f, t_f, np.inf)
+            elif type(t_f) in [np.array, list]:
+                con_f = opt.NonlinearConstraint(self.get_f, t_f[0], t_f[1])
+            else: raise ValueError("Incorrect f constraint provided.")
+            constraints.append(con_f)
+
+        # parameter bounds:
+        A = np.array([[1,0,0,0],[0,1,-1/2,0],[0,0,1,0],[0,0,0,1]])  # lin abb to verify geometry
+        lower_bound = np.array([0,self.R*5,0,0])
+        if t_p != "None":
+            if len(t_p)==4:  # anticipating a target parameter setting
+                if type(t_p) != np.array: t_p = np.array(t_p)
+                if not (A.dot(t_p)>lower_bound).all(): raise ValueError("Negative a,b, or inner radius below 5x beam radius provided")
+                con_p = opt.LinearConstraint(np.identity(4),t_p*(1-t_margin),t_p*(1+t_margin))
+            elif len(t_p)==2:
+                if not (A.dot(t_p[0])>lower_bound).all(): raise ValueError("Negative a,b, or inner radius below 5x beam radius provided")
+                if not (A.dot(t_p[1])>lower_bound).all(): raise ValueError("Negative a,b, or inner radius below 5x beam radius provided")
+                con_p = opt.LinearConstraint(np.identity(4),t_p[0],t_p[1])
+            else: raise ValueError("Improper geometry bounds provided.")
+            constraints.append(con_p)
+        else:
+            con_p = opt.LinearConstraint(A, lower_bound, np.inf)
+            constraints.appennd(con_p)
+
         return constraints
 
     def ctr_minimize(self, start_scaling, start_geometry, constraints, max_iter=1000, ptol=6, verbose=2):

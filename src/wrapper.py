@@ -98,10 +98,12 @@ class PWrapper(pycode.backend.Core):
         result = self.calc(scaling, geometry)
         return result
 
-    def run_ctr(self, target_margin=0.0499, bind_f=False, geom_lb=[0,0,0], geom_ub=[1000,1000,1000], maxiter=1000, ptol=6, verbose=2):
-        constraints = self.define_ctr_constraints(self.target_Bpeak, self.target_l, self.target_f,
-            target_margin=target_margin, bounded_f=bind_f,
-            geom_lb=geom_lb, geom_ub=geom_ub)
+    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2):
+        constraints = self.define_ctr_constraints(t_Bpeak=self.target_Bpeak,
+            t_l=self.target_l,
+            t_f=self.target_f,
+            t_p = [self.s,*self.g],
+            margin=margin)
         out = self.ctr_minimize(self.s, self.g, constraints, max_iter=maxiter, ptol=ptol, verbose=verbose)
         self.s_opt = out.x[0]
         self.g_opt = out.x[1:]
