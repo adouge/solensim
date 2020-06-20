@@ -16,54 +16,13 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# frontend code segment
-
-import wrapper as wrap
+import pycode.wrapper as wrap
 import numpy as np
 from pycode.methods import impuls
 
 mm = 10**(-3)
-
-def load_conf():
-    """
-    Rudimentary configuration, possibly replace with regexp
-    """
-    work_dir = wrap.workdir()
-    config = open(wrap.workdir()+"/solensim.cfg", "r")
-    config.readline()
-    vstring = config.readline().split("=")[1].strip()
-    config.close()
-    return [vstring]
-
-def test_matlab():
-    print("Testing Matlab interface:")
-    M = wrap.mWrapper()
-    print("\nRunning Kamp's script:")
-    M.run("doNewCoil.m", nargout=0)
-    print("done. \n Testing mwraptest.m:")
-    A = M.magic(5)
-    B = M.magic(5)
-    C = M.mwraptest(A,B)
-    print(A,B)
-    print("product:")
-    print(C)
-    input("Press Enter to continue...")
-    wrap.stop(M)
-
-def test_octave():
-    O = wrap.OWrapper()
-    print("Testing Oct2Py Wrapper:\nRunning Kamps's script:")
-    O.run("doNewCoil")
-    input("Press Enter to continue...")
-    O.close()
-    print("done. \n Testing wraptest.m:")
-    A = np.random.rand(5,5)
-    B = np.random.rand(5,5)
-    C = O.wraptest(A,B)
-    print(A,B)
-    print("product:")
-    print(C)
-    wrap.stop(O)
+fm = 10**(-15)
+cm = 10**(-2)
 
 class API_iPython(wrap.PWrapper):
 
@@ -75,9 +34,9 @@ class API_iPython(wrap.PWrapper):
         wrap.PWrapper.__init__(self, E, R)
         self.g = "None"
         self.s = "None"
-        self.target_Bpeak = 0.1
-        self.target_l = 0.05
-        self.target_f = 0.5
+        self.target_Bpeak = "None"
+        self.target_l = "None"
+        self.target_f = "None"
         self.target_g = "None"
         self.target_s = "None"
         self.process_E_R()
@@ -88,11 +47,11 @@ class API_iPython(wrap.PWrapper):
         """
         print("To view settings: handle.settings()")
         print("To view set targets: handle.targets()")
-        print("To set targets, initial parameter X:"")
+        print("To set targets, initial parameter X:")
         print("handle.target_x = new value / interval")
         print("handle.x = new value")
         print("Parameters: g (Rmean, a, b) [mm], s [Ampere-Turns]")
-        print("Targets: Bpeak [mT], l [mm], f [mm], g, s as above.")
+        print("Targets: Bpeak [mT], l [mm], f [cm];\         g, s as above.")
         print("To disable constraints in a parameter, set to \"None\".")
 
     def settings(self):
@@ -102,18 +61,29 @@ class API_iPython(wrap.PWrapper):
         print("s: Ampere-turns [A*N]:", self.s)
 
     def targets(self):
-        print("Target peak B [mT]:",self.target_Bpeak)
+        print("Target peak B [mT]:", self.target_Bpeak)
         print("Target FWHM [mm]:", self.target_l)
-        print("Target f [mm]:",self.target_f)
+        print("Target f [cm]:", self.target_f)
+        print("Target g [mm]:", self.target_g)
+        print("Target s [N*A]:", self.target_s)
 
-    def describe(self, result):
-        (B0, l, f, cs) = result
-        print("Peak axial field:", B0/mm, "mT")
-        print("Effective field length:", l/mm,"mm")
-        print("Focal distance for given E:", f/mm,"mm")
-        print("Spherical aberration for given E:", cs)
+    def get_spot(self, f, cs):
+        rspot = cs*(self.R/(f-self.R**2*cs/f**2))**3
+        return rspot
 
-    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2):
-        wrap.PWrapper.run_ctr(self, margin=margin, maxiter=maxiter, ptol=ptol, verbose=verbose)
-        result = self.calc(self.s_opt, self.g_opt)
-        self.describe(result)
+    def describe(self, s, g):
+        (B0, l, f, cs) = self.calc(s,g)
+        spotsize = self.get_spot(f, cs)
+        print("Peak axial field: %.3f mT"%(B0/mm))
+        print("Effective field length: %.3f mm"%(l/mm))
+        print("Focal distance for given E: %.3f cm"%(f/cm))
+        print("Spherical aberration for given E: %.3E m"%cs)
+        print("Focal spot radius: %.3E fm"%(spotsize/fm))
+
+    def run_ctr(self, margin=5, maxiter=1000, ptol=8, gtol=8, verbose=2, penalty=0):
+        wrap.PWrapper.run_ctr(self, margin=margin, verbose=verbose,
+        ptol=ptol, gtol=gtol, penalty=penalty, maxiter=maxiter)
+
+        print("Arrived at parameters:\n - s: %.3f"%self.s_opt)
+        print(" - R_mean: %.3f mm, a: %.3f mm, b: %.3f mm"%(self.g_opt[0], self.g_opt[1], self.g_opt[2]))
+        self.describe(s,g)

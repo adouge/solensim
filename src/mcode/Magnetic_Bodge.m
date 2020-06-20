@@ -1,3 +1,21 @@
+#########################################################################
+#    Copyright 2020 Andrii Yanovets
+#    This file is part of solensim.
+#
+#    solensim is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    solensim is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
+#########################################################################
+
 %% Magnetic Field Simulation %%
 % Notes %
 % ??? ????? ????? ???? ???????, ?? ? ???, ??? ? ?????? ????? ????????????
@@ -65,7 +83,7 @@ ub = [];
 x = fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon,options)
 fun1 = @(y) F3(y(1),y(2),y(3));
 y = fmincon(fun1,x0,A,b,Aeq,beq,lb,ub,nonlcon,options)
-%% Visualization %% 
+%% Visualization %%
 xsol = linspace(-0.45,0.45,1024);
 xsol = xsol(:);
 figure(1)
