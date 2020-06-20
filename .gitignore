@@ -28,6 +28,7 @@
 # latex library file backups
 *.bib.bak
 *.bib.sav
+*.bib.sav.bak
 
 # procedural octave remains
 octave-workspace
