@@ -24,6 +24,8 @@ import matlab.engine
 import pycode.backend
 import numpy as np
 
+mm = 10**(-3)
+
 def workdir():
     work_dir = os.path.dirname(os.path.realpath(__file__))
     return work_dir
@@ -66,31 +68,9 @@ class PWrapper(pycode.backend.Core):
     """
     def __init__(self, E, R):
         pycode.backend.Core.__init__(self, E, R)
-        self.g = "Not set",
-        self.s = "Not set"
-        self.sg = self.g
-        self.ss = self.s
-
-    def show_settings(self):
-        print("g: Geomtery [mm]:", self.g)
-        print("s: Ampere-turns [A*N]:", self.s)
-        print("E: Electron energy [MeV]:", self.E)
-        print("R: RMS Beam radius [mm]:", self.R_mm)
-
-    def show_target(self):
-        print("Target peak B [mT]:",self.target_Bpeak*1000)
-        print("Target FWHM [mm]:", self.target_l*1000)
-        print("Target f [cm]:",self.target_f*100)
 
     def exit(self):
         pass  # let the wrapper's del(self) handle it
-
-    def describe(self, result):
-        (B0, l, f, cs) = result
-        print("Peak axial field:", B0*1000, "mT")
-        print("Effective field length:", l*1000,"mm")
-        print("Focal distance for given E:", f*100,"cm")
-        print("Spherical aberration for given E:", cs)
 
     def scalc(self):  # placeholder output
         geometry = self.g
@@ -98,15 +78,30 @@ class PWrapper(pycode.backend.Core):
         result = self.calc(scaling, geometry)
         return result
 
-    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2):
-        constraints = self.define_ctr_constraints(t_Bpeak=self.target_Bpeak,
-            t_l=self.target_l,
-            t_f=self.target_f,
-            t_p = [self.s,*self.g],
+    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2,
+        target_Bpeak = "None",
+        target_l = "None",
+        target_f = "None",
+        target_p = "None"
+        ):
+        # IS THIS NECESSARY? unconstrained should be allowed
+        if target_Bpeak == "None": t_Bpeak = self.target_Bpeak
+        else: t_Bpeak = target_Bpeak
+        if target_l == "None": t_l = self.target_l
+        else: t_l = target_l
+        if target_f == "None": t_f = self.target_f
+        else: t_f = target_f
+        if target_p == "None": t_p = [self.s,*self.g]
+        else: t_p = target_p
+
+        constraints = self.define_ctr_constraints(
+            t_Bpeak = t_Bpeak,
+            t_l = t_l,
+            t_f = t_f,
+            t_p = t_p,
             margin=margin)
-        out = self.ctr_minimize(self.s, self.g, constraints, max_iter=maxiter, ptol=ptol, verbose=verbose)
+        out = self.ctr_minimize((self.s, *self.g), constraints, max_iter=maxiter, ptol=ptol, verbose=verbose)
         self.s_opt = out.x[0]
         self.g_opt = out.x[1:]
-        result = self.calc(self.s_opt, self.g_opt)
-        self.describe(result)
-        return out
+        self.last_message = out.message
+        return (self.s_opt, self.g_opt)

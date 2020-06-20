@@ -21,6 +21,8 @@
 import wrapper as wrap
 import numpy as np
 
+mm = 10**(-3)
+
 def load_conf():
     """
     Rudimentary configuration, possibly replace with regexp
@@ -62,8 +64,55 @@ def test_octave():
     print(C)
     wrap.stop(O)
 
-def demo(params):
-    """
-    the future main() to be presented.
-    """
-    print("This should be the main script for presenting the project, with adjustable parameters: %s"%params)
+class API_iPython(wrap.PWrapper):
+    def __init__(self, E, R):
+        wrap.PWrapper.__init__(self, E, R)
+        self.g = "Not set",
+        self.s = "Not set"
+        self.sg = self.g
+        self.ss = self.s
+        self.target_Bpeak = 100*mm
+        self.target_l = 50*mm
+        self.target_f = 500*mm
+
+    def help(self):
+        """
+        Print some helpful info !WIP!
+        """
+        pass
+
+    def show_settings(self):
+        print("g: Geomtery [mm]:", self.g)
+        print("s: Ampere-turns [A*N]:", self.s)
+        print("E: Electron energy [MeV]:", self.E)
+        print("R: RMS Beam radius [mm]:", self.R_mm)
+
+    def show_targets(self):
+        print("Target peak B [mT]:",self.target_Bpeak*1000)
+        print("Target FWHM [mm]:", self.target_l*1000)
+        print("Target f [cm]:",self.target_f*100)
+
+    def describe(self, result):
+        (B0, l, f, cs) = result
+        print("Peak axial field:", B0*1000, "mT")
+        print("Effective field length:", l*1000,"mm")
+        print("Focal distance for given E:", f*100,"cm")
+        print("Spherical aberration for given E:", cs)
+
+    def run_ctr(self, margin=5, maxiter=1000, ptol=6, verbose=2,
+        target_Bpeak = "None",
+        target_l = "None",
+        target_f = "None",
+        target_p = "None"
+        ):
+        if type(target_p) != np.array: target_p = np.array(target_p)
+        wrap.PWrapper.run_ctr(self,
+            margin=margin, maxiter=maxiter, ptol=ptol, verbose=verbose,
+            # units conversion: mT, mm, cm, mm
+            target_Bpeak = target_Bpeak*mm,
+            target_l = target_l*mm,
+            target_f = target_f*mm*10,
+            target_p = target_p*mm
+            )
+        result = self.calc(self.p_opt[0], self.p_opt[1:])
+        self.describe(result)

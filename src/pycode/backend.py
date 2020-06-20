@@ -36,9 +36,6 @@ class Core():
     def __init__(self, E, R):
         self.E = E
         self.R_mm = R
-        self.target_l = 0.05
-        self.target_f = 0.5
-        self.target_Bpeak = 0.1
         self.update_settings()
 
     # descriptive method:
@@ -54,8 +51,6 @@ class Core():
         cs = aberr(f3, f4, self.P, self.R)
         l = l_eff(scaling, geomp)
         B0 = peak_B(scaling, geomp)
-
-
 
         result = (B0, l, f, cs)
         return result
@@ -84,11 +79,6 @@ class Core():
         f3,df3 = F3(scaling, geomp)
         f4,df4 = F4(scaling, geomp)
         return aberr(f3, f4, self.P, self.R)
-
-    def verify_geometry(self, params):
-        scaling, r, a, b = params
-        inner_radius = r-a/2
-        return r, a, b, inner_radius
 
     # optimization methods
 
@@ -141,7 +131,7 @@ class Core():
             constraints.append(con_f)
 
         # parameter bounds:
-        A = np.array([[1,0,0,0],[0,1,-1/2,0],[0,0,1,0],[0,0,0,1]])  # lin abb to verify geometry
+        A = np.array([[1,0,0,0],[0,1,-1/2,0],[0,0,1,0],[0,0,0,1]])  # lin abb to verify p
         lower_bound = np.array([0,self.R*5,0,0])
         if t_p != "None":
             if len(t_p)==4:  # anticipating a target parameter setting
@@ -160,9 +150,8 @@ class Core():
 
         return constraints
 
-    def ctr_minimize(self, start_scaling, start_geometry, constraints, max_iter=1000, ptol=6, verbose=2):
-        start_params = (start_scaling, *start_geometry)
-        opt_out = opt.minimize(self.opt_cs, start_params,
+    def ctr_minimize(self, start_p, constraints, max_iter=1000, ptol=6, verbose=2):
+        opt_out = opt.minimize(self.opt_cs, start_p,
             constraints=constraints,
             options={"maxiter":max_iter, "verbose":verbose, "xtol":np.power(10.,-ptol)},
             method="trust-constr")

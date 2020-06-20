@@ -6,7 +6,7 @@ Solenoid simulation project
   - Problem, model, design Zusammenfassung
   - Прописать концепт работы, от указанных параметров до результата:
     - цільові характеристики, відносні ваги обмежень --> оптимізація --> аналіз (чутливість, характеристики солющн), презентація характ, чутливості
-  - replace NonlinearConstraint with LinearConstraint where possible
+  - ~replace NonlinearConstraint with LinearConstraint where possible~
   - finish backend
   - bridge backend to wrapper
   - iPython API, frontend (output)
@@ -29,8 +29,8 @@ Solenoid simulation project
      - ~get rid of bloat in backend~
      - review parameter model?
      - Flexible constraints definition - they influence CTR output strongly:
-        - Individual target margins
-        - starting parameter values from bounds
+        - **ALLOW UNCONSTRAINED**
+        - ~starting parameter values from bounds~
      - Optimization:
         - **Optimize in focal spot size?**
         - ctr
