@@ -11,14 +11,16 @@
 \usepackage{units}
 \usepackage{fancyhdr}
 \usepackage[font=small,labelfont=bf]{caption}
-\usepackage[
-citestyle=authortitle
+\usepackage[%backend=biber,
+citestyle=authortitle,
+sorting=nty
 ]{biblatex}
 
-\addbibresource{lib/lib.bib}
+%\addbibresource{lib/lib.bib}
+\addbibresource{solensim.bib}
 
 \setbeamertemplate{navigation symbols}{}
-%\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
 \setbeamertemplate{section in toc}[square]
 \setbeamertemplate{subsection in toc}[square]
 \setbeamertemplate{footline}[frame number]
@@ -44,7 +46,7 @@ citestyle=authortitle
 \begin{frame}
   \frametitle{Title}
   \framesubtitle{Subtitle}
-  This is how one cites. \footcite{Blobel1998}
+  This is how one cites. \footcite{AREAL-paper} \footcite{Disser}
 
 \end{frame}
 
