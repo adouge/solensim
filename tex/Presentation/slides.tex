@@ -28,7 +28,7 @@ sorting=nty
 \addbibresource{../solensim.bib}
 
 \setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{bibliography item}{\insertbiblabel}
+%\setbeamertemplate{bibliography item}{\insertbiblabel}
 \setbeamertemplate{section in toc}[square]
 \setbeamertemplate{subsection in toc}[square]
 \setbeamertemplate{footline}[frame number]
@@ -36,8 +36,9 @@ sorting=nty
 \newcommand{\citesame}{$^{\thefootnote}$}
 \newcommand{\citeprev}{\addtocounter{footnote}{-1}$^{\thefootnote}$\addtocounter{footnote}{1}}
 \newcommand{\citepprev}{\addtocounter{footnote}{-2}$^{\thefootnote}$\addtocounter{footnote}{2}}
-
-
+\newcommand{\bull}{$\bullet$}
+\newcommand{\rarrow}{$\rightarrow$ }
+\newcommand{\rfn}{\setcounter{footnote}{0}}
 \title{Solenoid electron lenses}
 \subtitle{Fundamentals and design}
 \author{Anton Douginets \and Andrii Yanovets}
@@ -55,20 +56,54 @@ sorting=nty
   \tableofcontents%[currentsection]
 \end{frame}
 
-\section{Electron optics}
+%%%%%%%%%%%%%
+\section{Motivation}
+%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Motivation}
+  \rfn
+  \begin{itemize}
+    \item Magnetic lenses - important components of particle accelerators, microscopes
+    \item Electromagnet solenoids - physical foundation of more advanced magnetic lenses
+    \item Design constraints:
+    \begin{itemize}
+      \item Power consumption
+      \item Physical size, material usage
+      \item Characteristic parameters for interaction with other machine components
+    \end{itemize}
+  \end{itemize}
+  \begin{figure}
+  \centering
+    \includegraphics[width=0.7\textwidth]{AREAL}
+    \caption{Schematic\footcite{Grigoryan2014} of AREAL, an electron bunch-research oriented linac\footcite{Grigoryan2011}}
+
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Structure}
+  \tableofcontents%[currentsection]
+\end{frame}
+
+%%%%%%%%%%%%%
+\section{Magnetic lens overview}
+%%%%%%%%%%%%%
+
 \begin{frame}
   \frametitle{Electron optics}
+  \rfn
   \framesubtitle{Definition}
   \begin{table}[t]
     \centering
     \begin{tabular}{   m{5cm}  m{5cm}  }
     \underline{Classic optics} & \underline{Electron optics} \\
     & \\
-    $\bullet$ Light ray - photons &  $\bullet$ Electron beam - electrons  \\
+    \bull Light ray - photons &  \bull Electron beam - electrons  \\
     & \\
-    $\bullet$ Can pass through optically transparent solids  & $\bullet$  Gets absorbed/loses energy due to interactions with atoms in media \\
+    \bull Can pass through optically transparent solids  & \bull  Gets absorbed/loses energy due to interactions with atoms in media \\
     & \\
-    $\bullet$ Bends due to refractive index difference between media & $\bullet$  Bends due to Coulomb and Lorentz forces in the presense of external EM-fields \\
+    \bull Bends due to refractive index difference between media & \bull  Bends due to Coulomb and Lorentz forces in the presense of external EM-fields \\
     \end{tabular}
   \end{table}
 \end{frame}
@@ -76,6 +111,7 @@ sorting=nty
 \begin{frame}
   \frametitle{Magnet lenses}
   \framesubtitle{Requirements}
+  \rfn
   A lens must have the following properties:
   \vspace{0.15cm}
   \begin{itemize}
@@ -102,6 +138,7 @@ sorting=nty
 \begin{frame}
   \frametitle{Magnet lenses}
   \framesubtitle{Solenoids}
+  \rfn
   \begin{figure}
     \includegraphics[width=.5\textwidth]{El_traj_in_B1.png}
     \caption{A solenoid cross-section along the optic axis\footcite{Egerton}}
@@ -137,6 +174,7 @@ sorting=nty
 \begin{frame}
   \frametitle{Magnet lenses}
   \framesubtitle{Electron path equations}
+  \rfn
   \begin{scriptsize}
   \begin{columns}
     \begin{column}{0.6\textwidth}
@@ -148,11 +186,11 @@ sorting=nty
       \end{equation}
     \end{column}
     \begin{column}{0.5\textwidth}
-      $\bullet$ From (5) follows:
+      \bull From (5) follows:
       \begin{equation}
         \dot{\varphi}=\frac{e}{2\gamma m}B_{z}
       \end{equation}
-      $\bullet$ From (4) and (6) follows:
+      \bull From (4) and (6) follows:
       \begin{equation}
         \ddot{r}=-\left(\frac{e}{2\gamma m}\right)^{2}rB_{z}^{2}
       \end{equation}
@@ -173,6 +211,7 @@ sorting=nty
 \begin{frame}
   \frametitle{Magnet lenses}
   \framesubtitle{Magnetic field of solenoid}
+  \rfn
   \vspace{-1cm}
   \begin{figure}
     \centering
@@ -197,7 +236,7 @@ sorting=nty
     \begin{column}{0.6\textwidth}
       Approximate field of the solenoid (b):
       \begin{equation}
-        B_{z}\left(z\right)\approx\frac{\mu_{0}nI}{2}\left(\frac{Rc^{2}}{\left(z^{2}+Rc^{2}\right)^{3/2}}+\frac{Rc^{*2}}{\left(z^{2}+Rc^{*2}\right)^{3/2}}\right)
+        B_{z}\left(z\right)\approx\frac{\mu_{0}NI}{4}\left(\frac{Rc^{2}}{\left(z^{2}+Rc^{2}\right)^{3/2}}+\frac{Rc^{*2}}{\left(z^{2}+Rc^{*2}\right)^{3/2}}\right)
       \end{equation}
       \begin{equation}
         Rc=R_{sq}+c,\,R_{sq}=R_{m}\left(1+\frac{a^{2}}{24R_{m}^{2}}\right),\,c^{2}=\frac{b^{2}-a^{2}}{12}
@@ -209,6 +248,7 @@ sorting=nty
 
 \begin{frame}
   \frametitle{Lens impefections}
+  \rfn
   %\framesubtitle{Defects}
   \begin{small}
   There are 3 main limitations to consider when designing a solenoid lens:
@@ -216,11 +256,11 @@ sorting=nty
     \centering
     \begin{tabular}{   m{5cm}  m{5cm}  }
       &  \underline{Source:}\vspace{0.2cm} \\
-      $\bullet$ Chromatic aberration & Spread of electron energies  \\
+      \bull Chromatic aberration & Spread of electron energies  \\
       & \\
-      $\bullet$ RMS Emittance growth  &   Spread of eletron coordinates in position-and-momentum phase space \\
+      \bull RMS Emittance growth  &   Spread of eletron coordinates in position-and-momentum phase space \\
       & \\
-      $\bullet$ Spherical aberration &  Real lens $\rightarrow$ different refraction based on distance from axis \\
+      \bull Spherical aberration &  Real lens $\rightarrow$ different refraction based on distance from axis \\
     \end{tabular}
   \end{table}
   \end{small}
@@ -240,6 +280,7 @@ sorting=nty
 \begin{frame}
   \frametitle{Lens impefections}
   \framesubtitle{Spherical aberration\footcite{Egerton}}
+  \rfn
   \begin{columns}
     \begin{column}{0.4\textwidth}
       \begin{tiny}
@@ -293,6 +334,7 @@ sorting=nty
 \section{Summary}
 \begin{frame}
   \frametitle{Summary}
+  \rfn
   \framesubtitle{Subtitle}
 \end{frame}
 
