@@ -1,3 +1,21 @@
+#########################################################################
+#    Copyright 2020 Andrii Yanovets
+#    This file is part of solensim.
+#
+#    solensim is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    solensim is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
+#########################################################################
+
 %% Initial parameters
 % Constants %
 uo=4*pi*10^-7; % Diamagnetic vac const.H/mm
@@ -5,8 +23,8 @@ I=8; % Max current A
 % Magnet field %
 tic
 % Estimated values %
-a=99.5*10^-3; % Solenoid heigth 
-b=41.8*10^-3; % Solenoid width 
+a=99.5*10^-3; % Solenoid heigth
+b=41.8*10^-3; % Solenoid width
 ri=30*10^-3; % Solenoid inner radius
 Ne=1000; % Number of windings
 rm=ri+a/2;
@@ -27,7 +45,7 @@ d2Bz=@(z,r,c,N)N.*(1.0./((c.*1i-r).^2+z.^2).^(5.0./2.0).*(c.*1i-r).^2.*3.0+1.0./
 F3= @(r,c, N) -integral(@(z) Bz3(z,r,c, N), -inf, inf)./2;
 F4= @(r,c, N) integral(@(z) Bz4(z,r,c, N), -inf, inf);
 F2= @(r,c, N) 2*integral(@(z) Bz2(z,r,c, N), 0, inf);
-% 
+%
 xsol = linspace(-0.45,0.45,1024);
 xsol = xsol(:);
 figure(1)
@@ -51,7 +69,7 @@ fmesh(F3plot2, [0.02 0.04 0.000001 0.05])
 fmesh(F3plot05, [0.02 0.04  0.000001 0.05])
 xlabel('Rsq');
 ylabel('c');
-zlabel('F3'); 
+zlabel('F3');
 hold off
 figure(4)
 plot(zsol, Bz(zsol, ro, co, No) )
