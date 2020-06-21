@@ -27,7 +27,7 @@ def_E = 3.5
 def_Rbeam = 1
 #################
 
-import wrapper as wrap
+import pycode.wrapper as wrap
 import frontend as front
 import numpy as np
 import matplotlib.pyplot as plt
