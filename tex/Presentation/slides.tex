@@ -1,0 +1,264 @@
+\documentclass{beamer}
+%\usepackage{ngerman}
+\usepackage{soul}
+\usepackage{mathtools}
+\usepackage{amssymb,amsmath,amsfonts}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[autostyle=true,german=quotes]{csquotes}
+\usepackage{gensymb}
+\usepackage{units}
+\usepackage{fancyhdr}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{biblatex}
+\usepackage{wrapfig}
+\usepackage{array}
+\usepackage{subcaption}
+\usepackage[export]{adjustbox}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[english]{babel}
+\usepackage{multicol}
+
+\graphicspath{ {figures/} }
+
+\addbibresource{lib/lib.bib}
+
+%\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{section in toc}[square]
+
+\title{TITLE}
+\subtitle{Subtitle}
+\author{Author 1 \and Author 2}
+\date{DATE \today}
+
+\begin{document}
+%Title slide:
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+%TOC slide:
+\begin{frame}
+  \frametitle{Structure}
+  \tableofcontents%[currentsection]
+\end{frame}
+
+\section{Electron optics}
+  \begin{frame}
+  \frametitle{Definition}
+  \begin{table}[t]
+  \centering
+  \begin{tabular}{   m{5cm}  m{5cm}  } 
+  \underline{ Classic optics} & \underline{Electron optics} \\ 
+   $\bullet$ Light ray- photons &  $\bullet$ Electron beam- electrons  \\ 
+   $\bullet$ Can pass through optically transparent solids  & $\bullet$  Get's absorbed/loses energy due to interactions with atoms in solids \\ 
+   $\bullet$ Bends due to refractive index difference between mediums  & $\bullet$  Bends due to Coulomb and Lorentz forces in the presense of outer EM field \\ 
+  \end{tabular}
+  \end{table}
+  
+  \end{frame}
+
+  \begin{frame}
+  \frametitle{Magnet lenses}
+  \framesubtitle{Requirements}
+  The lense must have following properties:
+  \begin{itemize}
+   \item deflection must increase with increasing deviation of the electron ray from the optic axis;
+   \item single electron energy in the beam should not be altered by passing through the lense or it's change must be neglegible;
+   \item for a constant deviation from the optic axis deflection must be symmetric with respect to rotation around optical axis;
+   \item methods and laws of classical optics (such as thin lens formula and approximation, matrix formalism) are assumed to be applicable;
+  \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+  \frametitle{Magnet lenses}
+  \framesubtitle{Solenoids}
+\begin{figure}
+\subfloat[Solenoid with S, as optical axis\footfullcite{_Basic course on accelerator optics_ , Rossbach and P. Schmüser}]{\includegraphics[width = 0.5\textwidth]{Solenoid_scheme3.png}} 
+\subfloat[Cross section through a magnetic lens\footfullcite{_Physical Principles of Electron Microscopy_ , Egerton, R.F.}]{\includegraphics[width = 0.5\textwidth]{Solenoid_pic1.png}}
+\label{some example}
+\end{figure}
+  \end{frame}
+
+\begin{frame}
+  \frametitle{Magnet lenses}
+  \framesubtitle{Solenoids}
+\begin{figure}
+  \includegraphics[width=.5\textwidth]{El_traj_in_B1.png}
+  \caption{Solenoid cross-section along optic axis\footfullcite{_Physical Principles of Electron Microscopy_ , Egerton, R.F.}}
+\end{figure}
+  \begin{scriptsize}
+\begin{columns}
+  \begin{column}{0.45\textwidth}
+  \begin{equation}
+   F_{\varphi}=e\left(B_{z}v_{r} - v_{z}B_{r}\right)
+  \end{equation}
+  \begin{equation}
+  F_{r}=-e\left(v_{z}B_{z}\right)
+  \end{equation}
+  \begin{equation}
+  F_{z}=e\left(v_{\varphi}B_{r}\right)
+  \end{equation}
+  \end{column}
+  \begin{column}{0.55\textwidth}
+  \begin{equation}
+  \gamma m\left(\ddot{r}-r\dot{\varphi}^{2}\right)=-er\dot{\varphi}B_{z}
+  \end{equation}
+  \begin{equation}
+  \gamma m\frac{d}{dt}\left(r^{2}\dot{\varphi}\right)=-er(\dot rB_{z}+B_{r}\dot{z})
+  \end{equation}
+  \begin{equation}
+  \gamma m\ddot{z}=er\dot{\varphi}B_{r}
+  \end{equation}
+  \end{column}
+ \end{columns}
+  \end{scriptsize}
+  \end{frame}
+
+  \begin{frame}
+  \frametitle{Magnet lenses}
+  \framesubtitle{Electron path equations}
+  \begin{scriptsize}
+\begin{columns}
+  \begin{column}{0.6\textwidth}
+  \begin{equation}
+  B_{z}\left(z,r\right)=\underset{n}{\sum}\frac{\left(-1\right)^{n}}{n!n!}\left(\frac{r}{2}\right)^{2n}\frac{\partial^{2n}B_{z,\,axis}}{\partial z^{2n}}
+  \end{equation}
+  \begin{equation}
+  B_{r}\left(z,r\right)=\underset{n}{\sum}\frac{\left(-1\right)^{n}}{n!\left(n-1\right)!}\left(\frac{r}{2}\right)^{2n-1}\frac{\partial^{2n-1}B_{z,\,axis}}{\partial z^{2n-1}}
+  \end{equation}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+  $\bullet$ From (5) follows:
+  \begin{equation}
+  \dot{\varphi}=\frac{e}{2\gamma m}B_{z}
+  \end{equation}
+ $\bullet$ From (4) and (6) follows:
+  \begin{equation}
+  \ddot{r}=-\left(\frac{e}{2\gamma m}\right)^{2}rB_{z}^{2}
+  \end{equation}
+  \begin{equation}
+  \ddot{z}=-\left(\frac{e}{2\gamma m}\right)^{2}r^{2}B_{z}B'_{z}
+  \end{equation}
+  \end{column}
+ \end{columns}
+  \begin{equation}
+  \ddot{r}=r''\dot{z}^{2}\approx r''\left(\beta c\right)^{2}\Rightarrow r''=\left(\frac{e}{2p_{z}}\right)^{2}rB_{z}^{2}
+  \end{equation}
+  \begin{equation}
+-\frac{r'}{r}=\frac{1}{f}\underset{integrate\,(12)}{\Rightarrow}\frac{1}{f}=\left(\frac{e}{2p_{z}}\right)^{2}\intop_{-\infty}^{\infty}B_{z}^{2}dz\coloneqq\left(\frac{e}{2p_{z}}\right)^{2}F_{2}
+  \end{equation}
+  \end{scriptsize}
+  \end{frame}
+
+  \begin{frame}
+  \frametitle{Magnet lenses}
+  \framesubtitle{Magnetic field of solenoid}
+  \begin{figure}
+  \subfloat[Solenoid with a single layer of windings\footfullcite{_Design of Permanent MagneticSolenoids for REGAE_ , Gehrke T.}]{\includegraphics[width = 0.3\textwidth]     {Single_lay_solenoid2.png}} 
+  \subfloat[Solenoid with multilayred windings\footfullcite{_Design of Permanent MagneticSolenoids for REGAE_ , Gehrke T.}]{\includegraphics[width = 0.3\textwidth]{Multilay_solenoid2.png}}
+  \subfloat[Fields produced by two coils with same N and L=b]{\includegraphics[width = 0.38\textwidth]{fieldcomparisson.png}}
+  \label{some example}
+  \end{figure}
+  \begin{tiny}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+  Field of the solenoid (a):
+  \begin{equation}
+B_{z}\!\left(z\right)=\!\frac{\mu_{0}nI}{2}\!\left(\!\frac{\triangle z}{\sqrt{R^{2}+\triangle z^{2}}}\!-\!\frac{\triangle z^{*}}{\sqrt{R^{2}+\triangle z^{*2}}}\!\right)\!
+  \end{equation}
+   \begin{equation}
+\triangle z=z-L/2
+  \end{equation}
+  \end{column}
+  \begin{column}{0.6\textwidth}
+  Approximate field of the solenoid (b):
+  \begin{equation}
+B_{z}\left(z\right)\approx\frac{\mu_{0}nI}{2}\left(\frac{Rc^{2}}{\left(z^{2}+Rc^{2}\right)^{3/2}}+\frac{Rc^{*2}}{\left(z^{2}+Rc^{*2}\right)^{3/2}}\right)
+  \end{equation}
+  \begin{equation}
+Rc=R_{sq}+c,\,R_{sq}=R_{m}\left(1+\frac{a^{2}}{24R_{m}^{2}}\right),\,c^{2}=\frac{b^{2}-a^{2}}{12}
+  \end{equation}
+  \end{column}
+ \end{columns}
+  \end{tiny}
+  \end{frame}
+
+  \begin{frame}
+  \frametitle{Lense impefections}
+  \framesubtitle{Defects}
+\begin{small}
+  There are 3 main defects to be considering when designing a solenoid lense:
+  \begin{table}[t]
+  \centering
+  \begin{tabular}{   m{5cm}  m{5cm}  } 
+    &  \underline{Source} \\ 
+   $\bullet$ Chromatic aberration & Spread of electron energies  \\ 
+   $\bullet$ RMS Emittance  &   Spread of eletron coordinates in position-and-momentum phase space \\ 
+   $\bullet$ Spherical aberration &  Dependence of $f$ from distance from optical axis, due to lense specific coefficient $ C_{s}$ \\ 
+  \end{tabular}
+  \end{table}
+\end{small}
+    \begin{tiny}
+    \begin{equation}
+\epsilon_{n,rms}=\frac{1}{mc}\sqrt{\left\langle x^{2}\right\rangle \left\langle \tilde{p}_{x}^{2}\right\rangle -\left\langle x\tilde{p}_{x}\right\rangle ^{2}}=\frac{1}{mc}\left(\frac{e^{2}\sigma^{4}}{3\sqrt{2}p_{z,0}}F_{3}+\frac{e^{4}\sigma^{4}}{24\sqrt{2}p_{z,0}^{3}}F_{4}\right)
+    \end{equation}
+     \begin{equation}
+r_{c}\approx\alpha f\left(\triangle E_{0}/E_{0}\right)\approx\alpha C_{c}\left(\triangle E_{0}/E_{0}\right)
+    \end{equation}
+  \end{tiny}
+  \end{frame}
+
+  \begin{frame}
+  \frametitle{Lense impefections}
+  \framesubtitle{Spherical aberration}
+  \begin{figure}[t]
+    \includegraphics[width=.3\textwidth]{Spher_Abb1.png}
+  \begin{tiny}
+    \caption{Def. of the beam radius change due to spherical aberration\footfullcite{_Physical Principles of Electron Microscopy_ , Egerton, R.F.}}
+  \end{tiny}
+  \end{figure}
+  \begin{tiny}
+\begin{columns}
+  \begin{column}{0.4\textwidth}
+   \begin{equation}
+  \triangle f=c\cdotp x^{2}
+    \end{equation}
+   \begin{equation}
+  x\approx f\cdotp tan\left(\alpha\right)
+    \end{equation}
+   \begin{align}
+  r_{s}&=\triangle f\cdotp tan\left(\alpha\right)\approx c\cdotp f^{2}tan\left(\alpha\right)^{3}\\
+&=C_{s}\cdotp\left(\frac{r_{in}}{f-\frac{C_{s}r_{in}^{2}}{f^{2}}}\right)^{3}
+    \end{align}
+  \end{column}
+  \begin{column}{0.6\textwidth}
+    \begin{equation}
+  F_{3}=-\int\frac{B_{z}B''_{z}}{2}dz
+    \end{equation}
+    \begin{equation}
+  F_{4}=\int B_{z}^{4}dz
+    \end{equation}
+    \begin{align}
+  C_{s}&=\frac{e}{96m\tilde{U}}\int\left(\frac{2e}{m\tilde{U}}B_{z}^{4}+5\left(B_{z}'\right)^{2}-B_{z}B_{z}''\right)R^{4}dz \\
+  &=\frac{e^{2}R^{4}}{4p_{z,0}^{2}}F_{3}+\frac{e^{4}R^{4}}{12p_{z,0}^{4}}F_{4}
+  \end{align}
+  \end{column}
+ \end{columns}
+  \end{tiny}
+  \end{frame}
+
+\section{Summary}
+\begin{frame}
+  \frametitle{Summary}
+  \framesubtitle{Subtitle}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+  \printbibliography
+\end{frame}
+
+\end{document}
