@@ -86,4 +86,4 @@ class API_iPython(wrap.PWrapper):
 
         print("Arrived at parameters:\n - s: %.3f"%self.s_opt)
         print(" - R_mean: %.3f mm, a: %.3f mm, b: %.3f mm"%(self.g_opt[0], self.g_opt[1], self.g_opt[2]))
-        self.describe(s,g)
+        self.describe(self.s_opt,self.g_opt)
