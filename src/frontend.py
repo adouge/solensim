@@ -51,7 +51,7 @@ class API_iPython(wrap.PWrapper):
         print("handle.target_x = new value / interval")
         print("handle.x = new value")
         print("Parameters: g (Rmean, a, b) [mm], s [Ampere-Turns]")
-        print("Targets: Bpeak [mT], l [mm], f [cm];\         g, s as above.")
+        print("Targets: Bpeak [mT], l [mm], f [cm]; \n g, s as above.")
         print("To disable constraints in a parameter, set to \"None\".")
 
     def settings(self):
