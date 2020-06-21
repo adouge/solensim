@@ -19,7 +19,7 @@
 
 # config
 #################
-vstring = "0.1.0"
+vstring = "0.1.1"
 def_B = [75,125]
 def_f = [50,50]
 def_l = [45,55]
@@ -71,14 +71,10 @@ def tests():
     print("----------------------------------------")
     test_matlab()
 
-def main():
-    print("solensim v%s Solenoid design tool"%vstring)
-    print("========================================")
-    e = front.API_iPython(def_E, def_Rbeam)
-    e.target_Bpeak = def_B
-    e.target_l = def_l
-    e.target_f = def_f
-    print("iPython interface handle initialized as \"e\".")
-
-if __name__ == '__main__':
-    main()
+print("solensim v%s Solenoid design tool"%vstring)
+print("========================================")
+e = front.API_iPython(def_E, def_Rbeam)
+e.target_Bpeak = def_B
+e.target_l = def_l
+e.target_f = def_f
+print("iPython interface handle initialized as \"e\".")
