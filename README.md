@@ -34,7 +34,6 @@ Solenoid simulation project
    - focal distance f > 50 cm
    - Peak field on axis ~100 mT
    - Energy 3.5 MeV, beam RMS radius 1 mm
-   - *2pi transversal rotation phase???*
  - Optimization:
    - Minimal spheric aberration
    - limit power, material usage

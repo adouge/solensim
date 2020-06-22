@@ -39,6 +39,13 @@ sorting=nty
 \newcommand{\bull}{$\bullet$}
 \newcommand{\rarrow}{$\rightarrow$ }
 \newcommand{\rfn}{\setcounter{footnote}{0}}
+\newcommand{\tocslide}{
+\begin{frame}
+  \frametitle{Structure}
+  \tableofcontents[currentsection]
+\end{frame}
+}
+
 \title{Solenoid electron lenses}
 \subtitle{Fundamentals and design}
 \author{Anton Douginets \and Andrii Yanovets}
@@ -81,15 +88,11 @@ sorting=nty
   \end{figure}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Structure}
-  \tableofcontents%[currentsection]
-\end{frame}
-
 %%%%%%%%%%%%%
 \section{Magnetic lens overview}
 %%%%%%%%%%%%%
-
+\tocslide
+\subsection{General notions}
 \begin{frame}
   \frametitle{Electron optics}
   \rfn
@@ -234,7 +237,7 @@ sorting=nty
       \end{equation}
     \end{column}
     \begin{column}{0.6\textwidth}
-      Approximate field of the solenoid (b):
+      Approximate field of the solenoid (b)\citesame:
       \begin{equation}
         B_{z}\left(z\right)\approx\frac{\mu_{0}NI}{4}\left(\frac{Rc^{2}}{\left(z^{2}+Rc^{2}\right)^{3/2}}+\frac{Rc^{*2}}{\left(z^{2}+Rc^{*2}\right)^{3/2}}\right)
       \end{equation}
@@ -245,6 +248,8 @@ sorting=nty
   \end{columns}
   \end{tiny}
 \end{frame}
+
+\subsection{Lens imperfections}
 
 \begin{frame}
   \frametitle{Lens impefections}
@@ -331,11 +336,171 @@ sorting=nty
   \end{columns}
   \end{frame}
 
-\section{Summary}
+%%%%%%%%%%%%%%%%%
+\section{Project methodology}
+%%%%%%%%%%%%%%%%%
+\tocslide
+\subsection{Aim}
+\begin{frame}
+  \rfn
+  \frametitle{Project task}
+  Simple solenoid lens design:
+  \begin{itemize}
+    \item Monochromatic \textit{e} beam, fixed beam radius $R$
+    \item Target FWHM, peak $B_z$, $f$
+    \item Optimize geometry, current for minimal spheric aberration
+  \end{itemize}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{blok_cxema}
+    \caption{Generalized design process}
+  \end{figure}
+\end{frame}
+
+\subsection{Model}
+\begin{frame}
+  \rfn
+  \frametitle{Solenoid model}
+  \begin{itemize}
+    \item Rectangular cross-section solenoid\footcite{Disser}
+  \end{itemize}
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      Two-loop field approximation:
+      \begin{small}
+      \begin{center}
+        \[
+        B_{z}\left(z\right)\approx\frac{\mu_{0}NI}{4}\left(\frac{Rc^{2}}{\left(z^{2}+Rc^{2}\right)^{3/2}}+\frac{Rc^{*2}}{\left(z^{2}+Rc^{*2}\right)^{3/2}}\right);
+        \]
+        \[
+        Rc = R_{sq}+c,\ \text{where}\
+        c^{2} = \frac{b^{2}-a^{2}}{12},
+        \]
+        \[
+        R_{sq} = R_{m}\left(1+\frac{a^{2}}{24R_{m}^{2}}\right).
+        \]
+      \end{center}
+      \end{small}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{figures/Multilay_solenoid2}
+        \caption{Solenoid geometry:\\
+        $R_m$ - mean radius\\
+        $a$ - transverse width\\
+        $b$ - axial length
+        }
+      \end{figure}
+    \end{column}
+  \end{columns}
+  \vspace{0.25cm}
+  Parameters: geometry, scaling factor $N\cdot I$ [Ampere-Turns]
+\end{frame}
+
+\begin{frame}
+  \rfn
+  \frametitle{Field integrals}
+  For an axial beam, only the on-axis $B_z$ is of significance\footcite{Disser}. The field's optical properties are described in terms of:
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+      \begin{small}
+        \[F_1 = \int B_z dz\]
+        \[F_2 = \int B_z^2 dz\]
+      \end{small}
+      \end{center}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+      \begin{small}
+      \[F_3 = \int - \frac{B_z''\cdot B_z}{2} dz \]
+      \[F_4 = \int B_z^4 dz\]
+      \end{small}
+      \end{center}
+    \end{column}
+  \end{columns}
+  \vspace{1cm}
+  whereas the integration domain is ($-\infty,\infty$).
+\end{frame}
+
+\begin{frame}
+  \rfn
+  \frametitle{Solenoid characteristics}
+    \begin{itemize}
+      \item Peak $B_z = B_z(0)$;
+      \item Effective field length $\rightleftarrows$ FWHM
+      \item Focal length:\\
+      \begin{small}
+        \[
+        f = \left(\frac{2p_z}{e}\right)^2\frac{1}{F_2}
+        \]
+      \end{small}
+      \item Aberration coefficient:\\
+      \begin{small}
+        \[
+        c_s = \frac{e^{2}R^{4}}{4p_{z,0}^{2}}F_{3}+\frac{e^{4}R^{4}}{12p_{z,0}^{4}}F_{4}
+        \]
+      \end{small}
+    \end{itemize}
+    \vspace{0.5cm}
+    Considerations:
+    \begin{itemize}
+      \item Geometry - size, material usage
+      \item Scaling factor - power, material usage
+      \item $f$, FWHM, $c_s$: interaction with other components, fitness to purpose
+    \end{itemize}
+\end{frame}
+
+\subsection{Optimization}
+\begin{frame}
+  \frametitle{Optimization}
+  \begin{itemize}
+    \item Constrained Trust Region algorithm\footcite{scipyctr}:\\
+      Iterative gradient search process; minimize merit function $m(p)$ of parameters $p = (s, R_m, a, b)$:
+      \[
+      m(p) = c_s(p) + k \cdot |\text{C}(p)|_2,\ \ \Delta p \leq R_T;
+      \]
+      C$(p) = (\text{C}_1,\text{C}_2,...,\text{C}_n)(p)$ - measure of constraint violation;
+    \item Sequential Quadratic Programming\footcite{sqp}:\\
+    A more rigid, constrained Gauss-Newton-type gradient search algorithm.
+  \end{itemize}
+  \vspace{-0.5cm}
+  \begin{figure}
+    \includegraphics[width=0.8\textwidth]{blok_cxema}
+  \end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%
+\section{Software demo}
+%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Software demo\footcite{repo}}
+  \rfn
+  \framesubtitle{Subtitle}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%
+\section{Summary, perspective}
+%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Perspective}
+  \framesubtitle{Potential for further development}
+  \rfn
+  \framesubtitle{Subtitle}
+\end{frame}
+
 \begin{frame}
   \frametitle{Summary}
   \rfn
   \framesubtitle{Subtitle}
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \textbf{Thank you for your attention!}
 \end{frame}
 
 \begin{frame}[allowframebreaks]
