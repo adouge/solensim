@@ -462,10 +462,24 @@ sorting=nty
       m(p) = c_s(p) + k \cdot |\text{C}(p)|_2,\ \ \Delta p \leq R_T;
       \]
       C$(p) = (\text{C}_1,\text{C}_2,...,\text{C}_n)(p)$ - measure of constraint violation;
-    \item Interior Point Algorithm\footcite{sqp}:\\
-    Solves a sequence of approximate optimization problems, by transforming the original problem $\underset{x}{min}\,f\left(x\right),\:h\left(x\right)=0\wedge g\left(x\right)\leq0$ into $\underset{x}{min}\,f\left(x\right)=\underset{x,s}{min}\,f\left(x\right)-\mu\underset{i}{\sum}ln\left(s_{i}\right),\:h\left(x\right)=0\wedge g\left(x\right)+s=0$.
   \end{itemize}
-  \vspace{-0.34cm}
+  \vspace{0.5cm}
+  \begin{figure}
+    \includegraphics[width=0.8\textwidth]{blok_cxema}
+  \end{figure}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Optimization}
+  \vspace{0.1cm}
+  \begin{itemize}
+    \item Interior Point Algorithm\footcite{byrd2000trust}:\\
+      Solves a sequence of approximate optimization problems, by transforming the original problem \[\underset{p}{min}\,f\left(p\right),\:h\left(p\right)=0\wedge g\left(p\right)\leq0\]
+      into
+      \[\underset{p}{min}\,f\left(p\right)=\underset{p,s}{min}\,f\left(p\right)-\mu\underset{i}{\sum}ln\left(s_{i}\right),\:h\left(p\right)=0\wedge g\left(p\right)+s=0.\]
+  \end{itemize}
+  \vspace{0.15cm}
   \begin{figure}
     \includegraphics[width=0.8\textwidth]{blok_cxema}
   \end{figure}
