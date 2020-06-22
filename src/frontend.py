@@ -40,6 +40,7 @@ class API_iPython(wrap.PWrapper):
         self.target_g = "None"
         self.target_s = "None"
         self.process_E_R()
+        self.results = []
 
     def help(self):
         """
@@ -74,16 +75,56 @@ class API_iPython(wrap.PWrapper):
     def describe(self, s, g):
         (B0, l, f, cs) = self.calc(s,g)
         spotsize = self.get_spot(f, cs)
-        print("Peak axial field: %.3f mT"%(B0/mm))
-        print("Effective field length: %.3f mm"%(l/mm))
-        print("Focal distance for given E: %.3f cm"%(f/cm))
-        print("Spherical aberration for given E: %.3E m"%cs)
-        print("Focal spot radius: %.3E fm"%(spotsize/fm))
+        print("Parameters:\n - s: %.3f"%s)
+        print(" - R_mean: %.3f mm, a: %.3f mm, b: %.3f mm"%(g[0], g[1], g[2]))
+        print("Resulting characteristics:")
+        print(" - Peak axial field: %.3f mT"%(B0/mm))
+        print(" - Effective field length: %.3f mm"%(l/mm))
+        print(" - Focal distance for given E: %.3f cm"%(f/cm))
+        print(" - Spherical aberration for given E: %.3E m"%cs)
+        print(" - Focal spot radius: %.3E fm"%(spotsize/fm))
+
+    def illustrate(self, s, g):
+        B = e.get_B(s, g)*1000
+        z = np.linspace(-1,1,len(B))
+        plt.figure()
+        plt.plot(z, B)
+        plt.axis([-0.2,0.2, 0, max(B)])
+        plt.xlabel("Position on axis [m]")
+        plt.ylabel("B_z [mT]")
+        plt.show()
+
+    def result(self, n):
+        result = self.results[n]
+        print("Settings:")
+        print(" - g [mm]:", result["g"])
+        print(" - s [A*N]:", result["s"])
+        print("Targets:")
+        print(" - peak B [mT]:", result["t_B"])
+        print(" - FWHM [mm]:", result["t_l"])
+        print(" - f [cm]:", result["t_f"])
+        print(" - g [mm]:", result["t_g"])
+        print(" - s [N*A]:", result["t_s"])
+        print("Result:")
+        self.describe(result["sopt"],result["gopt"])
+
+    def append_result(self):
+        result = {
+        "g" : self.g,
+        "s" : self.s,
+        "t_g" : self.target_g,
+        "t_s" : self.target_s,
+        "t_B" : self.target_Bpeak,
+        "t_l" : self.target_l,
+        "t_f" : self.target_f,
+        "gopt": self.g_opt,
+        "sopt": self.s_opt
+        }
+        self.results.append(result)
 
     def run_ctr(self, margin=5, maxiter=1000, ptol=8, gtol=8, verbose=2, penalty=0):
         wrap.PWrapper.run_ctr(self, margin=margin, verbose=verbose,
         ptol=ptol, gtol=gtol, penalty=penalty, maxiter=maxiter)
-
-        print("Arrived at parameters:\n - s: %.3f"%self.s_opt)
-        print(" - R_mean: %.3f mm, a: %.3f mm, b: %.3f mm"%(self.g_opt[0], self.g_opt[1], self.g_opt[2]))
-        self.describe(self.s_opt,self.g_opt)
+        self.append_result()
+        self.result(-1)
+        self.illustrate(self.s_opt, self.g_opt)

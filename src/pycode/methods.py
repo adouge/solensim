@@ -89,7 +89,7 @@ def l_eff(scaling, geomp, decimal_places=3):
     z = np.linspace(-1,1,2*10**decimal_places+1)
     Bz = get_Bz(z, scaling, *geomp)
     ober = z[Bz>=np.max(Bz)/2]
-    fwhm = np.round((2*abs(ober[0]) + 1/10**decimal_places), decimal_places)
+    fwhm = (2*abs(ober[0]))
     return fwhm  # l_eff at fwhm +- 1/10^decimal_places
 
 def peak_B(scaling, geomp):

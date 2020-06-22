@@ -64,10 +64,10 @@ class Core():
         f2,df2 = F2(scaling, geomp)
         return focal(f2, self.P)
 
-    def get_l(self, params):
+    def get_l(self, params, grain=3):
         scaling, r, a, b = params
         geomp = parse_geometry((r,a,b))
-        return l_eff(scaling, geomp)
+        return l_eff(scaling, geomp, decimal_places=grain)
 
     def get_cs(self, params):
         scaling, r, a, b = params

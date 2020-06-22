@@ -494,10 +494,44 @@ sorting=nty
 %%%%%%%%%%%%%%%%%
 
 \begin{frame}
-  \frametitle{Software demo\footcite{repo}}
+  \frametitle{Software demonstration\footcite{repo}}
   \rfn
-  \framesubtitle{Subtitle}
+  \framesubtitle{Evaluating the REGAE solenoid\footcite{Disser}}
+  \begin{figure}
+    \hspace{-0.5cm}\subfloat[Testing the model]{\includegraphics[width=0.5\textwidth]{calc_REGAE}}
+    \hspace{0.5cm}\subfloat[Attempting to optimize within 10\% margin]{\includegraphics[width=0.5\textwidth]{opt_REGAE}}
+
+  \end{figure}
 \end{frame}
+
+\begin{frame}
+  \rfn
+  \frametitle{Software demonstration}
+
+  \framesubtitle{General optimization}
+  \vspace{-1cm}
+  \begin{figure}
+    \hspace{-0.5cm}\subfloat[REGAE Solenoid\footcite{Disser}]{\includegraphics[width=0.5\textwidth]{calc_REGAE}}
+    \hspace{0.5cm}\subfloat[Optimizing for provided constraints]{\includegraphics[width=0.5\textwidth]{opt_best}}
+
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \rfn
+  \frametitle{Observations}
+  \begin{itemize}
+    \item \textbf{Correlated requirements pose over-constraining problems}
+    \vspace{0.5cm}
+    \item Multiple configurations in $(s, r, a, b)$ correspond to same minima\\
+      \rarrow convergence depends on initial guess and search region
+    \vspace{0.5cm}
+    \item P-space scaled differently along various axes \rarrow weak $s$-adjustment
+    \vspace{0.5cm}
+    \item Interval constraints are weighted differently
+  \end{itemize}
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%
 \section{Summary, perspective}
@@ -507,13 +541,44 @@ sorting=nty
   \frametitle{Perspective}
   \framesubtitle{Potential for further development}
   \rfn
-  \framesubtitle{Subtitle}
+  \vspace{-10cm}
+  \footcite{Disser}
+  \vspace{10cm}
+  \begin{columns}
+    \begin{column}{0.7\textwidth}
+      Algorithm:
+      \begin{itemize}
+        \item Normalize P-space for better parameter and constraint weighing
+      \end{itemize}
+      \vspace{0.5cm}
+      Model:
+      \begin{itemize}
+        \item Consider solenoids in ferromagnetic yokes
+        \vspace{0.5cm}
+        \item Study tradeoffs in desired characteristics
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.3\textwidth}
+        \begin{figure}
+          \includegraphics[width=\textwidth]{yoke}
+          \caption{Solenoid in yoke \citesame}
+        \end{figure}
+    \end{column}
+  \end{columns}
+
+
 \end{frame}
 
 \begin{frame}
   \frametitle{Summary}
   \rfn
-  \framesubtitle{Subtitle}
+  \begin{itemize}
+    \item Electromagnet solenoids are a flexible electron lens implementation
+    \vspace{1cm}
+    \item Minimal aberration can be achieved with different configurations\\
+      \rarrow Design is to be oriented on required characteristics
+  \end{itemize}
+
 \end{frame}
 
 \begin{frame}
