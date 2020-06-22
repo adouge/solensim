@@ -2,6 +2,9 @@
 Solenoid simulation project
 
 ### TODO:
+
+**CLEANUP**
+
 - General:
   - Problem, model, design Zusammenfassung
   - Прописать концепт работы, от указанных параметров до результата:
