@@ -7,14 +7,14 @@ Solenoid simulation project
     - Software manual
 
 **Improvements:**
-    1. Model:
-      - chromatic aberrations?
-      - yoke modeling?
-      - better field model?
-    2. Software:
-      - finish API
-      - comment code
-      - package/port mcode properly
+  1. Model:
+    1. chromatic aberrations?
+    2. yoke modeling?
+    3. better field model?
+  2. Software:
+    1. finish API
+    2. comment code
+    3. package/port mcode properly
 
 ### Presentation:
   0. Project formulation, motivation
