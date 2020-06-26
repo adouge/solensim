@@ -2,11 +2,11 @@
 Solenoid simulation project
 
 ### TODO:
- - Documentation:
+ - **Documentation:**
   - This Readme File
   - Software manual
 
- - Improvements:
+ - **Improvements:**
   1. Model:
     - chromatic aberrations?
     - yoke modeling?
@@ -16,7 +16,8 @@ Solenoid simulation project
     - comment code
     - package/port mcode properly
 
- - Presentation structure, _TODO_:
+### Presentation:
+Presentation structure, _TODO_:
   0. Project formulation, motivation
   1. Necessary theory beyond basics: _(TODO: condense, remove redundant)_
     1. Електронная оптика, общая теория, почему именно она?:
