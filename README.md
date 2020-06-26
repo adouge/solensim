@@ -2,11 +2,11 @@
 Solenoid simulation project
 
 ### TODO:
-1. Documentation:
+ 1. Documentation:
   - This Readme File
   - Software manual
 
-2. Improvements:
+ 2. Improvements:
   1. Model:
     - chromatic aberrations?
     - yoke modeling?
@@ -16,9 +16,9 @@ Solenoid simulation project
     - comment code
     - package/port mcode properly
 
-3. Presentation structure, _TODO_:
- 0. Project formulation, motivation
- 1. Necessary theory beyond basics: _(TODO: condense, remove redundant)_
+ 3. Presentation structure, _TODO_:
+  0. Project formulation, motivation
+  1. Necessary theory beyond basics: _(TODO: condense, remove redundant)_
     1. Електронная оптика, общая теория, почему именно она?:
        1. Классическая оптика -> Электронная оптика (_1 слайд_)
     2. Фокусна відстань, Общая теория e в соленоїдах:
@@ -36,17 +36,17 @@ Solenoid simulation project
        4. Сфер аберрация как самый важный деффект в нашем случае (объяснить важность) (_11 слайд_)
     4. Выводы:
        1. Полное теоретическое описание проблемы поиска параметров с минимальными дефектами, конечные формулы с которыми придётся работать (_12 слайд_)
- 2. Project methodology: _(TODO: Rewrite)_
+  2. Project methodology: _(TODO: Rewrite)_
     1. Model recap **_(TODO: avoid unneccessary redundancy & repetitions!!!)_**
     2. Algorithm:
        1. General schematic
        2. Optimization, briefly
- 3. Software presentation: _(TODO: **Rewrite completely**)_
+  3. Software presentation: _(TODO: **Rewrite completely**)_
     1. General structure
     2. Interface
     3. Example output - compare to calc
     4. Example design study - tradeoffs **_(TODO: more different examples)_**
- 4. Conclusions:
+  4. Conclusions:
     1. **Further development** - pitch ideas
     2. Summary **_(Rewrite!)_**
 
