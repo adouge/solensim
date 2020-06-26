@@ -3,18 +3,18 @@ Solenoid simulation project
 
 ### TODO:
  - **Documentation:**
-  - This Readme File
-  - Software manual
+    - This Readme File
+    - Software manual
 
  - **Improvements:**
-  1. Model:
-    - chromatic aberrations?
-    - yoke modeling?
-    - better field model?
-  2. Software:
-    - finish API
-    - comment code
-    - package/port mcode properly
+    1. Model:
+      - chromatic aberrations?
+      - yoke modeling?
+      - better field model?
+    2. Software:
+      - finish API
+      - comment code
+      - package/port mcode properly
 
 ### Presentation:
 Presentation structure, _TODO_:
