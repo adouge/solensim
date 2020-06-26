@@ -17,7 +17,6 @@ Solenoid simulation project
       - package/port mcode properly
 
 ### Presentation:
-Presentation structure, _TODO_:
   0. Project formulation, motivation
   1. Necessary theory beyond basics: _(TODO: condense, remove redundant)_
     1. Електронная оптика, общая теория, почему именно она?:
