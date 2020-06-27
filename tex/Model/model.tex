@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper,12pt]{article}
 %\usepackage{ngerman}
 \usepackage{soul}
 \usepackage{mathtools}
@@ -7,20 +7,19 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{geometry}
-\usepackage{float}
 \usepackage[autostyle=true,german=quotes]{csquotes}
 \usepackage{gensymb}
 \usepackage{units}
 \usepackage{fancyhdr}
 \usepackage[nottoc,numbib]{tocbibind}
 \usepackage{abstract}
-\usepackage{wrapfig}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage[
 citestyle=numeric
 ]{biblatex}
 
-\addbibresource{lib/lib.bib}
+\addbibresource{./../lib/lib.bib}
+\graphicspath{{./../figures/}}
 
 \geometry{a4paper, left=25mm, right=25mm, top=20mm, bottom=20mm}
 
@@ -31,6 +30,7 @@ citestyle=numeric
 %\lfoot{left footer}
 %\rfoot{right footer}
 
+\renewcommand{\abstractname}{Summary}
 
 \title{SOLENSIM Model summary}
 
@@ -45,9 +45,13 @@ citestyle=numeric
 
 \thispagestyle{empty}
 \maketitle
-\tableofcontents
+
 \begin{abstract}
+This is a summarizing description of the physical model - i.e. axial field calculation, characteristic value determination from axial field, field integrals etc.
 \end{abstract}
+
+\tableofcontents
+
 \newpage
 
 \pagenumbering{arabic}
@@ -56,7 +60,7 @@ citestyle=numeric
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.75\textwidth]{figures/cs_illustration}
+  \includegraphics[width=0.75\textwidth]{cs_illustration}
   \caption{title}
 \end{figure}
 

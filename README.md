@@ -59,5 +59,5 @@ Improvements:
 
 ### Branches:
  - master - main branch - only chunk in "done" fragments, no more merging master-->dev
- - dev_d - development branch Anton
- - dev_y - development branch Andrii
+ - dev_D - development branch Anton
+ - dev_Y - development branch Andrii
