@@ -43,10 +43,13 @@ Solenoid simulation project
 
 ### Dependencies:
  - numpy, scipy (found in e.g. Conda)
- - ~oct2py package, MATLAB Python interface~ - phased out
+ - oct2py package, MATLAB Python interface - phased out
 
 ### Structure:
  - User <-commands in, results, plots out-> [Frontend,Wrapper] <--> Backend (pycode, mcode?)
+ - File tree:
+    - src - software code 
+    - tex - docus, präsi
 
 ### Branches:
  - master - main branch - only chunk in "done" fragments, no more merging master-->dev
