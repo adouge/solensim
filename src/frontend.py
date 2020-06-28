@@ -72,6 +72,12 @@ class API_iPython(wrap.PWrapper):
                 l [mm] - FWHM
                 f [cm] - focal length for given E
             To disable constraints in a parameter, set to \"None\".
+
+            Main optimization routine:
+            handle.run_ctr(margin=5, maxiter=1000, ptol=8, gtol=8, verbose=2)
+                margin: maximum tolerable percent deviation from target values, for non-interval settings
+                maxiter: maximum iteration number
+                ptol, gtol: convergence tolerance (10 to negative power of), not really tested yet
         """
         print(helptext)
 
