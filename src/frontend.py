@@ -19,6 +19,7 @@
 import pycode.wrapper as wrap
 import numpy as np
 from pycode.methods import impuls
+import matplotlib.pyplot as plt
 
 mm = 10**(-3)
 fm = 10**(-15)
@@ -27,6 +28,10 @@ cm = 10**(-2)
 class API_iPython(wrap.PWrapper):
 
     def process_E_R(self):
+        """
+        Convert energy to impulse used later,
+        change beam radius to SI units
+        """
         self.P = impuls(self.E)
         self.R = self.R_mm*mm
 
@@ -44,16 +49,31 @@ class API_iPython(wrap.PWrapper):
 
     def help(self):
         """
-        Print some helpful info !WIP!
+        Display placeholder help text.
         """
-        print("To view settings: handle.settings()")
-        print("To view set targets: handle.targets()")
-        print("To set targets, initial parameter X:")
-        print("handle.target_x = new value / interval")
-        print("handle.x = new value")
-        print("Parameters: g (Rmean, a, b) [mm], s [Ampere-Turns]")
-        print("Targets: Bpeak [mT], l [mm], f [cm]; \n g, s as above.")
-        print("To disable constraints in a parameter, set to \"None\".")
+        helptext = """
+            To view settings:
+                handle.settings()
+            To view set targets:
+                handle.targets()
+            To set targets, initial parameter x:
+                handle.target_x = new value / interval
+                handle.x = new value
+            Permanent settings:
+                E [MeV] - electron energy (currently only monochrome beams handled)
+                R_mm [mm] - "beam radius"
+              call handle.process_E_R() to apply changes - currently a non-developed feature;
+              simpler would be to create a new handle, using "handle_name = front.API_iPython([E in MeV], [R im mm]).
+            Starting optimization settings:
+                g (Rmean, a, b) [mm]
+                s [Ampere-Turns]
+            Target values - single values or tuples (lower bound, upper bound):
+                Bpeak [mT] - peak field on axis
+                l [mm] - FWHM
+                f [cm] - focal length for given E
+            To disable constraints in a parameter, set to \"None\".
+        """
+        print(helptext)
 
     def settings(self):
         print("E: Electron energy [MeV]:", self.E)
@@ -69,10 +89,16 @@ class API_iPython(wrap.PWrapper):
         print("Target s [N*A]:", self.target_s)
 
     def get_spot(self, f, cs):
+        """
+        Get focal spot size (spherical aberration) from given f [m], cs [m]
+        """
         rspot = cs*(self.R/(f-self.R**2*cs/f**2))**3
         return rspot
 
     def describe(self, s, g):
+        """
+        Calculate characteristic values from given parameters s, g
+        """
         (B0, l, f, cs) = self.calc(s,g)
         spotsize = self.get_spot(f, cs)
         print("Parameters:\n - s: %.3f"%s)
@@ -85,7 +111,10 @@ class API_iPython(wrap.PWrapper):
         print(" - Focal spot radius: %.3E fm"%(spotsize/fm))
 
     def illustrate(self, s, g):
-        B = e.get_B(s, g)*1000
+        """
+        Draw a Bz(x) plot from given s, g
+        """
+        B = self.get_B(s, g)*1000
         z = np.linspace(-1,1,len(B))
         plt.figure()
         plt.plot(z, B)
@@ -95,6 +124,9 @@ class API_iPython(wrap.PWrapper):
         plt.show()
 
     def result(self, n):
+        """
+        Show n-th (0, 1, .... -1) result
+        """
         result = self.results[n]
         print("Settings:")
         print(" - g [mm]:", result["g"])
@@ -123,6 +155,13 @@ class API_iPython(wrap.PWrapper):
         self.results.append(result)
 
     def run_ctr(self, margin=5, maxiter=1000, ptol=8, gtol=8, verbose=2, penalty=0):
+        """
+        CTR Optimization routine wrapper.
+        Set parameters as attributes of the handle;
+        Keyword arguments:
+            maxiter - maximum number of algorithm iterations (default 1000)
+            margin - percent margin for non-interval target values (default 5%)
+        """
         wrap.PWrapper.run_ctr(self, margin=margin, verbose=verbose,
         ptol=ptol, gtol=gtol, penalty=penalty, maxiter=maxiter)
         self.append_result()

@@ -19,7 +19,7 @@
 
 # config
 #################
-vstring = "0.1.2"
+vstring = "0.1.3"
 def_B = [75,125]
 def_f = [50,50]
 def_l = [45,55]
@@ -32,49 +32,26 @@ import frontend as front
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-def tests():
-    import mcode.wrapper as mwrap
-
-    def test_matlab():
-        print("Testing Matlab interface:")
-        M = mwrap.mWrapper()
-        print("\nRunning Kamp's script:")
-        M.run("doNewCoil.m", nargout=0)
-        print("done. \n Testing mwraptest.m:")
-        A = M.magic(5)
-        B = M.magic(5)
-        C = M.mwraptest(A,B)
-        print(A,B)
-        print("product:")
-        print(C)
-        input("Press Enter to continue...")
-        wrap.stop(M)
-
-    def test_octave():
-        O = mwrap.OWrapper()
-        print("Testing Oct2Py Wrapper:\nRunning Kamps's script:")
-        O.run("doNewCoil")
-        input("Press Enter to continue...")
-        O.close()
-        print("done. \n Testing wraptest.m:")
-        A = np.random.rand(5,5)
-        B = np.random.rand(5,5)
-        C = O.wraptest(A,B)
-        print(A,B)
-        print("product:")
-        print(C)
-        wrap.stop(O)
-
-    print("Here are some wrapper tests:")
-    test_octave()
-    print("----------------------------------------")
-    test_matlab()
-
-print("solensim v%s Solenoid design tool"%vstring)
+print("solensim v%s WIP Solenoid design tool"%vstring)
 print("========================================")
 e = front.API_iPython(def_E, def_Rbeam)
 e.target_Bpeak = def_B
 e.target_l = def_l
 e.target_f = def_f
 print("iPython interface handle initialized as \"e\".")
+print("\nDefault settings:")
+e.settings()
+print("\nDefault targets:")
+e.targets()
+print("\nPlaceholder help text:")
+e.help()
+print("\nUse \"e.help()\" to view the startup help text again.")
+
+import demos
+print("""
+to run a few demos, try:
+demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke)
+demos.opt_best(e) - the "best" result shown in the presentation
+demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis
+
+""")

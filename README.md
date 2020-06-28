@@ -5,6 +5,14 @@ Solenoid simulation project
 
 ### Post-submission:
 
+**Repo cleanup:**
+1. Cleanup file structure
+2. Software:
+    1. finish API
+    2. comment code
+    3. Proper mcode packaging?
+    4. Rudimentary manual/doc signatures
+
 **Presentation:**
 
 0. Project formulation, motivation _(TODO: rewrite)_
@@ -23,14 +31,6 @@ Solenoid simulation project
     1. **Further development** - pitch ideas
     2. Summary **_(Rewrite!)_**
 
-**Repo cleanup:**
-1. Cleanup file structure
-2. Software:
-    1. finish API
-    2. comment code
-    3. Proper mcode packaging?
-    4. Rudimentary manual/doc signatures
-
 ### Further improvements:
 1. Expand model - yoke, FEM etc.
 2. Better optimization study
@@ -48,7 +48,7 @@ Solenoid simulation project
 ### Structure:
  - User <-commands in, results, plots out-> [Frontend,Wrapper] <--> Backend (pycode, mcode?)
  - File tree:
-    - src - software code 
+    - src - software code
     - tex - docus, präsi
 
 ### Branches:
