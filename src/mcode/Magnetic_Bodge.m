@@ -1,7 +1,24 @@
 %% Magnetic Field Simulation %%
+
+%    Copyright 2020 Andrii Yanovets
+%    This file is part of solensim.
+%
+%    solensim is free software: you can redistribute it and/or modify
+%    it under the terms of the GNU General Public License as published by
+%    the Free Software Foundation, either version 3 of the License, or
+%    (at your option) any later version.
+%
+%    solensim is distributed in the hope that it will be useful,
+%    but WITHOUT ANY WARRANTY; without even the implied warranty of
+%    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%    GNU General Public License for more details.
+%
+%    You should have received a copy of the GNU General Public License
+%    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
+
 % Notes %
 % Algorithm for optimization of Solenoid dimensions for focusing of
-% electron beam. 
+% electron beam.
 % Given restrictions/initial parameters:
 % -focus length
 % -effective field width
@@ -16,7 +33,7 @@ I=8; % Max current A
 % Magnet field %
 tic
 % Estimated values  %
-    a=99.5*10^-3; % Solenoid heigth 
+    a=99.5*10^-3; % Solenoid heigth
     b=41.8*10^-3; % Solenoid width
     ri=30*10^-3; % Solenoid inner radius
     Ne=400; % Number of windings
@@ -43,7 +60,7 @@ d2Bz=@(z,r,c,N)N.*(1.0./((c.*1i-r).^2+z.^2).^(5.0./2.0).*(c.*1i-r).^2.*3.0+1.0./
 Bz3= @(z,r,c, N) Bz(z,r,c, N).*d2Bz(z,r,c, N);
 Bz4= @(z,r,c, N) Bz(z,r,c, N).^4;
 %
-% 
+%
 F3= @(r,c, N) -integral(@(z) Bz3(z,r,c, N), -inf, inf)./2;
 F4= @(r,c, N) integral(@(z) Bz4(z,r,c, N), -inf, inf);
 F2= @(r,c, N) 2*integral(@(z) Bz2(z,r,c, N), 0, inf);
@@ -91,16 +108,16 @@ rey=@(ax) (riad+ax/2)*(1+(ax^2)/(24*(riad+ax/2)^2));
     maxBzF3=Bz(0, y(1), y(2),y(3))
     F2=  @(x1,x2, x3) 2*integral(@(z) Bz2(z,x1,x2, x3), 0, inf);
     f=   @(x1,x2, x3) 1/(F2(x1,x2, x3).*(eq/(2*pz))^2);
-    SphericalAbbMinF3sumF4 = eq^2*rb^4*F3(x(1),x(2),x(3))/(4*pz^2)+(eq^2/(3*pz^2))*F4(x(1),x(2),x(3))*(eq^2*rb^4)/(4*pz^2) % Searched spher. ab. 
+    SphericalAbbMinF3sumF4 = eq^2*rb^4*F3(x(1),x(2),x(3))/(4*pz^2)+(eq^2/(3*pz^2))*F4(x(1),x(2),x(3))*(eq^2*rb^4)/(4*pz^2) % Searched spher. ab.
     SphericalAbbMinF3 = eq^2*rb^4*F3(y(1),y(2),y(3))/(4*pz^2) % Alternative spher. ab. with considering only F3
     SphericalAbbREGAE = eq^2*rb^4*F3(rec,ce,Ne)/(4*pz^2)+eq^4*rb^4*F4(rec,ce,Ne)/(12*pz^4) % Spher. ab. for REGAE
     emittance= eq^2*(rb/2)^4*F3(x(1),x(2),x(3))/(3*sqrt(2)*vc*em*pz)
     emittanceREGAE=eq^2*(rb/2)^4*F3(rec, ce, 2.5*Ne)/(3*sqrt(2)*vc*em*pz)
     % focal Lengths
-    fokusfF3=f( y(1), y(2),y(3)) 
+    fokusfF3=f( y(1), y(2),y(3))
     fokusfS=f( ys(1), ys(2), ys(3))
     fokusregae= f( rec, ce, 2.5*Ne)
-%% Visualization %% 
+%% Visualization %%
 % Here ctr is put before all parameters to note the method they were
 % estimated with
 ctra=26.823*10^-3;
@@ -137,7 +154,7 @@ line([x(1);x(1)],[0.001;0.001],[0;1.5],'color','green'); % Plot param. estimated
 line([ctrrec;ctrrec],[ctrce;ctrce],[0;1.5],'color','blue'); % Plot the param. estimated with alt. method
 xlabel('Rsq');
 ylabel('c');
-zlabel('F3'); 
+zlabel('F3');
 hold off
 figure( 5)
 plot(zsold, d1Bz(zsold, x(1), x(2), x(3)),zsold,d2Bz(zsold, x(1), x(2), x(3)) )
