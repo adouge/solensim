@@ -28,8 +28,6 @@ from numpy.lib.scimath import power as cpow
 from scipy.integrate import quad as integral
 from scipy.misc import derivative
 
-from pysnooper import snoop as debug
-
 mm = 10**(-3)
 MeV = 10**6
 
