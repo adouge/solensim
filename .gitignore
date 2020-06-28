@@ -41,6 +41,7 @@ octave-workspace
 
 # jupyter trash
 aux/.ipynb_checkpoints/*
+.ipynb_checkpoints/*
 
 # helper dev scripts
 src/dev.py

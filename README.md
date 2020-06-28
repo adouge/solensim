@@ -27,7 +27,7 @@ Solenoid simulation project
 1. Expand model - yoke, FEM etc.
 2. Better optimization study
 3. Improve interface
-
+4. normalized parameter space
 -------
 
 ### TODO Documentation:
@@ -36,7 +36,7 @@ Solenoid simulation project
 
 ### Dependencies:
  - numpy, scipy (found in e.g. Conda)
- - oct2py package, MATLAB Python interface - phased out
+ - _oct2py package, MATLAB Python interface_ - not used currently
 
 ### Structure:
  - User <-commands in, results, plots out-> [Frontend,Wrapper] <--> Backend (pycode, mcode?)
