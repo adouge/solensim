@@ -32,12 +32,30 @@ sorting=nty
 \setbeamertemplate{subsection in toc}[square]
 \setbeamertemplate{footline}[frame number]
 
+%\usecolortheme{seahorse}
+%\useoutertheme{infolines}
+%\setbeamertemplate{headline}{}
+%\setbeamertemplate{footline}
+%{
+%  \leavevmode%
+%  \hbox{%
+%  \begin{beamercolorbox}[wd=0.9\paperwidth,ht=2.25ex,dp=1ex,left]{author in head/foot}%
+%    \hspace{0.2cm} \insertshortauthor : \insertshorttitle
+%  \end{beamercolorbox}%
+%  \begin{beamercolorbox}[wd=0.1\paperwidth,ht=2.25ex,dp=1ex,right]{title in head/foot}%
+%    \insertframenumber{}/\inserttotalframenumber \hspace{0.2cm}
+%  \end{beamercolorbox}}%
+%  \vskip0pt%
+%}
+
+
 \newcommand{\citesame}{$^{\thefootnote}$}
 \newcommand{\citeprev}{\addtocounter{footnote}{-1}$^{\thefootnote}$\addtocounter{footnote}{1}}
 \newcommand{\citepprev}{\addtocounter{footnote}{-2}$^{\thefootnote}$\addtocounter{footnote}{2}}
 \newcommand{\bull}{$\bullet$}
 \newcommand{\rarrow}{$\rightarrow$ }
 \newcommand{\rfn}{\setcounter{footnote}{0}}
+
 \newcommand{\tocslide}{
 \begin{frame}
   \frametitle{Structure}
@@ -72,12 +90,12 @@ sorting=nty
   \begin{itemize}
     \item Magnetic lenses - important components of particle accelerators, microscopes
     \item Electromagnet solenoids - physical foundation of more advanced magnetic lenses
-    \item Design constraints:
-    \begin{itemize}
-      \item Power consumption
-      \item Physical size, material usage
-      \item Characteristic parameters for interaction with other machine components
-    \end{itemize}
+%    \item Design constraints:
+%    \begin{itemize}
+%      \item Power consumption
+%      \item Physical size, material usage
+%      \item Characteristic parameters for interaction with other machine components
+%    \end{itemize}
   \end{itemize}
   \begin{figure}
   \centering
