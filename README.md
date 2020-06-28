@@ -5,14 +5,6 @@ Solenoid simulation project
 
 ### Post-submission:
 
-**Repo cleanup:**
-1. Cleanup file structure
-2. Software:
-    1. finish API
-    2. comment code
-    3. Proper mcode packaging?
-    4. Rudimentary manual/doc signatures
-
 **Presentation:**
 
 0. Project formulation, motivation _(TODO: rewrite)_

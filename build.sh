@@ -27,6 +27,7 @@ rm -rf src/__pycache__
 rm -rf src/mcode/__pycache__
 rm -rf src/pycode/__pycache__
 rm src/octave-workspace
+rm src/mcode/octave-workspace
 
 # pack .zip
 mkdir solensim
