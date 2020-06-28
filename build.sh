@@ -33,6 +33,11 @@ mkdir solensim
 cp -r src/* solensim/
 cp LICENSE solensim/
 cp readme.txt solensim/
+
+# pack matlab code separately, for now:
+mv solensim/mcode/Magnetic_Bodge.m solensim/m_script.m
+rm -rf solensim/mcode
+
 zip -r solensim.zip solensim
 
 # clean tmp build dir
