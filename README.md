@@ -26,6 +26,7 @@ Solenoid simulation project
 ### Further improvements:
 1. Expand model - yoke, FEM etc.
 2. Better optimization study
+3. Improve interface
 
 -------
 

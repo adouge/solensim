@@ -28,7 +28,7 @@ def_Rbeam = 1
 #################
 
 import pycode.wrapper as wrap
-import frontend as front
+import pycode.frontend as front
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -47,7 +47,7 @@ print("\nPlaceholder help text:")
 e.help()
 print("\nUse \"e.help()\" to view the startup help text again.")
 
-import demos
+import pycode.demos as demos
 print("""
 to run a few demos, try:
 demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke)
