@@ -85,6 +85,13 @@ class Core():
         f4,df4 = F4(scaling, geomp)
         return aberr(f3, f4, self.P, self.R)
 
+    def get_spot(self, f, cs):
+        """
+        Get focal spot size (spherical aberration) from given f [m], cs [m]
+        """
+        rspot = cs*(self.R/(f-self.R**2*cs/f**2))**3
+        return rspot
+
     # optimization methods
 
     def opt_cs(self, params):  # function for use in minimization
@@ -170,7 +177,7 @@ class Core():
         return constraints
 
     def ctr_minimize(self, constraints, max_iter=1000, ptol=6, gtol=6, verbose=2, penalty=0):
-        opt_out = opt.minimize(self.opt_cs, (self.s, *self.g),
+        opt_out = opt.minimize(self.get_cs, (self.s, *self.g),
             constraints=constraints,
             options={"maxiter":max_iter,
                 "verbose":verbose,

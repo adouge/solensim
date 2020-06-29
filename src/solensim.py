@@ -19,7 +19,7 @@
 
 # config
 #################
-vstring = "0.1.3"
+vstring = "0.1.4"
 def_B = [75,125]
 def_f = [50,50]
 def_l = [45,55]
@@ -50,8 +50,12 @@ print("\nUse \"e.help()\" to view the startup help text again.")
 import pycode.demos as demos
 print("""
 to run a few demos, try:
-demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke)
-demos.opt_best(e) - the "best" result shown in the presentation
+demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke);
+    keyword arguments:
+        margin - % bound on the deviation from source parameters, defaults to 5%
+        maxiter - maximum iterations, defaults to 1000
+        verbose - True/False - show optimizer's output to follow per-iteration progress, defaults to False
 demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis
 
+No "best" result to show yet, as we have problems with the general concept.
 """)

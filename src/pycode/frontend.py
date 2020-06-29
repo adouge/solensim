@@ -84,13 +84,6 @@ class API_iPython(wrap.PWrapper):
         print("Target g [mm]:", self.target_g)
         print("Target s [N*A]:", self.target_s)
 
-    def get_spot(self, f, cs):
-        """
-        Get focal spot size (spherical aberration) from given f [m], cs [m]
-        """
-        rspot = cs*(self.R/(f-self.R**2*cs/f**2))**3
-        return rspot
-
     def describe(self, s, g):
         """
         Calculate characteristic values from given parameters s, g
