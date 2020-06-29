@@ -19,6 +19,7 @@ citestyle=numeric
 ]{biblatex}
 
 \addbibresource{./../lib/lib.bib}
+\addbibresource{../solensim.bib}
 \graphicspath{{./../figures/}}
 
 \geometry{a4paper, left=25mm, right=25mm, top=20mm, bottom=20mm}
@@ -56,12 +57,22 @@ This is a summarizing description of the physical model - i.e. axial field calcu
 
 \pagenumbering{arabic}
 
+\section{Beam parameters}
+
+The formulas involving $p_{z,0}$ call for relativistic momentum \cite[p. 27]{Disser}. The energy-momentum relation is:
+\[
+E^2 = p^2 + m_0^2;
+\]
+With SI factors, this yields
+\begin{equation}
+	p = \frac{1}{c}\sqrt{E^2 - m_0^2c^4}.
+\end{equation}
 \section{Chromatic aberrations and focal spot size}
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.75\textwidth]{cs_illustration}
-  \caption{title}
+  \caption{Focus shift due to spherical aberrations}
 \end{figure}
 
 \[
