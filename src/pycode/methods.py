@@ -37,8 +37,8 @@ def parse_geometry(geometry):
     c = csqrt((b**2 - a**2)/12)
     return [Rsq, c]
 
-def impuls(E):  # [MeV]
-    return np.sqrt(2*const.m_e*(E*const.e*MeV - const.m_e*const.c**2))
+def impuls(E):  # [MeV] relativistic impulse
+    return 1/const.c*np.sqrt((E*const.e*MeV)**2 - (const.m_e*const.c**2)**2)
 
 # # # # #
 
