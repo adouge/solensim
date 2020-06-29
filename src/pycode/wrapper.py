@@ -34,7 +34,7 @@ class PWrapper(pycode.backend.Core):
         pycode.backend.Core.__init__(self, E, R)
 
     def exit(self):
-        pass  # let the wrapper's del(self) handle it
+        pass  # let the wrapper's close() handle it
 
     def scalc(self):  # placeholder output
         geometry = self.g

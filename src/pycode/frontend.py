@@ -18,7 +18,6 @@
 
 import pycode.wrapper as wrap
 import numpy as np
-from pycode.methods import impuls
 import matplotlib.pyplot as plt
 
 mm = 10**(-3)
@@ -26,14 +25,6 @@ fm = 10**(-15)
 cm = 10**(-2)
 
 class API_iPython(wrap.PWrapper):
-
-    def process_E_R(self):
-        """
-        Convert energy to impulse used later,
-        change beam radius to SI units
-        """
-        self.P = impuls(self.E)
-        self.R = self.R_mm*mm
 
     def __init__(self, E, R):
         wrap.PWrapper.__init__(self, E, R)
@@ -44,7 +35,6 @@ class API_iPython(wrap.PWrapper):
         self.target_f = "None"
         self.target_g = "None"
         self.target_s = "None"
-        self.process_E_R()
         self.results = []
 
     def help(self):

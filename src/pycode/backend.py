@@ -25,9 +25,18 @@ mm = 10**(-3)
 cm = 10**(-2)
 
 class Core():
+    def process_E_R(self):
+        """
+        Convert energy to impulse used later,
+        change beam radius to SI units
+        """
+        self.P = impuls(self.E)
+        self.R = self.R_mm*mm
+
     def __init__(self, E, R):
         self.E = E
         self.R_mm = R
+        self.process_E_R()
 
     # descriptive method:
     def calc(self, scaling, geometry):
