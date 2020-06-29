@@ -15,6 +15,8 @@
 \usepackage{abstract}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage[
+%style=alphabetic,
+%citestyle=alphabetic,
 citestyle=numeric,
 sorting=nty
 ]{biblatex}
@@ -27,6 +29,8 @@ sorting=nty
     linkcolor=black,
     urlcolor=black
 }
+
+\newcommand{\todo}{\textbf{\textit{TODO}} }
 
 \addbibresource{./../lib/lib.bib}
 \addbibresource{../solensim.bib}
@@ -58,7 +62,7 @@ sorting=nty
 \maketitle
 
 \begin{abstract}
-\textit{TODO}
+  \todo
 \end{abstract}
 
 \tableofcontents
@@ -66,64 +70,87 @@ sorting=nty
 \newpage
 
 \section{Introduction}
+  \todo
 \newpage
 
 \section{Physical model}
-\subsection{Beam parameters}
+  \todo Few general words
 
-The formulas involving $p_{z,0}$ call for relativistic momentum \cite[p. 27]{Disser}. The energy-momentum relation is:
-\[
-E^2 = p^2 + m_0^2;
-\]
-With SI factors, this yields
-\begin{equation}
-	p = \frac{1}{c}\sqrt{E^2 - m_0^2c^4}.
-\end{equation}
+  \paragraph{Solenoid geometry} \todo
 
-\subsection{Field calculation}
+  \subsection{Beam parameters}
+    A symmetrical, axial beam of known radius and energy distribution is assumed; the interactions of electrons within the beam are neglected.
+    \paragraph{Electron energy distribution}
+    \todo \cite{Grigoryan2014}
 
-\subsection{Deriving characteristic values}
+    \paragraph{Beam radius}
+    \todo \cite{Disser}
 
-\subsection{Aberrations}
-\paragraph{Spherical aberrations}
+    \paragraph{Electron momentum}
+    The formulas involving $p_{z,0}$ call for relativistic momentum \cite[p. 27]{Disser}. The energy-momentum relation is:
+    \[
+      E^2 = p^2 + m_0^2;
+    \]
+      With SI factors, this yields
+    \begin{equation}
+	     p = \frac{1}{c}\sqrt{E^2 - m_0^2c^4}.
+      \end{equation}
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.75\textwidth]{cs_illustration}
-  \caption{Focus shift due to spherical aberrations}
-\end{figure}
+  \subsection{Field calculation}
+    For on-axis electrons, only the on-axis $B_z(x)$ field component is relevant \cite{Disser}. The models used to describe this field are listed below.
 
-\[
-1/f=const.\cdotp F2
-\]
+    \paragraph{Two-loop approximation}
+      \todo
 
-\[
-\triangle f\simeq c\cdotp x^{2}
-\]
+  \subsection{Deriving characteristic values}
+    \todo
 
-\[
-x=f_{1}tan\left(\alpha\right)\simeq f\cdotp tan\left(\alpha\right)
-\]
+  \subsection{Aberrations}
+    \todo
+    \paragraph{Spherical aberrations} \todo
+      \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{cs_illustration}
+        \caption{Focus shift due to spherical aberrations}
+      \end{figure}
 
-\[
-r_{s}=\triangle f\cdotp tan\left(\alpha\right)\simeq\triangle f\cdotp\alpha\approx\left(c\left(f\cdotp tan\left(\alpha\right)\right)^{2}\right)\cdotp tan\left(\alpha\right)=C_{s}tan\left(\alpha\right)^{3}=C_{s}\cdotp\left(\frac{max\left\{ x\right\} }{f-\triangle f}\right)^{3}
-\]
+      \[
+        1/f=const.\cdotp F2
+      \]
 
-\[
-\underset{f\approx f_{1}}{=}C_{s}\cdotp\left(\frac{max\left\{ x\right\} }{f}\right)^{3}\quad(1)
-\]
+      \[
+        \triangle f\simeq c\cdotp x^{2}
+      \]
 
-If $f\cancel{\approx}f_{1}$then replace $f$ in (1) with $f-max\left\{ x\right\} ^{2}\cdotp\frac{C_{s}}{f^{2}}$
+      \[
+        x=f_{1}tan\left(\alpha\right)\simeq f\cdotp tan\left(\alpha\right)
+      \]
 
-\subsubsection{Chromatic aberrations}
+      \[
+        r_{s}=\triangle f\cdotp tan\left(\alpha\right)\simeq\triangle f\cdotp\alpha\approx\left(c\left(f\cdotp tan\left(\alpha\right)\right)^{2}\right)\cdotp tan\left(\alpha\right)=C_{s}tan\left(\alpha\right)^{3}=C_{s}\cdotp\left(\frac{max\left\{ x\right\} }{f-\triangle f}\right)^{3}
+      \]
+
+      \[
+        \underset{f\approx f_{1}}{=}C_{s}\cdotp\left(\frac{max\left\{ x\right\} }{f}\right)^{3}\quad(1)
+      \]
+
+      If $f\cancel{\approx}f_{1}$then replace $f$ in (1) with $f-max\left\{ x\right\} ^{2}\cdotp\frac{C_{s}}{f^{2}}$
+
+  \subsubsection{Chromatic aberrations}
+    \todo
 
 \newpage
-\section{Software concept and implementation}
+
+\section{Project concept and implementation}
+  \todo
 
 \newpage
+
 \section{Software manual}
+  \todo
 
 \newpage
+
 \printbibliography[
 heading=bibintoc,
 title={References}
