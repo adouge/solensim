@@ -15,8 +15,18 @@
 \usepackage{abstract}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage[
-citestyle=numeric
+citestyle=numeric,
+sorting=nty
 ]{biblatex}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
 
 \addbibresource{./../lib/lib.bib}
 \addbibresource{../solensim.bib}
@@ -24,16 +34,16 @@ citestyle=numeric
 
 \geometry{a4paper, left=25mm, right=25mm, top=20mm, bottom=20mm}
 
-\pagestyle{plain}
-%\pagestyle{fancy}
-%\lhead{Left header}
-%\rhead{Right header}
-%\lfoot{left footer}
-%\rfoot{right footer}
+%\pagestyle{plain}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{solensim documentation}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
 
 \renewcommand{\abstractname}{Summary}
 
-\title{solensim model summary}
+\title{solensim project documentation}
 
 
 \author{Anton Douginets (anton.douginets@physik.hu-berlin.de)
@@ -48,16 +58,18 @@ citestyle=numeric
 \maketitle
 
 \begin{abstract}
-This is a summarizing description of the physical model - i.e. axial field calculation, characteristic value determination from axial field, field integrals etc.
+\textit{TODO}
 \end{abstract}
 
 \tableofcontents
 
 \newpage
 
-\pagenumbering{arabic}
+\section{Introduction}
+\newpage
 
-\section{Beam parameters}
+\section{Physical model}
+\subsection{Beam parameters}
 
 The formulas involving $p_{z,0}$ call for relativistic momentum \cite[p. 27]{Disser}. The energy-momentum relation is:
 \[
@@ -67,7 +79,13 @@ With SI factors, this yields
 \begin{equation}
 	p = \frac{1}{c}\sqrt{E^2 - m_0^2c^4}.
 \end{equation}
-\section{Chromatic aberrations and focal spot size}
+
+\subsection{Field calculation}
+
+\subsection{Deriving characteristic values}
+
+\subsection{Aberrations}
+\paragraph{Spherical aberrations}
 
 \begin{figure}[h]
   \centering
@@ -97,7 +115,19 @@ r_{s}=\triangle f\cdotp tan\left(\alpha\right)\simeq\triangle f\cdotp\alpha\appr
 
 If $f\cancel{\approx}f_{1}$then replace $f$ in (1) with $f-max\left\{ x\right\} ^{2}\cdotp\frac{C_{s}}{f^{2}}$
 
-\printbibliography
+\subsubsection{Chromatic aberrations}
+
+\newpage
+\section{Software concept and implementation}
+
+\newpage
+\section{Software manual}
+
+\newpage
+\printbibliography[
+heading=bibintoc,
+title={References}
+]
 
 %\section{Appendix}
 %Also as begin/end environment
