@@ -45,3 +45,6 @@ aux/.ipynb_checkpoints/*
 
 # helper dev scripts
 src/dev.py
+
+# untrack the jupyter notebook
+solensim.ipynb
