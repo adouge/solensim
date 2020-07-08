@@ -48,7 +48,7 @@ class Core():
         f4,df4 = F4(scaling, geomp)
 
         f = focal(f2, self.P)
-        cs = aberr(f3, f4, self.P, self.R)
+        cs = aberr_s(f3, f4, self.P, self.R)
         l = l_eff(scaling, geomp)
         B0 = peak_B(scaling, geomp)
 
@@ -83,7 +83,7 @@ class Core():
         geomp = parse_geometry((r,a,b))
         f3,df3 = F3(scaling, geomp)
         f4,df4 = F4(scaling, geomp)
-        return aberr(f3, f4, self.P, self.R)
+        return aberr_s(f3, f4, self.P, self.R)
 
     def get_spot(self, f, cs):
         """
@@ -99,7 +99,7 @@ class Core():
         geomp = parse_geometry((r,a,b))
         f3,df3 = F3(NI, geomp)
         f4,df4 = F4(NI, geomp)
-        return aberr(f3, f4, self.P, self.R)
+        return aberr_s(f3, f4, self.P, self.R)
 
     #####
         # constrained trust region algorithm:

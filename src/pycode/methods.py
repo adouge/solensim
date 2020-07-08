@@ -80,7 +80,7 @@ def focal(f2, p):
     inverted = (const.e/2/p)**2*f2
     return 1/inverted
 
-def aberr(f3, f4, p, rad):
+def aberr_s(f3, f4, p, rad):
     return const.e**2*rad**4/4/p**2*f3 + const.e**4*rad**4/12/p**4*f4
 
 def l_eff(scaling, geomp, decimal_places=3):
