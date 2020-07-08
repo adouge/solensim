@@ -38,6 +38,7 @@ class API_iPython(wrap.PWrapper):
         self.target_s = "None"
         self.results = []
 
+### Help text
     def help(self):
         """
         Display placeholder help text.
@@ -70,6 +71,7 @@ class API_iPython(wrap.PWrapper):
         """
         print(helptext)
 
+### Current settings/targets readout
     def settings(self):
         print("E: Electron energy [MeV]:", self.E)
         print("R: RMS Beam radius [mm]:", self.R)
@@ -82,6 +84,9 @@ class API_iPython(wrap.PWrapper):
         print("Target f [cm]:", self.target_f)
         print("Target g [mm]:", self.target_g)
         print("Target s [N*A]:", self.target_s)
+
+### descriptive methods
+
 
     def describe(self, s, g):
         """
@@ -111,38 +116,9 @@ class API_iPython(wrap.PWrapper):
         plt.ylabel("B_z [mT]")
         plt.show()
 
-    def result(self, n):
-        """
-        Show n-th (0, 1, .... -1) result
-        """
-        result = self.results[n]
-        print("Settings:")
-        print(" - g [mm]:", result["g"])
-        print(" - s [A*N]:", result["s"])
-        print("Targets:")
-        print(" - peak B [mT]:", result["t_B"])
-        print(" - FWHM [mm]:", result["t_l"])
-        print(" - f [cm]:", result["t_f"])
-        print(" - g [mm]:", result["t_g"])
-        print(" - s [N*A]:", result["t_s"])
-        print("Result:")
-        self.describe(result["sopt"],result["gopt"])
-        self.illustrate(result["sopt"],result["gopt"])
 
-    def append_result(self):
-        result = {
-        "g" : self.g,
-        "s" : self.s,
-        "t_g" : self.target_g,
-        "t_s" : self.target_s,
-        "t_B" : self.target_Bpeak,
-        "t_l" : self.target_l,
-        "t_f" : self.target_f,
-        "gopt": self.g_opt,
-        "sopt": self.s_opt
-        }
-        self.results.append(result)
 
+### main routine
     def run_ctr(self, margin=5, maxiter=1000, ptol=8, gtol=8, verbose=2, penalty=0):
         """
         CTR Optimization routine wrapper.

@@ -19,12 +19,12 @@
 
 # config
 #################
-vstring = "0.2.0-RC1"
+vstring = "0.2.0-alpha"
 def_B = [75,125]
 def_f = [50,50]
 def_l = [45,55]
 def_E = 3.5
-def_Rbeam = 1
+def_Rbeam = 3
 #################
 
 import pycode.wrapper as wrap

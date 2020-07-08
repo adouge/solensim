@@ -35,7 +35,7 @@ class Core():
     def P(self):
         return impuls(self.E)
 
-    # descriptive method:
+# descriptive methods:
     def calc(self, scaling, geometry):
         geomp = parse_geometry(geometry)
 
@@ -57,8 +57,15 @@ class Core():
         z = np.linspace(-1,1,num=2*10**grain+1)
         return get_Bz(z, s, *geomp)
 
-    # constraint evaluation:
+    def get_spot(self, f, cs):
+        """
+        Get focal spot size (spherical aberration) from given f [m], cs [m]
+        """
+        R = self.R*mm
+        rspot = cs*(R/(f-R**2*cs/f**2))**3
+        return rspot
 
+# constraint evaluation:
     def get_Bpeak(self, params):
         scaling, r, a, b = params
         geomp = parse_geometry((r,a,b))
@@ -75,32 +82,15 @@ class Core():
         geomp = parse_geometry((r,a,b))
         return l_eff(scaling, geomp, decimal_places=grain)
 
-    def get_cs(self, params):
+    def get_cs(self, params):  # current opt function
         scaling, r, a, b = params
         geomp = parse_geometry((r,a,b))
         f3,df3 = F3(scaling, geomp)
         f4,df4 = F4(scaling, geomp)
         return aberr_s(f3, f4, self.P, self.R)
 
-    def get_spot(self, f, cs):
-        """
-        Get focal spot size (spherical aberration) from given f [m], cs [m]
-        """
-        R = self.R*mm
-        rspot = cs*(R/(f-R**2*cs/f**2))**3
-        return rspot
-
-    # optimization methods
-
-    def opt_cs(self, params):  # function for use in minimization
-        NI, r, a, b = params
-        geomp = parse_geometry((r,a,b))
-        f3,df3 = F3(NI, geomp)
-        f4,df4 = F4(NI, geomp)
-        return aberr_s(f3, f4, self.P, self.R)
-
-    #####
-        # constrained trust region algorithm:
+#####
+# constrained trust region algorithm:
 
     def define_ctr_constraints(self, margin=5):
         """

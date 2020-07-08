@@ -36,12 +36,40 @@ class PWrapper(pycode.backend.Core):
     def exit(self):
         pass  # let the wrapper's close() handle it
 
-    def scalc(self):  # placeholder output
-        geometry = self.g
-        scaling = self.s
-        result = self.calc(scaling, geometry)
-        return result
+### result storage
+    def result(self, n):
+        """
+        Show n-th (0, 1, .... -1) result
+        """
+        result = self.results[n]
+        print("Settings:")
+        print(" - g [mm]:", result["g"])
+        print(" - s [A*N]:", result["s"])
+        print("Targets:")
+        print(" - peak B [mT]:", result["t_B"])
+        print(" - FWHM [mm]:", result["t_l"])
+        print(" - f [cm]:", result["t_f"])
+        print(" - g [mm]:", result["t_g"])
+        print(" - s [N*A]:", result["t_s"])
+        print("Result:")
+        self.describe(result["sopt"],result["gopt"])
+        self.illustrate(result["sopt"],result["gopt"])
 
+    def append_result(self):
+        result = {
+        "g" : self.g,
+        "s" : self.s,
+        "t_g" : self.target_g,
+        "t_s" : self.target_s,
+        "t_B" : self.target_Bpeak,
+        "t_l" : self.target_l,
+        "t_f" : self.target_f,
+        "gopt": self.g_opt,
+        "sopt": self.s_opt
+        }
+        self.results.append(result)
+
+### main routine interlayer
     def run_ctr(self, margin=5, maxiter=1000, ptol=6, gtol=6, verbose=2,penalty=0):
         constraints = self.define_ctr_constraints(margin=margin)
         out = self.ctr_minimize(constraints,
