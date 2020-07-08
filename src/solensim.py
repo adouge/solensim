@@ -19,7 +19,7 @@
 
 # config
 #################
-vstring = "0.1.4"
+vstring = "0.2.0-RC1"
 def_B = [75,125]
 def_f = [50,50]
 def_l = [45,55]
@@ -34,7 +34,9 @@ import matplotlib.pyplot as plt
 
 print("solensim v%s WIP Solenoid design tool"%vstring)
 print("========================================")
-e = front.API_iPython(def_E, def_Rbeam)
+e = front.API_iPython()
+e.E = def_E
+e.R = def_Rbeam
 e.target_Bpeak = def_B
 e.target_l = def_l
 e.target_f = def_f

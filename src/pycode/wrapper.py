@@ -30,8 +30,8 @@ class PWrapper(pycode.backend.Core):
     """
     User-facing methods of the python backend
     """
-    def __init__(self, E, R):
-        pycode.backend.Core.__init__(self, E, R)
+    def __init__(self):
+        pycode.backend.Core.__init__(self)
 
     def exit(self):
         pass  # let the wrapper's close() handle it

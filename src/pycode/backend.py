@@ -25,18 +25,15 @@ mm = 10**(-3)
 cm = 10**(-2)
 
 class Core():
-    def process_E_R(self):
-        """
-        Convert energy to impulse used later,
-        change beam radius to SI units
-        """
-        self.P = impuls(self.E)
-        self.R = self.R_mm*mm
+    """
+    TODO
+    """
+    def __init__(self):
+        self.E = 1  # default value to make my life easier
 
-    def __init__(self, E, R):
-        self.E = E
-        self.R_mm = R
-        self.process_E_R()
+    @property
+    def P(self):
+        return impuls(self.E)
 
     # descriptive method:
     def calc(self, scaling, geometry):
@@ -89,7 +86,8 @@ class Core():
         """
         Get focal spot size (spherical aberration) from given f [m], cs [m]
         """
-        rspot = cs*(self.R/(f-self.R**2*cs/f**2))**3
+        R = self.R*mm
+        rspot = cs*(R/(f-R**2*cs/f**2))**3
         return rspot
 
     # optimization methods
@@ -149,7 +147,7 @@ class Core():
         A = np.array([[1,0,0,0],[0,1,-1/2,0],[0,0,1,0],[0,0,0,1]])  # lin abb to verify p, general case
         Ag = np.array([[0,0,0,0],[0,1,-1/2,0],[0,0,1,0],[0,0,0,1]])  # verifying geometry
         As = np.array([[1,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])  # making sure scaling is positive
-        lower_bound = np.array([0,self.R*5,0,0])
+        lower_bound = np.array([0,self.R*5*mm,0,0])
 
         if self.target_s != "None":
             t_s = np.array(self.target_s)

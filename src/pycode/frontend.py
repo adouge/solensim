@@ -26,8 +26,9 @@ cm = 10**(-2)
 
 class API_iPython(wrap.PWrapper):
 
-    def __init__(self, E, R):
-        wrap.PWrapper.__init__(self, E, R)
+    def __init__(self):
+        wrap.PWrapper.__init__(self)
+        self.R = "None"
         self.g = "None"
         self.s = "None"
         self.target_Bpeak = "None"
@@ -49,11 +50,9 @@ class API_iPython(wrap.PWrapper):
             To set targets, initial parameter x:
                 handle.target_x = new value / interval
                 handle.x = new value
-            Permanent settings:
+            Beam settings:
                 E [MeV] - electron energy (currently only monochrome beams handled)
-                R_mm [mm] - "beam radius"
-              call handle.process_E_R() to apply changes - currently a non-developed feature;
-              simpler would be to create a new handle, using "handle_name = front.API_iPython([E in MeV], [R im mm]).
+                R [mm] - "beam radius"
             Starting optimization settings:
                 g (Rmean, a, b) [mm]
                 s [Ampere-Turns]
@@ -67,13 +66,13 @@ class API_iPython(wrap.PWrapper):
             handle.run_ctr(margin=5, maxiter=1000, ptol=8, gtol=8, verbose=2)
                 margin: maximum tolerable percent deviation from target values, for non-interval settings
                 maxiter: maximum iteration number
-                ptol, gtol: convergence tolerance (10 to negative power of), not really tested yet
+                ptol, gtol: convergence tolerance (10 to the negative power of), not really tested yet
         """
         print(helptext)
 
     def settings(self):
         print("E: Electron energy [MeV]:", self.E)
-        print("R: RMS Beam radius [mm]:", self.R_mm)
+        print("R: RMS Beam radius [mm]:", self.R)
         print("g: Geomtery [mm]:", self.g)
         print("s: Ampere-turns [A*N]:", self.s)
 
@@ -96,7 +95,7 @@ class API_iPython(wrap.PWrapper):
         print(" - Peak axial field: %.3f mT"%(B0/mm))
         print(" - Effective field length: %.3f mm"%(l/mm))
         print(" - Focal distance for given E: %.3f cm"%(f/cm))
-        print(" - Spherical aberration for given E: %.3E m"%cs)
+        print(" - Spherical aberration for given E, R: %.3E m"%cs)
         print(" - Focal spot radius: %.3E fm"%(spotsize/fm))
 
     def illustrate(self, s, g):
@@ -128,6 +127,7 @@ class API_iPython(wrap.PWrapper):
         print(" - s [N*A]:", result["t_s"])
         print("Result:")
         self.describe(result["sopt"],result["gopt"])
+        self.illustrate(result["sopt"],result["gopt"])
 
     def append_result(self):
         result = {
@@ -155,4 +155,3 @@ class API_iPython(wrap.PWrapper):
         ptol=ptol, gtol=gtol, penalty=penalty, maxiter=maxiter)
         self.append_result()
         self.result(-1)
-        self.illustrate(self.s_opt, self.g_opt)
