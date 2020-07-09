@@ -54,11 +54,9 @@ print("\nUse \"e.help()\" to view the startup help text again.")
 import pycode.demos as demos
 print("""
 to run a few demos, try:
-demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke);
-    keyword arguments:
-        maxiter - maximum iterations, defaults to 1000
-        verbose - True/False - show optimizer's output to follow per-iteration progress, defaults to False
-demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis
-
-No "best" result to show yet, as we have problems with the general concept.
+    demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke)
+    demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis
+    demos.opt_ok(e) - an OK approach to characteristics originally demanded
+    demos.opt_overcon(e) - an example of how overconstraining can throw the algorithm off
+        (unexpectedly, to a good result, but that is an exception.)
 """)
