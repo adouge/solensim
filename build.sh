@@ -34,6 +34,7 @@ mkdir solensim
 cp -r src/* solensim/
 cp LICENSE solensim/
 cp readme.txt solensim/
+cp tex/doc/doc.pdf solensim/solensim.pdf
 
 # pack matlab code separately, for now:
 mv solensim/mcode/Magnetic_Bodge.m solensim/m_script.m

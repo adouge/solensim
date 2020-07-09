@@ -38,6 +38,38 @@ def opt_REGAE(e, maxiter=1000, verbose=False):
     e.target_Bpeak = 60.855
     if verbose==True: v = 2
     else: v = 1
-    e.settings()
-    e.targets()
     e.run_ctr(maxiter=maxiter, verbose=v)
+
+def opt_overcon(e):
+    e.s = 8000
+    e.g = [50,50,50]
+    e.target_s = [4000,12000]
+    e.target_g = [[10,10,10],[200,200,200]]
+    e.target_f = [50, np.inf]
+
+    e.target_Bpeak = [100,100]
+    e.target_l = [50,50]
+    e.run_ctr(maxiter=100, verbose=1)
+
+def opt_ok(e):
+    e.s = 8000
+    e.g = [50,50,50]
+    e.target_s = [4000,12000]
+    e.target_g = [[10,10,10],[200,200,200]]
+    e.target_f = [50, np.inf]
+
+    e.target_Bpeak = [100,100]
+    e.target_l = [45,55]
+    e.run_ctr(maxiter=100, verbose=1)
+
+
+def opt_ok2(e):
+    e.s = 5000
+    e.g = [100,100,100]
+    e.target_s = [4000,12000]
+    e.target_g = [[10,10,10],[200,200,200]]
+    e.target_f = [50, np.inf]
+
+    e.target_Bpeak = [100,100]
+    e.target_l = [45,55]
+    e.run_ctr(maxiter=100, verbose=1)
