@@ -61,3 +61,15 @@ def opt_ok(e):
     e.target_Bpeak = [100,100]
     e.target_l = [45,55]
     e.run_ctr(maxiter=100, verbose=1)
+
+
+def opt_ok2(e):
+    e.s = 5000
+    e.g = [100,100,100]
+    e.target_s = [4000,12000]
+    e.target_g = [[10,10,10],[200,200,200]]
+    e.target_f = [50, np.inf]
+
+    e.target_Bpeak = [100,100]
+    e.target_l = [45,55]
+    e.run_ctr(maxiter=100, verbose=1)
