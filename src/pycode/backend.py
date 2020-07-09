@@ -29,11 +29,16 @@ class Core():
     TODO
     """
     def __init__(self):
-        self.E = 1  # default value to make my life easier
+        self._E = 1  # default value to make my life easier
 
-    @property
-    def P(self):
-        return impuls(self.E)
+# E, P relationship:
+    def get_E(self):
+        return self._E
+    def set_E(self, E):
+        self._E = E
+        if E != "None": self.P = impuls(E)
+        else: self.P = 0
+    E = property(get_E, set_E)
 
 # descriptive methods:
     def calc(self, scaling, geometry):
@@ -92,7 +97,7 @@ class Core():
 #####
 # constrained trust region algorithm:
 
-    def define_ctr_constraints(self, margin=5):
+    def define_ctr_constraints(self):
         """
         Define constraints. Defaults to unconstrained.
         B, l: [lower, upper] or target (margin of X% (def. 5%) assumed)
@@ -102,7 +107,7 @@ class Core():
             or target list +- margin
         """
 
-        t_margin = margin/100
+        t_margin = self.margin/100
         # target constraints:
         constraints = []
         # peak B:
@@ -134,35 +139,33 @@ class Core():
             constraints.append(con_f)
 
         # geometry, scaling bounds:
-        A = np.array([[1,0,0,0],[0,1,-1/2,0],[0,0,1,0],[0,0,0,1]])  # lin abb to verify p, general case
-        Ag = np.array([[0,0,0,0],[0,1,-1/2,0],[0,0,1,0],[0,0,0,1]])  # verifying geometry
-        As = np.array([[1,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])  # making sure scaling is positive
-        lower_bound = np.array([0,self.R*5*mm,0,0])
+        lower_bound = [0,self.minRin,0,0]
+        upper_bound = [np.inf, np.inf, np.inf, np.inf]
 
-        if self.target_s != "None":
+        if str(self.target_s) != "None":
             t_s = np.array(self.target_s)
             if (t_s.shape == ()):
-                lb = np.array(((1-t_margin)*t_s,0,0,0))
-                ub = np.array(((1+t_margin)*t_s,0,0,0))
-                con_s = opt.LinearConstraint(As, lb, ub)
+                lower_bound[0] = (1-t_margin)*t_s
+                upper_bound[0] = (1+t_margin)*t_s
             else:
-                con_s = opt.LinearConstraint(As, np.array((t_s[0],0,0,0)), np.array((t_s[1],0,0,0)))
-            constraints.append(con_s)
+                lower_bound[0] = t_s[0]
+                upper_bound[0] = t_s[1]
 
         if str(self.target_g) != "None":
             t_g = np.array(self.target_g)
             if len(t_g) == 3:
-                con_g = opt.LinearConstraint(Ag, np.array((0,*t_g*(1-t_margin))),np.array((0,*t_g*(1+t_margin))))
+                lower_bound = [lower_bound[0], *t_g*(1-t_margin)]
+                upper_bound = [upper_bound[0], *t_g*(1+t_margin)]
             elif len(t_g) == 2:
-                con_g = opt.LinearConstraint(Ag, np.array((0,*t_g[0])),np.array((0,*t_g[1])))
-            else: raise ValueError("Improper geometry bounds provided.")
-            constraints.append(con_g)
+                lower_bound = [lower_bound[0], *t_g[0]]
+                upper_bound = [upper_bound[0], *t_g[1]]
+            else: raise ValueError("Error handling geometry bounds.")
 
-        if (str(self.target_s) == "None") and (str(self.target_g) == "None"):
-            con_validity = opt.LinearConstraint(A, lower_bound, np.inf)
-            constraints.append(con_validity)
+        con_p = opt.LinearConstraint(np.identity(4), lower_bound, upper_bound)
+        constraints.append(con_p)
 
         return constraints
+
 
     def ctr_minimize(self, constraints, max_iter=1000, ptol=6, gtol=6, verbose=2, penalty=0):
         opt_out = opt.minimize(self.get_cs, (self.s, *self.g),

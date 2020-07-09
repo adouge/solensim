@@ -32,7 +32,8 @@ mm = 10**(-3)
 MeV = 10**6
 
 def parse_geometry(geometry):
-    r, a, b = np.array(geometry, dtype=np.complex128)*mm
+    r_in, a, b = np.array(geometry, dtype=np.complex128)*mm
+    r = r_in + a/2
     Rsq = r + a**2/24/r
     c = csqrt((b**2 - a**2)/12)
     return [Rsq, c]

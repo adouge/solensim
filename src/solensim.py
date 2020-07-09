@@ -25,6 +25,7 @@ def_f = [50,50]
 def_l = [45,55]
 def_E = 3.5
 def_Rbeam = 3
+def_minRin = def_Rbeam*3
 #################
 
 import pycode.wrapper as wrap
@@ -37,6 +38,7 @@ print("========================================")
 e = front.API_iPython()
 e.E = def_E
 e.R = def_Rbeam
+e.minRin = def_minRin
 e.target_Bpeak = def_B
 e.target_l = def_l
 e.target_f = def_f
@@ -54,7 +56,6 @@ print("""
 to run a few demos, try:
 demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke);
     keyword arguments:
-        margin - % bound on the deviation from source parameters, defaults to 5%
         maxiter - maximum iterations, defaults to 1000
         verbose - True/False - show optimizer's output to follow per-iteration progress, defaults to False
 demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis

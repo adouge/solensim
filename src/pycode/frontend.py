@@ -29,6 +29,7 @@ class API_iPython(wrap.PWrapper):
     def __init__(self):
         wrap.PWrapper.__init__(self)
         self.R = "None"
+        self.minRin = "None"
         self.g = "None"
         self.s = "None"
         self.target_Bpeak = "None"
@@ -36,6 +37,7 @@ class API_iPython(wrap.PWrapper):
         self.target_f = "None"
         self.target_g = "None"
         self.target_s = "None"
+        self.margin = 10
         self.results = []
 
 ### Help text
@@ -54,6 +56,7 @@ class API_iPython(wrap.PWrapper):
             Beam settings:
                 E [MeV] - electron energy (currently only monochrome beams handled)
                 R [mm] - "beam radius"
+                minRin [mm] - Lower bound on solenoid inner radius
             Starting optimization settings:
                 g (Rmean, a, b) [mm]
                 s [Ampere-Turns]
@@ -61,6 +64,8 @@ class API_iPython(wrap.PWrapper):
                 Bpeak [mT] - peak field on axis
                 l [mm] - FWHM
                 f [cm] - focal length for given E
+
+            handle.margin [%] - target margin for single-value settings
             To disable constraints in a parameter, set to \"None\".
 
             Main optimization routine:
@@ -74,9 +79,10 @@ class API_iPython(wrap.PWrapper):
 ### Current settings/targets readout
     def settings(self):
         print("E: Electron energy [MeV]:", self.E)
-        print("R: RMS Beam radius [mm]:", self.R)
-        print("g: Geomtery [mm]:", self.g)
-        print("s: Ampere-turns [A*N]:", self.s)
+        print("R: Beam radius [mm]:", self.R)
+        print("minRin: Minimal inner radius [mm]:", self.minRin)
+        print("g: Starting geomtery [mm]:", self.g)
+        print("s: Starting scaling factor [A*N]:", self.s)
 
     def targets(self):
         print("Target peak B [mT]:", self.target_Bpeak)
@@ -84,10 +90,9 @@ class API_iPython(wrap.PWrapper):
         print("Target f [cm]:", self.target_f)
         print("Target g [mm]:", self.target_g)
         print("Target s [N*A]:", self.target_s)
+        print("Target margin for non-interval bounds [%]:", self.margin)
 
 ### descriptive methods
-
-
     def describe(self, s, g):
         """
         Calculate characteristic values from given parameters s, g
@@ -95,7 +100,7 @@ class API_iPython(wrap.PWrapper):
         (B0, l, f, cs) = self.calc(s,g)
         spotsize = self.get_spot(f, cs)
         print("Parameters:\n - s: %.3f"%s)
-        print(" - R_mean: %.3f mm, a: %.3f mm, b: %.3f mm"%(g[0], g[1], g[2]))
+        print(" - R: %.3f mm, a: %.3f mm, b: %.3f mm"%(g[0], g[1], g[2]))
         print("Resulting characteristics:")
         print(" - Peak axial field: %.3f mT"%(B0/mm))
         print(" - Effective field length: %.3f mm"%(l/mm))
@@ -119,7 +124,7 @@ class API_iPython(wrap.PWrapper):
 
 
 ### main routine
-    def run_ctr(self, margin=5, maxiter=1000, ptol=8, gtol=8, verbose=2, penalty=0):
+    def run_ctr(self, maxiter=1000, ptol=8, gtol=8, verbose=2, penalty=0):
         """
         CTR Optimization routine wrapper.
         Set parameters as attributes of the handle;
@@ -127,7 +132,7 @@ class API_iPython(wrap.PWrapper):
             maxiter - maximum number of algorithm iterations (default 1000)
             margin - percent margin for non-interval target values (default 5%)
         """
-        wrap.PWrapper.run_ctr(self, margin=margin, verbose=verbose,
+        wrap.PWrapper.run_ctr(self, verbose=verbose,
         ptol=ptol, gtol=gtol, penalty=penalty, maxiter=maxiter)
         self.append_result()
         self.result(-1)

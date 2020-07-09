@@ -51,6 +51,7 @@ class PWrapper(pycode.backend.Core):
         print(" - f [cm]:", result["t_f"])
         print(" - g [mm]:", result["t_g"])
         print(" - s [N*A]:", result["t_s"])
+        print(" - Margin [%]:", result["t_margin"])
         print("Result:")
         self.describe(result["sopt"],result["gopt"])
         self.illustrate(result["sopt"],result["gopt"])
@@ -64,14 +65,15 @@ class PWrapper(pycode.backend.Core):
         "t_B" : self.target_Bpeak,
         "t_l" : self.target_l,
         "t_f" : self.target_f,
+        "t_margin" : self.margin,
         "gopt": self.g_opt,
         "sopt": self.s_opt
         }
         self.results.append(result)
 
 ### main routine interlayer
-    def run_ctr(self, margin=5, maxiter=1000, ptol=6, gtol=6, verbose=2,penalty=0):
-        constraints = self.define_ctr_constraints(margin=margin)
+    def run_ctr(self, maxiter=1000, ptol=6, gtol=6, verbose=2,penalty=0):
+        constraints = self.define_ctr_constraints()
         out = self.ctr_minimize(constraints,
             max_iter=maxiter,
             ptol=ptol, gtol=gtol,
