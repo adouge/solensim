@@ -20,8 +20,6 @@ import scipy.constants as const
 import numpy as np
 from numpy.lib.scimath import sqrt as csqrt
 from numpy.lib.scimath import power as cpow
-from scipy.integrate import quad as integral
-from scipy.misc import derivative
 
 mm = 10**(-3)
 MeV = 10**6
@@ -41,23 +39,3 @@ def twoloop(z, s, g):
 ### Beam properties
 def impuls(E):  # [MeV] relativistic impulse
     return 1/const.c*np.sqrt((E*const.e*MeV)**2 - (const.m_e*const.c**2)**2)
-
-
-### Characteristics
-def focal(f2, p):
-    inverted = (const.e/2/p)**2*f2
-    return 1/inverted
-
-
-### Aberrations
-def aberr_s(f3, f4, p, R):
-    rad = R*mm
-    return const.e**2*rad**4/4/p**2*f3 + const.e**4*rad**4/12/p**4*f4
-
-def spot_s(f, cs, R_mm):
-    """
-    Get focal spot size (spherical aberration) from given f [m], cs [m]
-    """
-    R = R_mm*mm
-    rspot = cs*(R/(f-R**2*cs/f**2))**3
-    return rspot

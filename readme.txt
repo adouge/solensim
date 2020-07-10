@@ -1,4 +1,4 @@
-solensim v0.2.0-alpha
+solensim v0.2.0-alpha.2
 
 To use, please run solensim.py in an iPython environment of choice;
 only an iPython interface is so far implemented.

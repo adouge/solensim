@@ -16,11 +16,13 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-from pycode.methods import *
 import scipy.constants as const
 import scipy.optimize as opt
+from scipy.integrate import quad as integral
+from scipy.misc import derivative
 import numpy as np
 import pycode.model as model
+
 
 mm = 10**(-3)
 cm = 10**(-2)
@@ -30,7 +32,7 @@ class Core():
     TODO
     """
     def __init__(self):
-        self.M = "twoloop"
+        pass
 
     field = {
     "twoloop" : model.twoloop
@@ -45,12 +47,14 @@ class Core():
         else: self.P = 0
     E = property(get_E, set_E)
 
-# 0.2.0 code:
-    def FI(self, s, g, n):
-        if n == 3:
-            integrand = lambda z: -1/2*self.field[self.M](z, s, g)*derivative(self.field[self.M], z, n=2, args=(s,g))
-        else:
-            integrand = lambda z: self.field[self.M](z, s, g)**n
+# Field description:
+    def F3(self, s, g):
+        integrand = lambda z: -1/2*self.field[self.M](z, s, g)*derivative(self.field[self.M], z, n=2, args=(s,g))
+        I, dI = integral(integrand, -np.inf, np.inf)
+        return I
+
+    def FN(self, s, g, n):
+        integrand = lambda z: self.field[self.M](z, s, g)**n
         I, dI = integral(integrand, -np.inf, np.inf)
         return I
 
@@ -68,55 +72,23 @@ class Core():
         return opt.root_scalar(f, bracket=[0,1], xtol=10**(-tol)).root*2
 
     def get_f(self, s, g):
-        f2 = self.FI(s, g, 2)
-        return self.focal(f2)
+        f2 = self.FN(s, g, 2)
+        return 1/((const.e/2/self.P)**2*f2)
 
-    def get_cs(self, s, g):  # current opt function
-        f3 = self.FI(s, g, 3)
-        f4 = self.FI(s, g, 4)
-        return self.aberr_s(f3, f4)
-
-### Handles to model:
     def get_Bpeak(self, s, g):
         return self.field[self.M](0,s,g)
 
-    def focal(self, f2):
-        return model.focal(f2, self.P)
+# Aberrations and the like:
+    def get_cs(self, s, g):  # current opt function
+        f3 = self.F3(s, g)
+        f4 = self.FN(s, g, 4)
+        rad = self.R*mm
+        return const.e**2*rad**4/4/self.P**2*f3 + const.e**4*rad**4/12/self.P**4*f4
 
-    def aberr_s(self, f3, f4):
-        return model.aberr_s(f3, f4, self.P, self.R)
-
-    def spot_s(self, f, cs):
-        return model.spot_s(f, cs, self.R)
-
-
-# descriptive methods:
-    def calc(self, scaling, geometry):
-        f2 = self.FI(scaling, geometry, 2)
-        f3 = self.FI(scaling, geometry, 3)
-        f4 = self.FI(scaling, geometry, 4)
-
-        f = self.focal(f2)
-        cs = self.aberr_s(f3, f4)
-        l = self.get_l(scaling,geometry)
-        B0 = self.get_Bpeak(scaling, geometry)
-
-        result = (B0, l, f, cs)
-        return result
-
-    def get_spot(self, f, cs):
-        """
-        Get focal spot size (spherical aberration) from given f [m], cs [m]
-
-        TODO: replace for a param-based function
-        """
-        R = self.R*mm
-        rspot = cs*(R/(f-R**2*cs/f**2))**3
-        return rspot
-
+### OPT section:
 
     def opt(self, p):
-        return self.get_cs(p[0],p[1:])
+        return self.get_cs(p[0], p[1:])
 
     def char(self, p):  # characteristic vector for constraints, order Bmax FWHM Focal
         Bpeak = self.get_Bpeak(p[0], p[1:])
@@ -125,8 +97,6 @@ class Core():
         return (Bpeak, l, f)
 
 
-#####
-# constrained trust region algorithm:
     def define_ctr_constraints(self):
         """
         Define constraints. Defaults to unconstrained.
@@ -211,7 +181,7 @@ class Core():
 
         return constraints
 
-    def ctr_minimize(self, constraints, max_iter=1000, ptol=6, gtol=6, verbose=2, penalty=0):
+    def ctr_minimize(self, constraints, max_iter=100, ptol=9, gtol=9, verbose=2, penalty=0):
         opt_out = opt.minimize(self.opt, (self.s, *self.g),
             constraints=constraints,
             options={"maxiter":max_iter,

@@ -26,7 +26,7 @@ def calc_REGAE(e):
     e.describe(s_REGAE, g_REGAE)
     e.illustrate(s_REGAE, g_REGAE)
 
-def opt_REGAE(e, maxiter=1000, verbose=False):
+def opt_REGAE(e, maxiter=100, verbose=False):
     g_REGAE = [30, 99.5, 41.8]
     s_REGAE = 9*1000
     e.g = g_REGAE
@@ -39,17 +39,6 @@ def opt_REGAE(e, maxiter=1000, verbose=False):
     if verbose==True: v = 2
     else: v = 1
     e.run_ctr(maxiter=maxiter, verbose=v)
-
-def opt_overcon(e):
-    e.s = 8000
-    e.g = [50,50,50]
-    e.target_s = [4000,12000]
-    e.target_g = [[10,10,10],[200,200,200]]
-    e.target_f = [50, np.inf]
-
-    e.target_Bpeak = [100,100]
-    e.target_l = [50,50]
-    e.run_ctr(maxiter=100, verbose=1)
 
 def opt_ok(e):
     e.s = 8000

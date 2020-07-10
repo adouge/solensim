@@ -28,6 +28,7 @@ class API_iPython(wrap.PWrapper):
 
     def __init__(self):
         wrap.PWrapper.__init__(self)
+        self.M = "twoloop"
         self.E = "None"
         self.R = "None"
         self.minRin = "None"
@@ -70,10 +71,11 @@ class API_iPython(wrap.PWrapper):
             To disable constraints in a parameter, set to \"None\".
 
             Main optimization routine:
-            handle.run_ctr(margin=5, maxiter=1000, ptol=8, gtol=8, verbose=2)
+            handle.run_ctr(margin=5, maxiter=1000, ptol=9, gtol=9, verbose=2)
                 margin: maximum tolerable percent deviation from target values, for non-interval settings
                 maxiter: maximum iteration number
-                ptol, gtol: convergence tolerance (10 to the negative power of), not really tested yet
+                ptol, gtol: convergence tolerance (10 to the negative power of),
+                    should be set according to desired result precision and scale of the end solution (WIP)
         """
         print(helptext)
 
@@ -94,12 +96,29 @@ class API_iPython(wrap.PWrapper):
         print("Target margin for non-interval bounds [%]:", self.margin)
 
 ### descriptive methods
+    def calc(self, scaling, geometry):
+        f2 = self.FN(scaling, geometry, 2)
+        f3 = self.F3(scaling, geometry)
+        f4 = self.FN(scaling, geometry, 4)
+
+        f = self.get_f(scaling, geometry)
+        cs = self.get_cs(scaling, geometry)
+        l = self.get_l(scaling,geometry)
+        B0 = self.get_Bpeak(scaling, geometry)
+
+        result = (B0, l, f, cs)
+        return result
+
+    def get_spot(self, f, cs):
+        R = self.R*mm
+        return cs*(R/(f-R**2*cs/f**2))**3
+
     def describe(self, s, g):
         """
         Calculate characteristic values from given parameters s, g
         """
         (B0, l, f, cs) = self.calc(s,g)
-        spotsize = self.get_spot(f, cs)
+        spotsize = self.get_spot(f,cs)
         print("Parameters:\n - s: %.3f"%s)
         print(" - R: %.3f mm, a: %.3f mm, b: %.3f mm"%(g[0], g[1], g[2]))
         print("Resulting characteristics:")
@@ -125,7 +144,7 @@ class API_iPython(wrap.PWrapper):
 
 
 ### main routine
-    def run_ctr(self, maxiter=1000, ptol=8, gtol=8, verbose=2, penalty=0):
+    def run_ctr(self, maxiter=100, ptol=9, gtol=9, verbose=2, penalty=0):
         """
         CTR Optimization routine wrapper.
         Set parameters as attributes of the handle;

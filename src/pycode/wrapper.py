@@ -72,7 +72,7 @@ class PWrapper(pycode.backend.Core):
         self.results.append(result)
 
 ### main routine interlayer
-    def run_ctr(self, maxiter=1000, ptol=6, gtol=6, verbose=2,penalty=0):
+    def run_ctr(self, maxiter=100, ptol=9, gtol=9, verbose=2,penalty=0):
         constraints = self.define_ctr_constraints()
         out = self.ctr_minimize(constraints,
             max_iter=maxiter,

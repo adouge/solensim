@@ -19,7 +19,7 @@
 
 # config
 #################
-vstring = "0.2.0-alpha"
+vstring = "0.2.0-alpha.2"
 def_B = [75,125]
 def_f = [50,50]
 def_l = [45,55]
@@ -54,10 +54,7 @@ print("\nUse \"e.help()\" to view the startup help text again.")
 import pycode.demos as demos
 print("""
 to run a few demos, try:
-    demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke)
     demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis
     demos.opt_ok(e) - an OK approach to characteristics originally demanded
     demos.opt_ok2(e) - a second ok approach from different starting values
-    demos.opt_overcon(e) - an example of how overconstraining can throw the algorithm off
-        (unexpectedly, to a good result, but that is an exception.)
 """)
