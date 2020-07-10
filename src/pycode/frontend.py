@@ -28,6 +28,7 @@ class API_iPython(wrap.PWrapper):
 
     def __init__(self):
         wrap.PWrapper.__init__(self)
+        self.E = "None"
         self.R = "None"
         self.minRin = "None"
         self.g = "None"
@@ -58,7 +59,7 @@ class API_iPython(wrap.PWrapper):
                 R [mm] - "beam radius"
                 minRin [mm] - Lower bound on solenoid inner radius
             Starting optimization settings:
-                g (Rmean, a, b) [mm]
+                g (Inner radius, a, b) [mm]
                 s [Ampere-Turns]
             Target values - single values or tuples (lower bound, upper bound):
                 Bpeak [mT] - peak field on axis

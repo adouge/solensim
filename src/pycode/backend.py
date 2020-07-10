@@ -20,6 +20,7 @@ from pycode.methods import *
 import scipy.constants as const
 import scipy.optimize as opt
 import numpy as np
+import pycode.model as model
 
 mm = 10**(-3)
 cm = 10**(-2)
@@ -29,74 +30,103 @@ class Core():
     TODO
     """
     def __init__(self):
-        self._E = 1  # default value to make my life easier
+        self.M = "twoloop"
+
+    field = {
+    "twoloop" : model.twoloop
+    }
 
 # E, P relationship:
     def get_E(self):
         return self._E
     def set_E(self, E):
         self._E = E
-        if E != "None": self.P = impuls(E)
+        if str(E) != "None": self.P = model.impuls(E)
         else: self.P = 0
     E = property(get_E, set_E)
 
+# 0.2.0 code:
+    def FI(self, s, g, n):
+        if n == 3:
+            integrand = lambda z: -1/2*self.field[self.M](z, s, g)*derivative(self.field[self.M], z, n=2, args=(s,g))
+        else:
+            integrand = lambda z: self.field[self.M](z, s, g)**n
+        I, dI = integral(integrand, -np.inf, np.inf)
+        return I
+
+    def get_B(self, s, g, grain=3):
+        z = np.linspace(-1,1,num=2*10**grain+1)
+        return self.field[self.M](z, s, g)
+
+    def get_l(self, s, g):
+        """
+        Assuming a symmetrical field with max at 0
+        """
+        tol = 4  # (0.1 milimeter precision)
+        Bhalb = self.field[self.M](0,s,g)/2
+        f = lambda x: self.field[self.M](x,s,g) - Bhalb
+        return opt.root_scalar(f, bracket=[0,1], xtol=10**(-tol)).root*2
+
+    def get_f(self, s, g):
+        f2 = self.FI(s, g, 2)
+        return self.focal(f2)
+
+    def get_cs(self, s, g):  # current opt function
+        f3 = self.FI(s, g, 3)
+        f4 = self.FI(s, g, 4)
+        return self.aberr_s(f3, f4)
+
+### Handles to model:
+    def get_Bpeak(self, s, g):
+        return self.field[self.M](0,s,g)
+
+    def focal(self, f2):
+        return model.focal(f2, self.P)
+
+    def aberr_s(self, f3, f4):
+        return model.aberr_s(f3, f4, self.P, self.R)
+
+    def spot_s(self, f, cs):
+        return model.spot_s(f, cs, self.R)
+
+
 # descriptive methods:
     def calc(self, scaling, geometry):
-        geomp = parse_geometry(geometry)
+        f2 = self.FI(scaling, geometry, 2)
+        f3 = self.FI(scaling, geometry, 3)
+        f4 = self.FI(scaling, geometry, 4)
 
-        f1,df1 = F1(scaling, geomp)
-        f2,df2 = F2(scaling, geomp)
-        f3,df3 = F3(scaling, geomp)
-        f4,df4 = F4(scaling, geomp)
-
-        f = focal(f2, self.P)
-        cs = aberr_s(f3, f4, self.P, self.R)
-        l = l_eff(scaling, geomp)
-        B0 = peak_B(scaling, geomp)
+        f = self.focal(f2)
+        cs = self.aberr_s(f3, f4)
+        l = self.get_l(scaling,geometry)
+        B0 = self.get_Bpeak(scaling, geometry)
 
         result = (B0, l, f, cs)
         return result
 
-    def get_B(self, s, g, grain=3):
-        geomp = parse_geometry(g)
-        z = np.linspace(-1,1,num=2*10**grain+1)
-        return get_Bz(z, s, *geomp)
-
     def get_spot(self, f, cs):
         """
         Get focal spot size (spherical aberration) from given f [m], cs [m]
+
+        TODO: replace for a param-based function
         """
         R = self.R*mm
         rspot = cs*(R/(f-R**2*cs/f**2))**3
         return rspot
 
-# constraint evaluation:
-    def get_Bpeak(self, params):
-        scaling, r, a, b = params
-        geomp = parse_geometry((r,a,b))
-        return peak_B(scaling, geomp)
 
-    def get_f(self, params):
-        scaling, r, a, b = params
-        geomp = parse_geometry((r,a,b))
-        f2,df2 = F2(scaling, geomp)
-        return focal(f2, self.P)
+    def opt(self, p):
+        return self.get_cs(p[0],p[1:])
 
-    def get_l(self, params, grain=3):
-        scaling, r, a, b = params
-        geomp = parse_geometry((r,a,b))
-        return l_eff(scaling, geomp, decimal_places=grain)
+    def char(self, p):  # characteristic vector for constraints, order Bmax FWHM Focal
+        Bpeak = self.get_Bpeak(p[0], p[1:])
+        l = self.get_l(p[0], p[1:])
+        f = self.get_f(p[0], p[1:])
+        return (Bpeak, l, f)
 
-    def get_cs(self, params):  # current opt function
-        scaling, r, a, b = params
-        geomp = parse_geometry((r,a,b))
-        f3,df3 = F3(scaling, geomp)
-        f4,df4 = F4(scaling, geomp)
-        return aberr_s(f3, f4, self.P, self.R)
 
 #####
 # constrained trust region algorithm:
-
     def define_ctr_constraints(self):
         """
         Define constraints. Defaults to unconstrained.
@@ -108,37 +138,52 @@ class Core():
         """
 
         t_margin = self.margin/100
-        # target constraints:
         constraints = []
-        # peak B:
-        if str(self.target_Bpeak) != "None":
-            t_Bpeak = np.array(self.target_Bpeak)*mm
-            if type(t_Bpeak) in [np.float64, float]:
-                con_Bpeak = opt.NonlinearConstraint(self.get_Bpeak, t_Bpeak*(1-t_margin), t_Bpeak*(1+t_margin))
-            elif type(t_Bpeak) in [np.ndarray, list]:
-                con_Bpeak = opt.NonlinearConstraint(self.get_Bpeak, t_Bpeak[0], t_Bpeak[1])
-            else: raise ValueError("Incorrect maxB constraint provided.")
-            constraints.append(con_Bpeak)
-        # FWHM:
-        if str(self.target_l) != "None":
-            t_l = np.array(self.target_l)*mm
-            if type(t_l) in [np.float64, float]:
-                con_l = opt.NonlinearConstraint(self.get_l, t_l*(1-t_margin), t_l*(1+t_margin))
-            elif type(t_l) in [np.ndarray, list]:
-                con_l = opt.NonlinearConstraint(self.get_l, t_l[0], t_l[1])
-            else: raise ValueError("Incorrect FWHM constraint provided.")
-            constraints.append(con_l)
-        # focal length:
-        if str(self.target_f) != "None":
-            t_f = np.array(self.target_f)*cm
-            if type(t_f) in [np.float64, float]:
-                con_f = opt.NonlinearConstraint(self.get_f, t_f, np.inf)
-            elif type(t_f) in [np.ndarray, list]:
-                con_f = opt.NonlinearConstraint(self.get_f, t_f[0], t_f[1])
-            else: raise ValueError("Incorrect f constraint provided.")
-            constraints.append(con_f)
 
-        # geometry, scaling bounds:
+        # characteristics: Bpeak, fwhm, f
+        lower_bound = [0,0,0]
+        upper_bound = [np.inf,np.inf,np.inf]
+
+        constrained_B = str(self.target_Bpeak) != "None"
+        constrained_FWHM = str(self.target_l) != "None"
+        constrained_f = str(self.target_f) != "None"
+
+        if constrained_B or constrained_FWHM or constrained_f:
+            # Bpeak
+            if constrained_B:
+                t_Bpeak = np.array(self.target_Bpeak)*mm
+                if type(t_Bpeak) in [np.float64, float]:
+                    lower_bound[0] = t_Bpeak*(1-t_margin)
+                    upper_bound[0] = t_Bpeak*(1+t_margin)
+                elif type(t_Bpeak) in [np.ndarray, list]:
+                    lower_bound[0] = t_Bpeak[0]
+                    upper_bound[0] = t_Bpeak[1]
+                else: raise ValueError("Incorrect Bpeak constraint provided.")
+
+            if constrained_FWHM:
+                t_l = np.array(self.target_l)*mm
+                if type(t_l) in [np.float64, float]:
+                    lower_bound[1] = t_l*(1-t_margin)
+                    upper_bound[1] = t_l*(1+t_margin)
+                elif type(t_l) in [np.ndarray, list]:
+                    lower_bound[1] = t_l[0]
+                    upper_bound[1] = t_l[1]
+                else: raise ValueError("Incorrect FWHM constraint provided.")
+
+            if constrained_f:
+                t_f = np.array(self.target_f)*cm
+                if type(t_f) in [np.float64, float]:
+                    lower_bound[2] = t_f*(1-t_margin)
+                    upper_bound[2] = t_f*(1+t_margin)
+                elif type(t_f) in [np.ndarray, list]:
+                    lower_bound[2] = t_f[0]
+                    upper_bound[2] = t_f[1]
+                else: raise ValueError("Incorrect f constraint provided.")
+
+            con_char = opt.NonlinearConstraint(self.char, lower_bound, upper_bound)
+            constraints.append(con_char)
+
+        # parameter bounds:
         lower_bound = [0,self.minRin,0,0]
         upper_bound = [np.inf, np.inf, np.inf, np.inf]
 
@@ -166,9 +211,8 @@ class Core():
 
         return constraints
 
-
     def ctr_minimize(self, constraints, max_iter=1000, ptol=6, gtol=6, verbose=2, penalty=0):
-        opt_out = opt.minimize(self.get_cs, (self.s, *self.g),
+        opt_out = opt.minimize(self.opt, (self.s, *self.g),
             constraints=constraints,
             options={"maxiter":max_iter,
                 "verbose":verbose,
