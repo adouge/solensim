@@ -28,6 +28,9 @@
 # release .zip
 *.zip
 
+# old versions archive
+old/*
+
 # latex library file backups
 *.bib.bak
 *.bib.sav

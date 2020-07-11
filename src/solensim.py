@@ -17,24 +17,28 @@
 
 # main program script
 
-# config
-#################
-vstring = "0.1.4"
-def_B = [75,125]
-def_f = [50,50]
-def_l = [45,55]
-def_E = 3.5
-def_Rbeam = 1
-#################
-
 import pycode.wrapper as wrap
 import pycode.frontend as front
 import numpy as np
 import matplotlib.pyplot as plt
 
+# config
+#################
+vstring = "0.2.0"
+def_B = [75,125]
+def_f = [50,np.inf]
+def_l = [45,55]
+def_E = 3.5
+def_Rbeam = 3
+def_minRin = def_Rbeam*3
+#################
+
 print("solensim v%s WIP Solenoid design tool"%vstring)
 print("========================================")
-e = front.API_iPython(def_E, def_Rbeam)
+e = front.API_iPython()
+e.E = def_E
+e.R = def_Rbeam
+e.minRin = def_minRin
 e.target_Bpeak = def_B
 e.target_l = def_l
 e.target_f = def_f
@@ -43,19 +47,12 @@ print("\nDefault settings:")
 e.settings()
 print("\nDefault targets:")
 e.targets()
-print("\nPlaceholder help text:")
-e.help()
-print("\nUse \"e.help()\" to view the startup help text again.")
+print("\nUse \"e.help()\" to view the help text.")
 
 import pycode.demos as demos
 print("""
 to run a few demos, try:
-demos.opt_REGAE(e) - try to make the REGAE magnet even better (without considering the yoke);
-    keyword arguments:
-        margin - % bound on the deviation from source parameters, defaults to 5%
-        maxiter - maximum iterations, defaults to 1000
-        verbose - True/False - show optimizer's output to follow per-iteration progress, defaults to False
-demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis
-
-No "best" result to show yet, as we have problems with the general concept.
+    demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis
+    demos.opt_ok(e) - an OK approach to characteristics originally demanded
+    demos.opt_ok2(e) - a second ok approach from different starting values
 """)

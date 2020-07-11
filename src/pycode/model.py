@@ -1,4 +1,3 @@
-#!/bin/sh
 #########################################################################
 #    Copyright 2020 Anton Douginets
 #    This file is part of solensim.
@@ -17,32 +16,26 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# Release .zip "build" script
+import scipy.constants as const
+import numpy as np
+from numpy.lib.scimath import sqrt as csqrt
+from numpy.lib.scimath import power as cpow
 
-# clear previous zip
-rm solensim.zip
+mm = 10**(-3)
+MeV = 10**6
 
-# clean up
-rm -rf src/__pycache__
-rm -rf src/mcode/__pycache__
-rm -rf src/pycode/__pycache__
-rm src/octave-workspace
-rm src/mcode/octave-workspace
+### Field models
+def twoloop(z, s, g):
+    r_in, a, b = np.array(g, dtype=np.complex128)*mm
+    r = r_in + a/2
+    Rsq = r + a**2/24/r
+    c = csqrt((b**2 - a**2)/12)
+    pterm = (Rsq + c)**2/(z**2+(Rsq+c)**2)**(1.5)
+    mterm = (Rsq - c)**2/(z**2+(Rsq-c)**2)**(1.5)
+    B = 1/4*const.mu_0*s*(pterm + mterm)
+    return np.real(B)  # complex part is 0 anyways
 
-# pack .zip
-mkdir solensim
-cp -r src/* solensim/
-cp LICENSE solensim/
-cp readme.txt solensim/
 
-# pack docs into zip
-#cp tex/doc/doc.pdf solensim/solensim.pdf
-
-# pack matlab code separately, for now:
-mv solensim/mcode/Magnetic_Bodge.m solensim/m_script.m
-rm -rf solensim/mcode
-
-zip -r solensim.zip solensim
-
-# clean tmp build dir
-rm -rf solensim
+### Beam properties
+def impuls(E):  # [MeV] relativistic impulse
+    return 1/const.c*np.sqrt((E*const.e*MeV)**2 - (const.m_e*const.c**2)**2)
