@@ -17,6 +17,11 @@
 
 # main program script
 
+import pycode.wrapper as wrap
+import pycode.frontend as front
+import numpy as np
+import matplotlib.pyplot as plt
+
 # config
 #################
 vstring = "0.2.0"
@@ -27,11 +32,6 @@ def_E = 3.5
 def_Rbeam = 3
 def_minRin = def_Rbeam*3
 #################
-
-import pycode.wrapper as wrap
-import pycode.frontend as front
-import numpy as np
-import matplotlib.pyplot as plt
 
 print("solensim v%s WIP Solenoid design tool"%vstring)
 print("========================================")
