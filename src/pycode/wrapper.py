@@ -32,6 +32,7 @@ class PWrapper(pycode.backend.Core):
     """
     def __init__(self):
         pycode.backend.Core.__init__(self)
+        self.results = []
 
     def exit(self):
         pass  # let the wrapper's close() handle it

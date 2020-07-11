@@ -19,9 +19,9 @@
 
 # config
 #################
-vstring = "0.2.0-alpha.2"
+vstring = "0.2.0"
 def_B = [75,125]
-def_f = [50,50]
+def_f = [50,np.inf]
 def_l = [45,55]
 def_E = 3.5
 def_Rbeam = 3
@@ -47,9 +47,7 @@ print("\nDefault settings:")
 e.settings()
 print("\nDefault targets:")
 e.targets()
-print("\nPlaceholder help text:")
-e.help()
-print("\nUse \"e.help()\" to view the startup help text again.")
+print("\nUse \"e.help()\" to view the help text.")
 
 import pycode.demos as demos
 print("""

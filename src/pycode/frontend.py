@@ -40,7 +40,6 @@ class API_iPython(wrap.PWrapper):
         self.target_g = "None"
         self.target_s = "None"
         self.margin = 10
-        self.results = []
 
 ### Help text
     def help(self):
@@ -76,6 +75,23 @@ class API_iPython(wrap.PWrapper):
                 maxiter: maximum iteration number
                 ptol, gtol: convergence tolerance (10 to the negative power of),
                     should be set according to desired result precision and scale of the end solution (WIP)
+
+            handle.describe(s, g):
+                characterize a given parameter set
+            handle.illustrate(s,g):
+                draw a plot
+
+            handle.result(n):
+                show result #n; follows standard python indexing:
+                    - n -1: previous result, -2 the one before etc.
+                    - n 0: first result, 1 the second etc.
+                A WIP feature, will be improved.
+
+            handle.get_B(s,g,model):
+                return axial field from -1 to 1 m, using specified field model (default - "twoloop")
+            handle.FN(s, g, n):
+                get the nth field integral of field with parameters s, g
+
         """
         print(helptext)
 
@@ -98,7 +114,7 @@ class API_iPython(wrap.PWrapper):
 ### descriptive methods
     def calc(self, scaling, geometry):
         f2 = self.FN(scaling, geometry, 2)
-        f3 = self.F3(scaling, geometry)
+        f3 = self.FN(scaling, geometry, 3)
         f4 = self.FN(scaling, geometry, 4)
 
         f = self.get_f(scaling, geometry)

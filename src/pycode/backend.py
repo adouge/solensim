@@ -48,13 +48,11 @@ class Core():
     E = property(get_E, set_E)
 
 # Field description:
-    def F3(self, s, g):
-        integrand = lambda z: -1/2*self.field[self.M](z, s, g)*derivative(self.field[self.M], z, n=2, args=(s,g))
-        I, dI = integral(integrand, -np.inf, np.inf)
-        return I
-
     def FN(self, s, g, n):
-        integrand = lambda z: self.field[self.M](z, s, g)**n
+        if n == 3:
+            integrand = lambda z: -1/2*self.field[self.M](z, s, g)*derivative(self.field[self.M], z, n=2, args=(s,g))
+        else:
+            integrand = lambda z: self.field[self.M](z, s, g)**n
         I, dI = integral(integrand, -np.inf, np.inf)
         return I
 
@@ -80,7 +78,7 @@ class Core():
 
 # Aberrations and the like:
     def get_cs(self, s, g):  # current opt function
-        f3 = self.F3(s, g)
+        f3 = self.FN(s, g, 3)
         f4 = self.FN(s, g, 4)
         rad = self.R*mm
         return const.e**2*rad**4/4/self.P**2*f3 + const.e**4*rad**4/12/self.P**4*f4
