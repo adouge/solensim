@@ -1,11 +1,11 @@
-solensim v0.2.0-alpha.2
+solensim v0.2.0
 
 To use, please run solensim.py in an iPython environment of choice;
-only an iPython interface is so far implemented.
-WIP help text will display upon script loading.
+the displayed instructions will help further.
 
 m_script.m is the MATLAB code; the Python-MATLAB interface is in place, but we haven't
 yet figured out a way to introduce it well into the python program.
+
 
     Copyright 2020 Anton Douginets, Andrii Yanovets
 
