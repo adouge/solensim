@@ -53,4 +53,4 @@ src/dev.py
 solensim.ipynb
 
 # untrack presentation
-tex/Presentation/*
+tex/Presentation
