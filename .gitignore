@@ -51,3 +51,6 @@ src/dev.py
 
 # untrack the jupyter notebook
 solensim.ipynb
+
+# don't track astra executables
+src/tracking/astra/
