@@ -17,32 +17,25 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# Release .zip "build" script
+# Pull Astra executables
+# Run get_astra path/to/solensim/root
+# If none specified, the current directory is used.
 
-# clear previous zip
-rm solensim.zip
+if [ -z $1 ]
+then
+  target="./plugins/astra"
+else
+  target=$1/plugins/astra
+fi
 
-# clean up
-rm -rf src/__pycache__
-rm -rf src/mcode/__pycache__
-rm -rf src/pycode/__pycache__
-rm src/octave-workspace
-rm src/mcode/octave-workspace
+echo "Putting Astra into "$target
+echo "=================="
 
-# pack .zip
-mkdir solensim
-cp -r src/* solensim/
-cp LICENSE solensim/
-cp readme.txt solensim/
+mkdir $target
+cd $target
 
-# pack docs into zip
-#cp tex/doc/doc.pdf solensim/solensim.pdf
+wget https://www.desy.de/~mpyflo/Astra_for_64_Bit_Linux/Astra
+wget https://www.desy.de/~mpyflo/Astra_for_64_Bit_Linux/generator
 
-# pack matlab code separately, for now:
-mv solensim/mcode/Magnetic_Bodge.m solensim/m_script.m
-rm -rf solensim/mcode
-
-zip -r solensim.zip solensim
-
-# clean tmp build dir
-rm -rf solensim
+echo "================="
+echo "Done."

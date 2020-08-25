@@ -17,14 +17,14 @@
 
 # main program script
 
-import pycode.wrapper as wrap
-import pycode.frontend as front
+import wrapper
+import frontend.frontend as front
 import numpy as np
 import matplotlib.pyplot as plt
 
 # config
 #################
-vstring = "0.2.0"
+vstring = "0.2.1"
 def_B = [75,125]
 def_f = [50,np.inf]
 def_l = [45,55]
@@ -49,7 +49,7 @@ print("\nDefault targets:")
 e.targets()
 print("\nUse \"e.help()\" to view the help text.")
 
-import pycode.demos as demos
+import demos
 print("""
 to run a few demos, try:
     demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis

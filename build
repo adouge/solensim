@@ -1,0 +1,49 @@
+#!/bin/sh
+#########################################################################
+#    Copyright 2020 Anton Douginets
+#    This file is part of solensim.
+#
+#    solensim is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    solensim is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
+#########################################################################
+
+# Release .zip build script
+# for v0.2.1
+
+# clear previous zip
+rm solensim.zip
+
+# clean up caches
+rm -rf src/__pycache__
+rm -rf src/backend/__pycache__
+rm -rf src/backend/tracking/__pycache__
+rm -rf src/frontend/__pycache__
+rm -rf src/plugins/__pycache__
+rm -rf src/plugins/mcode/__pycache__
+rm -rf src/plugins/astra/__pycache__
+rm src/octave-workspace
+rm src/mcode/octave-workspace
+
+# pack .zip
+mkdir solensim
+cp -r src/* solensim/
+cp LICENSE solensim/
+cp readme.txt solensim/
+
+# pack docs into zip
+#cp tex/doc/doc.pdf solensim/solensim.pdf
+
+zip -r solensim.zip solensim
+
+# clean tmp build dir
+rm -rf solensim

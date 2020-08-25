@@ -1,20 +1,15 @@
 # solensim
-Solenoid magnet lens simulation project
+Solenoid magnet lens simulation project.
 
-### Task:
-Perform a design study of solenoid magnet lenses
+### Goal:
+A comprehensive solenoid lens design tool
 
 ---
 
 ### Dependencies:
  - numpy, scipy (found in e.g. Conda)
- - _oct2py package, MATLAB Python interface_ - not used currently
-
-### Structure:
- - Program: User <-commands, settings, targets in, results, plots out-> [Frontend,Wrapper] <--> Backend (pycode, mcode?)
- - File tree:
-    - src - software code
-    - tex - docus, präsi
+ - WIP MATLAB plugin: oct2py package, MATLAB Python interface - ***not used currently***
+ - WIP Tracking module: Astra - ***WIP***
 
 ### Branches:
  - master - main branch - only chunk in "done" fragments, no more merging master-->dev
