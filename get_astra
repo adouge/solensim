@@ -18,7 +18,7 @@
 #########################################################################
 
 # Pull Astra executables
-# Run get_astra path/to/solensim/root/ - the last / is important!.
+# Run get_astra path/to/solensim/root
 # If none specified, the current directory is used.
 
 if [ -z $1 ]
