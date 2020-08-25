@@ -26,7 +26,12 @@ def stop(Wrapper):
     Wrapper.exit()
     del(Wrapper)
 
-class PWrapper(backend.Core):
+def test_load_mcode_plugin():
+    import plugins.mcode.wrapper as mwrapper
+    o = mwrapper.OWrapper()
+    return o
+
+class Wrapper(backend.Core):
     """
     User-facing methods of the python backend
     """

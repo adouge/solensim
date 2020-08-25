@@ -16,7 +16,7 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-import wrapper as wrap
+import wrapper
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -24,10 +24,10 @@ mm = 10**(-3)
 fm = 10**(-15)
 cm = 10**(-2)
 
-class API_iPython(wrap.PWrapper):
+class API_iPython(wrapper.Wrapper):
 
     def __init__(self):
-        wrap.PWrapper.__init__(self)
+        wrapper.Wrapper.__init__(self)
         self.M = "twoloop"
         self.E = "None"
         self.R = "None"
@@ -185,7 +185,7 @@ class API_iPython(wrap.PWrapper):
             maxiter - maximum number of algorithm iterations (default 1000)
             margin - percent margin for non-interval target values (default 5%)
         """
-        wrap.PWrapper.run_ctr(self, verbose=verbose,
+        wrapper.Wrapper.run_ctr(self, verbose=verbose,
         ptol=ptol, gtol=gtol, penalty=penalty, maxiter=maxiter)
         self.append_result()
         self.result(-1)
