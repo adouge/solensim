@@ -17,15 +17,20 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# Release .zip "build" script
+# Release .zip build script
+# for v0.2.1
 
 # clear previous zip
 rm solensim.zip
 
-# clean up
+# clean up caches
 rm -rf src/__pycache__
-rm -rf src/mcode/__pycache__
-rm -rf src/pycode/__pycache__
+rm -rf src/backend/__pycache__
+rm -rf src/backend/tracking/__pycache__
+rm -rf src/frontend/__pycache__
+rm -rf src/plugins/__pycache__
+rm -rf src/plugins/mcode/__pycache__
+rm -rf src/plugins/astra/__pycache__
 rm src/octave-workspace
 rm src/mcode/octave-workspace
 
@@ -37,13 +42,6 @@ cp readme.txt solensim/
 
 # pack docs into zip
 #cp tex/doc/doc.pdf solensim/solensim.pdf
-
-# pack matlab code separately, for now:
-mv solensim/mcode/Magnetic_Bodge.m solensim/m_script.m
-rm -rf solensim/mcode
-
-# don't touch tracking, yet
-rm -rf solensim/tracking
 
 zip -r solensim.zip solensim
 

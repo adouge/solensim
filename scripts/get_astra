@@ -23,9 +23,9 @@
 
 if [ -z $1 ]
 then
-  target="./tracking/astra"
+  target="./plugins/astra"
 else
-  target=$1/tracking/astra
+  target=$1/plugins/astra
 fi
 
 echo "Putting Astra into "$target

@@ -16,7 +16,7 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-import pycode.wrapper as wrap
+import wrapper as wrap
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -157,7 +157,24 @@ class API_iPython(wrap.PWrapper):
         plt.ylabel("B_z [mT]")
         plt.show()
 
-
+    def result(self, n):
+        """
+        Show n-th (0, 1, .... -1) result
+        """
+        result = self.results[n]
+        print("Settings:")
+        print(" - g [mm]:", result["g"])
+        print(" - s [A*N]:", result["s"])
+        print("Targets:")
+        print(" - peak B [mT]:", result["t_B"])
+        print(" - FWHM [mm]:", result["t_l"])
+        print(" - f [cm]:", result["t_f"])
+        print(" - g [mm]:", result["t_g"])
+        print(" - s [N*A]:", result["t_s"])
+        print(" - Margin [%]:", result["t_margin"])
+        print("Result:")
+        self.describe(result["sopt"],result["gopt"])
+        self.illustrate(result["sopt"],result["gopt"])
 
 ### main routine
     def run_ctr(self, maxiter=100, ptol=9, gtol=9, verbose=2, penalty=0):

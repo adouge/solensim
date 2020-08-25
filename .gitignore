@@ -53,4 +53,5 @@ src/dev.py
 solensim.ipynb
 
 # don't track astra executables
-src/tracking/astra/
+src/plugins/astra/Astra
+src/plugins/astra/generator

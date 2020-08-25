@@ -16,7 +16,7 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-import pycode.backend
+import backend.backend as backend
 import numpy as np
 
 def stop(Wrapper):
@@ -26,37 +26,18 @@ def stop(Wrapper):
     Wrapper.exit()
     del(Wrapper)
 
-class PWrapper(pycode.backend.Core):
+class PWrapper(backend.Core):
     """
     User-facing methods of the python backend
     """
     def __init__(self):
-        pycode.backend.Core.__init__(self)
+        backend.Core.__init__(self)
         self.results = []
 
     def exit(self):
         pass  # let the wrapper's close() handle it
 
 ### result storage
-    def result(self, n):
-        """
-        Show n-th (0, 1, .... -1) result
-        """
-        result = self.results[n]
-        print("Settings:")
-        print(" - g [mm]:", result["g"])
-        print(" - s [A*N]:", result["s"])
-        print("Targets:")
-        print(" - peak B [mT]:", result["t_B"])
-        print(" - FWHM [mm]:", result["t_l"])
-        print(" - f [cm]:", result["t_f"])
-        print(" - g [mm]:", result["t_g"])
-        print(" - s [N*A]:", result["t_s"])
-        print(" - Margin [%]:", result["t_margin"])
-        print("Result:")
-        self.describe(result["sopt"],result["gopt"])
-        self.illustrate(result["sopt"],result["gopt"])
-
     def append_result(self):
         result = {
         "g" : self.g,

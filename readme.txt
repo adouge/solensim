@@ -1,11 +1,16 @@
-solensim v0.2.0
-
+solensim v0.2.1
+-------------------------------------------------------------------
 To use, please run solensim.py in an iPython environment of choice;
 the displayed instructions will help further.
 
-m_script.m is the MATLAB code; the Python-MATLAB interface is in place, but we haven't
-yet figured out a way to introduce it well into the python program.
-
+The .zip contains all of the source code,
+including extremely WIP, undone and unsuable segments:
+  - MATLAB plugin
+  - Tracking backend
+  - Astra interface & plugin
+They are included for completeness.
+-------------------------------------------------------------------
+License notice:
 
     Copyright 2020 Anton Douginets, Andrii Yanovets
 
