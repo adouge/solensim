@@ -12,6 +12,7 @@ They are included for completeness.
 -------------------------------------------------------------------
 License notice:
 
+
     Copyright 2020 Anton Douginets, Andrii Yanovets
 
     solensim is free software: you can redistribute it and/or modify
