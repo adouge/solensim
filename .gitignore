@@ -60,4 +60,4 @@ src/plugins/astra/generator
 tex/Presentation/*
 
 # untrack figures:
-tex/Figures/*
+tex/figures/*
