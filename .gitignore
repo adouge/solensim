@@ -57,7 +57,7 @@ src/plugins/astra/Astra
 src/plugins/astra/generator
 
 # untrack presentation:
-tex/Presentation
+tex/Presentation/*
 
 # untrack figures:
-tex/Figures
+tex/Figures/*
