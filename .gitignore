@@ -55,9 +55,3 @@ solensim.ipynb
 # don't track astra executables
 src/plugins/astra/Astra
 src/plugins/astra/generator
-
-# untrack presentation:
-tex/Presentation/*
-
-# untrack figures:
-tex/figures/*
