@@ -21,7 +21,7 @@ import scipy.optimize as opt
 from scipy.integrate import quad as integral
 from scipy.misc import derivative
 import numpy as np
-import plugins.model as model
+import backend.model as model
 
 
 mm = 10**(-3)

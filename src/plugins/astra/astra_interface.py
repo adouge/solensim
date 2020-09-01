@@ -1,4 +1,3 @@
-#!/bin/sh
 #########################################################################
 #    Copyright 2020 Anton Douginets
 #    This file is part of solensim.
@@ -17,26 +16,5 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# Pull Astra executables
-# Run get_astra path/to/solensim/root
-# If none specified, the current directory is used.
-
-if [ -z $1 ]
-then
-  target="./plugins/astra"
-else
-  target=$1/plugins/astra
-fi
-
-echo "Putting Astra into "$target
-echo "=================="
-
-cd $target
-
-wget https://www.desy.de/~mpyflo/Astra_for_64_Bit_Linux/Astra
-wget https://www.desy.de/~mpyflo/Astra_for_64_Bit_Linux/generator
-chmod +x Astra
-chmod +x generator
-
-echo "================="
-echo "Done."
+import wrapper
+import f90nml as nml

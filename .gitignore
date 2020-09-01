@@ -46,12 +46,18 @@ octave-workspace
 aux/.ipynb_checkpoints/*
 .ipynb_checkpoints/*
 
-# helper dev scripts
+# helper dev scripts, folder
+dev/*
 src/dev.py
 
 # untrack the jupyter notebook
 solensim.ipynb
 
+# Astra:
 # don't track astra executables
 src/plugins/astra/Astra
 src/plugins/astra/generator
+# don't track example files
+src/plugins/astra/example/*
+# NORRAN
+src/plugins/astra/NORRAN
