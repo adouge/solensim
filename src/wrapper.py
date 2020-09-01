@@ -22,6 +22,7 @@ import numpy as np
 def stop(Wrapper):
     """
     Stop the engine, delete handle
+    (not to be used with the core object)
     """
     Wrapper.exit()
     del(Wrapper)
@@ -31,16 +32,36 @@ def test_load_mcode_plugin():
     o = mwrapper.OWrapper()
     return o
 
+def wip():
+    print("WIP feature, not implemented.")
+
 class Wrapper(backend.Core):
     """
-    User-facing methods of the python backend
+    Backend I/O wrap methods
     """
+    
+    config_path = "WIP"
+
     def __init__(self):
         backend.Core.__init__(self)
         self.results = []
 
-    def exit(self):
-        pass  # let the wrapper's close() handle it
+    def restart(self):
+        """
+        A restart method
+        """
+        print("Clearing result storage...")
+        self.results = []  # flush result storage
+        print("Reloading default settings...")
+        self.load_default_settings()  # WIP
+        print("Done.")
+
+    def load_default_settings(self):
+        """
+            Load default settings from config file @ self.config_path (WIP)
+        """
+        wip()
+        pass
 
 ### result storage
     def append_result(self):
