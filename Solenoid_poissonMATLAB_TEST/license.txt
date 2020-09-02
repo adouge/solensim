@@ -1,0 +1,42 @@
+
+This End-User License Agreement ("EULA") is a legal agreement between you (either as an individual user or as the representative on behalf of yourinstitution) and Los Alamos National Laboratory for the software product identified above, which product includes computer software and may include associated media, printed materials, and "online" or electronic documentation.  By installing, copying, or otherwise using the software product, you agree to be bound by the terms of this EULA.  If you do not agree to the terms of this EULA, then do not install or use the software product.
+
+SOFTWARE PRODUCT LICENSE
+The software product is protected by copyright laws and international copyright treaties, as well as other intellectual property laws and treaties. The software product is licensed, not sold.
+
+ 1) GRANT OF LICENSE.
+
+This EULA grants you, the software user, the following rights:
+
+- Applications Software Use.  The software product may be used by you and others, including visitors, at your institution.  You may install and use the software product, or any prior version thereof on any number of computers.
+
+- File Redistribution.  You may not redistribute the executable files nor the documentation files of the software product.  You may modify and share example input files from the software product subject to the following restriction.  No files from this software product may be sold either separately or bundled with another software product.
+
+- Storage or Network Use. You may store or install a copy of the software product on a storage device, such as a network server, used to install or run the software product on your other computers over an internal network.
+
+
+2) DESCRIPTION OF OTHER RIGHTS AND LIMITATIONS.
+
+- Limitations on Reverse Engineering, Decompilation, and Disassembly.  You may not modify, reverse engineer, decompile, or disassemble the software product, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation of components.
+
+- Rental. You may not rent, lease, or lend the software product to any party.
+
+- Software Transfer.  No provision is made for transfer of rights under this EULA.  You may terminate this EULA by destroying all copies of the software product and all of its component parts.
+
+- Support Services.  Los Alamos National Laboratory may provide you with support services related to the software product.  The provision and use of support services is governed by policies described in the software product
+documentation.  Any supplemental software code provided to you as part of the support services shall be considered part of the software product and subject to the terms and conditions of this EULA.  If you provide technical information to Los Alamos National Laboratory as part of the Support Services, Los Alamos National Laboratory may use such information for product updates and development.  Los Alamos National Laboratory will strive not to utilize such technical information in a form that personally identifies you.
+
+- Termination.  Without prejudice to any of Los Alamos National Laboratory's other rights, Los Alamos National Laboratory may terminate this EULA if you fail to comply with the terms and conditions of this EULA.  In such event, you must destroy all copies of the software product and all of its component parts.
+
+- Upgrades.  The latest version of this software product is available by FTP (File Transport Protocol) as described in the software product documentation.  The software product is not otherwise identified by as an upgrade.
+
+
+3) COPYRIGHT
+
+Copyright, 1985-2005 by the Regents of the University of California.
+
+This software product was produced under U.S. Government contract W-7405-ENG-36 by Los Alamos National Laboratory, which is operated by the University of California for the U.S. Department of Energy.
+
+Neither Los Alamos National Laboratory, nor the U. S. Government, nor the University of California makes any warranty, express or implied, or assumes any liability or responsibility for the use of this software.
+
+

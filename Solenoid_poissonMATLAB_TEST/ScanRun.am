@@ -1,0 +1,92 @@
+Superconducting solenoid magnet for HZB SRF gun - v3a id=160
+
+&reg kprob=0, ! Poisson or Pandira problem
+
+mode=0,      ! -1 Materials have fixed permeability; 0 internal permeability tables
+icylin=1,    ! Cylindrical symmetry
+ienergy=1,   ! Calculate stored energy (inductance)
+dx=.05,dy=.05, ! Mesh size intervals
+nbslo=0, ! Dirichlet boundary cond. on lower edge (-y/z) (was Neumann for 1/2 sol)
+nbsup=0, ! Dirichlet boundary cond. on upper edge (+y/z)
+nbslf=0, ! Dirichlet boundary cond. on left edge (-x/r)
+nbsrt=0, ! Dirichlet boundary cond. on right edge (+x/r)
+RHOGAM = 0.001
+! x = radius, y = long. dimensions
+kmin=1, ktop=116, lmin=60, ltop=420,
+
+; Define X (or R) (physical) and K (logical) line regions:
+xreg= 20., 30., 40., 90.,
+kreg= 1, 201, 251, 281, 301, 302,
+; Define Y (or Z) (physical) and L (logical) line regions:
+yreg= -99,-70.,-12., 0., 12., 70., 99.,
+lreg= 1, 20, 120, 520, 670,820, 920, 1040, 1041, 
+
+
+
+
+
+&
+! define the problem box
+&po x= 0.,y=-100. &
+&po x= 100.,y=-100. &
+&po x= 100.,y= 100. &
+&po x= 0.,y= 100. &
+&po x= 0.,y=-100. &
+
+
+
+!Superconducting solenoid magnet for Niowave SRF gun - v3
+! define the flux clamp - use decarburized iron
+&reg mat=2, mtid=-1 &
+&po y= 4.924, x=  8.000 &
+&po y= 6.805, x=  8.000 &
+&po y= 6.805, x= 13.060 &
+&po y= 6.659, x= 13.060 &
+&po y= 6.659, x= 12.285 &
+&po y= 5.851, x= 12.285 &
+&po y= 5.851, x= 13.060 &
+&po y=-5.851, x= 13.060 &
+&po y=-5.851, x= 12.285 &
+&po y=-6.659, x= 12.285 &
+&po y=-6.659, x= 13.060 &
+&po y=-6.805, x= 13.060 &
+&po y=-6.805, x=  8.000 &
+&po y=-4.924, x=  8.000 &
+&po y=-4.924, x= 10.590 &
+&po y= 4.924, x= 10.590 &
+&po y= 4.924, x=  8.000 &
+
+
+!clamp shell1:
+&reg mat=2, mtid=-1 &
+&po y= 4.924, x=  8.000 &
+&po y= 6.805, x=  8.000 &
+&po y= 6.805, x= 13.060 &
+&po y= 8.700, x= 13.060 &
+&po y= 8.700, x=  6.500 &
+&po y= 4.924, x=  6.500 &
+&po y= 4.924, x=  8.000 &
+
+
+!clamp shell2:
+&reg mat=2, mtid=-1 &
+&po y=-4.924, x=  8.000 &
+&po y=-6.805, x=  8.000 &
+&po y=-6.805, x= 13.060 &
+&po y=-8.700, x= 13.060 &
+&po y=-8.700, x=  6.500 &
+&po y=-4.924, x=  6.500 &
+&po y=-4.924, x=  8.000 &
+
+
+! define the SC solenoid coil pack: N=3030, i=20 A , 
+! org. cross section: 1174mm^2 , new cross section: 1767 mm^2
+&reg mat=1,cur=60600.0 &
+&po y= 0. , x= 8.5185 &
+&po y=-3.5000, x= 8.5185 &
+&po y=-3.5000, x=10.4850 &
+&po y= 3.5000, x=10.4850 &
+&po y= 3.5000, x= 8.5185 &
+&po y= 0. , x= 8.5185 &
+
+!=================================================

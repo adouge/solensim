@@ -1,0 +1,1077 @@
+Following are changes, additions, and bug fixes in Poisson Superfish 
+version 7.  The entries are in reverse chronological order.
+
+October 18, 2013
+Poisson Superfish Version 7.19.0002
+
+Change in SF7: Fixed writing of EGUN files
+
+October 17, 2011
+Poisson Superfish Version 7.19.0001
+
+Change in MDTfish: Maximum number of cell increased from 60 to 99.
+
+February 7, 2007
+Poisson Superfish Version 7.18.0001
+
+Fixed bug in reading parameters for a frequency scan in CFISH
+
+November 7, 2005
+Poisson Superfish Version 7.17.0001
+
+Error messages 320, 321, 322, and 323 now advise how to recover if 
+Automesh exceeds the maximum number of boundary points allocated for 
+the problem.  Automesh estimates the number of fixed boundary points 
+it will need from the number of &PO namelist regions and the number 
+of line regions in the problem.  The estimate is usually much larger 
+than actually needed, but files with a large number of overlapping 
+regions may require a larger allocation.  New REG namelist variable 
+BndMult, which must be 1.0 or greater, multiplies the initial estimate 
+to increase the alllocation.
+
+Error message 120 now works as intended (see 7.16.0001 below).
+
+
+
+September 23, 2005
+Poisson Superfish Version 7.16.0016
+
+A new warning message 194 provides information about failure of the 
+field interpolator caused when it encounters a zero determinant while
+attempting to invert a matrix.  This warning may occur in SFO, SF7,
+WSFplot or any of the tuning programs
+ 
+
+In CFish, new warning message 195 occurs if the code encounters a zero 
+determinant while attempting to attempting to fit the resonance circle.
+
+
+
+
+September 22, 2005
+Poisson Superfish Version 7.16.0014
+
+Program SF7 no longer reports that Egun or Parmela files have been
+created unless the file actually has been created.  Previously, the 
+code reported that it created a file for Parmela when the SF.INI setting
+MakeParmelaFile=Yes.  However, the file is only created for problems 
+with cylindrical symmetry. 
+
+Variable RootNameLength in the [SF7] section of SF.INI defines the number 
+of characters of the name of the solution file to use for the root name 
+of Tablplot files and output files for other codes.  The default setting 
+is 6 characters.  The minimum is 2 characters and the maximum is 246
+characters. 
+
+SF7-created plot files and output files are no longer limited to 2-digit 
+sequence numbers.
+
+The tuning programs now allow long filenames for the Superfish files that
+the code creates.   
+
+
+
+
+September 6, 2005
+Poisson Superfish Version 7.16.0013
+
+When plotting programs Tablplot and Quikplot are launched from the Start 
+menu (or from a batch file or Cmd.exe window without a filename on the 
+command line), the codes will immediately display the Select file dialog 
+window.  The name of the last file opened will appear in the "File name:" 
+field if it still exists.  To open the last file automatically (bypassing 
+the Select file dialog), set AlwaysBrowse=No in the [Quikplot] or [Tablplot] 
+section of SF.INI.
+
+Quikplot now displays on the status bar current values of SF.INI variables 
+MaxDataSets and MaxPoints, and Tablplot displays variables MaxColumns and 
+MaxLines. The status bar also shows progress as the it reads an input file. 
+If the file contains more data than the current SF.INI settings, the status 
+bar will indicate that the code is skipping some data, which may be helpful 
+when reading large files.
+
+The File Statistics item in the File pull-down menu in programs Quikplot 
+and Tablplot reports information about the data file and current settings
+in SF.INI.
+
+
+
+August 31, 2005
+Poisson Superfish Version 7.16.0012
+
+Plotting programs Tablplot and Quikplot now implement the "NoConnect"
+instruction on startup as described in the documentation.  The codes 
+had been ignoring this keyword and line connecting points could only 
+be changed from the program menu.
+ 
+
+
+August 26, 2005
+Poisson Superfish Version 7.16.0011
+
+Instructions in the documentation for starting programs has been 
+updated to reflect the fact that all codes are Windows programs and 
+they can be started by double-click and right-click procedures.  
+The information for some programs still described only command-line 
+procedures.
+
+FTP servers LAACG1.LANL.GOV and LAACG2.LANL.GOV have been retired.
+Distribution is now by web download from:
+http://laacg.lanl.gov/
+The direct link to the Poisson Superfish download page is:
+http://laacg.lanl.gov/laacg/services/download_sf.phtml
+
+
+
+June 28, 2005
+Poisson Superfish Version 7.16.0010
+
+We fixed a bug in Automesh that occurred very rarely and usually
+when called from one of the tuning codes.  The symptom was that the 
+tuning code would abort a run indicating that Automesh reported
+error 328 or 329.  These errors involve overflow of some internal 
+arrays.  The actual problem was too tight a tolerance in comparing 
+end-point coordinates to line region coordinates when tracing the 
+logical path along a segment, which resulted in a failure to identify 
+the mesh section containing the segment.
+
+
+
+June 14, 2005
+Poisson Superfish Version 7.16.0008
+
+We updated the documentation for program SegField (file SFcodes3.doc)
+and the description of the mesh-modification option in the Automesh
+chapter (file SFcodes.doc).  When using SegField for this option, the 
+user can extract data only for the mesh-point nodes by adding the 
+line NodesOnly to the SegField input file.
+
+
+
+May 10, 2005
+Poisson Superfish Version 7.16.0007
+
+We fixed a bug in the field interpolator for electrostatic problems 
+with cylindrical symmetry, which was reported by a user at the Paul 
+Scherrer Institut in Switzerland.  The code was not using special 
+fitting functions near horizontal lines with either Neumann or 
+Dirichlet boundaries.  In some cases, the interpolated results had 
+large unphysical fluctuations in the field components. 
+
+
+
+May 9, 2005
+Poisson Superfish Version 7.16.0006
+
+We fixed a bug in the tuning codes.  The code would stop with an 
+error if the input file's complete pathname were longer than about 
+80 characters.  Pathnames can now be 256 characters long as in other 
+Poisson Superfish codes.
+
+The field interpolator will no longer return interpolated fields for
+points outside the problem geometry when the unit factor CONV is small
+(for example, CONV=0.001 or less).  This bug could be seen when using 
+WSFplot to view the fields at the cursor location.
+
+
+
+April 5, 2005
+Poisson Superfish Version 7.16.0001
+
+Certain REG namelist variables in the Automesh input file should
+only appear in the first REG namelist.  Previously, it was the user's
+responsibility to heed the advice in the documentation to avoid 
+potential problems.  Automesh now stops with error 120 if it finds
+any of these particular variables after the first REG namelist.  The 
+list of variables includes all of the line-region variables, boundary
+conditions at the edges of the geometry, and KPROB, ICYLIN, XJFACT, 
+DX, DY, RX, RY, CONV, MODE, XDRI, and YDRI.
+
+
+
+February 14, 2005 
+Poisson Superfish Version 7.15.0008
+
+The installer now preserves user settings in SF.INI even if the 
+line starts with a comment character (semicolon or exclamation 
+mark).  Previously, if a user had commented a line in the file, 
+the commented line would be preserved, but the original line with
+its default setting would also appear in the new file.  This older 
+behavior could lead to unexpected results.  For example, if the 
+user included in the [Global] section of SF.INI an active version 
+of a commented line in another section, the setting in the [Global]
+section would be ignored.  The Mk_SFINI utility, if run separately 
+after the installation, includes the same change.  
+
+
+
+February 1, 2005 
+Poisson Superfish Version 7.15.0007
+
+We fixed a bug in the line parser used in all Poisson Superfish 
+codes.  In previous versions, a tab character appearing in certain 
+places could cause the parser to fail to recognize valid numerical
+entries.  Tab characters between parameters was not a problem.  
+However, a trailing tab or a tab between the last numerical 
+parameter and a comment string (starting with either a semicolon 
+or an exclamation mark) prevented the code from identifying the 
+last numerical parameter as a number. 
+
+
+The Beta utility program now lists beta, gamma, and energy in 
+the results table.  The user can provide any one of these three
+variables to solve for the other two variables.  These improvements 
+were suggested by a Poisson Superfish user. 
+
+Several new SF.INI settings select the initial display preferences 
+for program Beta.
+
+
+
+January 16, 2005 
+Poisson Superfish Version 7.15.0005
+
+Dialog windows for utility programs Beta and Kilpat now include 
+an entry for the maximum number of significant digits to display 
+for the particle velocity in Beta or for the Kilpatrick field in 
+Kilpat.
+
+
+
+January 13, 2005 
+Poisson Superfish Version 7.15.0004
+
+Stored values of particle rest-mass energies in postprocessor SFO 
+and utility program Beta have been updated with the 2002 CODATA 
+(Committee on Data for Science and Technology) recommended values.
+For more information refer to the National Institute of Standards
+and Technology (NIST) web pages (www.nist.gov). 
+
+In program Beta, the user can choose to enter the particle mass 
+either as rest-mass energy in MeV or a mass in amu. 
+
+We updated the documentation for utility programs Beta and Kilpat
+to reflect the Windows dialog format that has been in use for some 
+time.  
+
+
+
+January 5, 2005 
+Poisson Superfish Version 7.15.0003
+
+In SF7, a minor change in the format of lines written to .T7 files
+(for Parmela) makes the output conform to the Parmela documentation.  
+The change did not affect the performance of Parmela in any way.
+
+
+
+
+December 3, 2004 
+Poisson Superfish Version 7.15.0001
+
+SFO will no longer issue warning message 182 if the particle velocity
+beta computed from the problem geometry and cavity phase length is
+only slightly larger than 1.0.  If the calculated value is between
+1.0 and 1.00001, the code will set BETA = 1.0.  Users can change the 
+permitted range by setting variable BetaTolerance in file SF.INI.
+The default setting is BetaTolerance = 0.00001.
+
+When tuning programs CCLfish, CDTfish, DTLfish, ELLfish, and MDTfish 
+calculate BETA from the supplied cavity length, they check to see if 
+the value lies within the range defined by the BetaTolerance setting 
+in SF.INI. If so, then the code sets BETA = 1.0 and does not issue a
+warning message. 
+
+The SFO postprocessor issues warning messages 181, 182, 183, and 184
+for unphysical values of the particle velocity.  These messages now 
+list possible courses of action for preventing the warning from
+occurring on future calculations.
+
+Tuning programs CCLfish, CDTfish, DTLfish, ELLfish, and MDTfish now 
+add the line "KMETHOD=1" to the REG namelist in Automesh input files.
+This setting directs the SFO part of the calculation (and subsequent
+runs using the stand-alone postprocessor SFO) to use the supplied 
+value BETA to compute the wavenumber for transit-time factor 
+integrals.  With this change we were able to eliminate REG namelist 
+variable BETAD as it is no longer needed. (For backward compatibility,
+Automesh now recognizes BETAD as a synonym for BETA.  However, the 
+documentation no longer refers to BETAD.) These changes should not 
+affect the results of tuning code calculations. Automesh input files
+created by the tuning codes contain more detailed descriptions of 
+REG namelist variables FREQ, FREQD, BETA, KMETHOD, and DPHI. 
+
+We fixed a bug in ELLfish. Although the code was reading file SF.INI,
+it was only using variables from the [Global] section of the file and 
+it was not making use of variables in the [ELLfish] section because 
+of a typographical error.
+  
+
+
+October 27, 2004 
+Poisson Superfish Version 7.14.0022
+
+We added warning message 193 to Pandira to alert the user that the  
+code cannot compute stored energy in permanent-magnet or anisotropic 
+materials.  This feature may be available in a future release.  In
+previous versions, the code would simple skip the calculation without
+indicating why.  The pop-up warning is turned ON by default, but it 
+may be disabled with the line "ShowWarning=-193" in the [Global] 
+section of SF.INI.
+
+Several warning messages were added to Automesh and Poisson starting 
+with version 7.09 related to variable RHOGAM, an under-relaxation
+parameter that limits the rate of change in the reluctivity at each
+re-calculation.  Automesh will no longer give these warnings for 
+problems that only Pandira can solve.  Poisson cannot solve problems 
+containing permanent-magnet or anisotropic materials, and Pandira does 
+not use RHOGAM.
+
+
+October 13, 2004 
+Poisson Superfish Version 7.14.0021
+
+For better readability in electrostatic problems that contain charge,
+Automesh will now recognize REG namelist variable CHARGE as a synonym 
+for CUR.
+
+The ChargeDensity subdirectory under Examples\Electrostatic now 
+contains several problem files that illustrate different ways to set
+up problems with a charge or charge density.  The documentation (in
+file SFexmpl2.doc) discusses these examples.
+
+We fixed a bug in Automesh that affected electrostatic problems for 
+Poisson or Pandira containing a charge region specified by variable CUR 
+or one of its synonyms.  The bug did not affect problems that specified 
+a charge density using variable DEN.  When A REG namelist in the 
+Automesh input file contained a value for CUR, the code multiplied the 
+charge/length by the permittivity of free space where it should have 
+divided by it, making the charge too small by 22 orders of magnitude.
+
+
+October 1, 2004 
+Poisson Superfish Version 7.14.0020
+
+The SFO output file and the documentation have been updated to explain 
+more clearly the transit-time factor integrals.   
+
+
+September 27, 2004 
+Poisson Superfish Version 7.14.0017
+
+The feature in SFO that generates a series of PMI files for a range 
+of beta values was working correctly for multicell cavities, but it 
+was not working for a single cavity.  This bug has been fixed, and it 
+will now work for a single cavity.  
+
+
+September 10, 2004 
+Poisson Superfish Version 7.14.0011
+
+Beginning with version 7.00, the installer and utility program 
+MK_SFINI.EXE would preserve settings in SF.INI that had been edited
+by the user.  The codes will now also preserve any additional comment 
+lines added by the user.
+
+
+August 20, 2004 
+Poisson Superfish Version 7.14.0007
+
+Eliminated support for environment variables SF7_Table, FishScan, and 
+Tape40 left over from version 5 of Poisson Superfish.  The functions
+performed by these setting have long been available using variables 
+in SF.INI. 
+
+SF7 now uses a different variable in SF.INI to indicate whether or
+not to include the field interpolator fitting data in output file 
+OUTSF7.TXT.  Variable ExpandedTable, which can be either Yes or No,
+replaces variable SF7_Table.  When installing an update, the Setup 
+program will make the conversion in an existing SF.INI file, and 
+retain the user's current choice.
+   
+
+
+August 2, 2004 
+Poisson Superfish Version 7.14.0005
+
+Fixed a formatting bug introduced in version 7.13.  Automesh again 
+correctly reports the size of Y mesh spacings when line regions are 
+used.  The code calculated the correct Y mesh intervals, but was 
+reporting values for DXT on lines that said DYT.  
+
+
+
+July 27, 2004 
+Poisson Superfish Version 7.14.0004
+
+Fixed a few other formats in Automesh and SFO similar to the changes 
+made for version 7.14.0003. 
+
+
+July 14, 2004 
+Poisson Superfish Version 7.14.0003
+
+In the output summary of powers and frequency shifts, SFO now writes 
+variables with up to 5 significant figures for the physical coordinates 
+and up to 4 significant figures for fields, powers, and frequencies.
+In previous versions, if the table spanned a wide range of values 
+(e.g., for power dissipation), very small values would show zero or
+only one or two significant digits, and large values might not print
+at all.
+
+
+July 1, 2004 
+Poisson Superfish Version 7.14.0002
+
+The field interpolator in the dynamic link libraries (DLLs) runs slowly 
+if the calling program switches between files very often.  At the 
+suggestion of Tibor Kibedi of the Australian National University, an 
+application now can keep open up to 4 different solution files if the 
+program is linked with additional DLLs provided separately in WinZip 
+file MultiDLL.zip on the LAACG FTP servers.  (The additional files are 
+not part of the Poisson Superfish installation to avoid increasing the 
+size of the installer by more than 40%.  Interested users should download 
+file MultiDLL.zip and refer to Readme_xxx.txt files in the subdirectories 
+of LANL\DeveloperFiles\PoissonSuperfish, where "xxx" stands for the 
+subdirectory name.) 
+
+To assist users in developing programs that call the field interpolator 
+dynamic link library, the DLL now writes more diagnostic information when 
+requested.  To use this feature, set REG namelist variable DiagDLL = 1 in 
+the Automesh input file used to create the Poisson Superfish solution file.  
+
+Documentation of the dynamic link library (DLL) has been updated (see file 
+SFintro.doc).
+
+We thank Peter de Castro of the Thomas Jefferson National Accelerator 
+Laboratory for supplying an example source file for the Microsoft Visual 
+C/C++ language system that calls the field interpolator DLL.  
+
+
+
+June 14, 2004
+Poisson Superfish Version 7.13.0005
+
+Poisson Superfish now uses Winteracter version 5.10f. The Fortran 
+compiler remains Lahey/Fujistu Fortran 95 version 5.7d.
+
+We fixed a bug in Automesh that affected problems with very small 
+mesh dimensions (e.g., Xmax-Xmin less than 0.0001).  The bug was 
+apparently introduced in Automesh version 7.09.  In the section 
+where the code traces the path along circular or elliptical segments, 
+Automesh was using a tolerance for comparisons based upon the smallest 
+mesh interval. However, in that section of code, the coordinates have 
+been scaled to a "logical plane" where a mesh interval is 1 unit 
+regardless of the physical dimensions.  For very small dimensions,
+the code stopped with error 360 because it could not satisfy a 
+convergence requirement when computing the location of the next 
+point along the arc.  
+
+Program SFOtable now reads RFQfish-generated SFO files if keyword
+CartesianCoordinates appears in the SFOtable control file.  Before,
+the code would reach the end of SFO files unexpectedly because it
+could not find items that are only calculated for problems with 
+cylindrical symmetry (e.g., E0, transit-time factor, etc.) 
+
+Program RFQfish now writes entries in the SFO output file (in the
+list of tuning-code setup parameters) for the first eight 
+parameters in the Data/EndData section. 
+
+The Data/EndData section of RFQfish control files may include a 
+tenth column supplied by the user.  The name of this data column 
+appears on new keyword line ParameterName line near the beginning 
+of the file.  If present, the value of the tenth column appears in 
+the list of setup parameters in the SFO file. 
+
+When more than one Poisson Superfish job runs simultaneously on the 
+same machine, two programs could cause a sharing violation when opening
+file SF.INI or other preference files.  The codes now check for this 
+problem.  If unable to open SF.INI after a few tries, the codes will 
+write a warning in the output text file and alert the user with a 
+pop-up warning message.
+
+The example file CVFInterp1.f90 that demonstrates how to create a 
+Compaq Visual Fortran (CVF) program that calls the field interpolator
+DLL has been updated. The new version contains compiler directives 
+that allow compilation to proceed with all default compiler settings.
+We thank Tibor Kibedi of the Australian National University for 
+sending the updated example file.
+
+
+
+April 7, 2004
+Poisson Superfish Version 7.12.0008
+
+We fixed a formatting error in warning message 184 in SFO.
+
+
+
+March 26, 2004
+Poisson Superfish Version 7.12.0006
+
+In version 7.05, we added SF.INI variable Force1MVperMeter to 
+control whether postprocessor SF7 normalizes the fields calculated
+for Parmela to EZERO = 1.0 MV/m when running the code with a .IN7
+input file.  It is now possible to specify whether or not to do
+this normalization in the .IN7 file itself. If the new keyword 
+Normalization appears on the Parmela command line for interpolating
+on a grid, then SF7 forces EZERO = 1.0 MV/m. But, if the keyword 
+NoNormalization appears, then the code uses the normalization 
+computed by postprocessor SFO (or the default of H = 1000 A/m at
+the driving point if SFO has not been run). For multiple sets of
+interpolations in the same file, the last setting remains in 
+effect until changed by another keyword.  
+
+
+
+March 26, 2004
+Poisson Superfish Version 7.12.0004
+
+We fixed a bug that could cause Automesh to crash if any 
+single-point regions appeared in the Automesh input file before 
+other regions containing the same point(s).
+
+The POA namelist in Automesh input files now works correctly
+for input units other than centimeters (CONV set to a value
+other than 1.0).     
+
+Tuning programs CCLfish, CDTfish, DTLfish, and ELLfish will now 
+create an input control file for program ReadPMI under certain 
+circumstances. ReadPMI is distributed with the Parmila program.
+A tuning code creates this input file if ParmilaData = Yes 
+in file SF.INI (indicating that the code should produce PMI files
+containing transit-time factor integrals), and if the particle 
+velocity always increases from one problem to the next, and if 
+tuning code control file contains at least two problems.  The 
+ReadPMI input file has extension .RDP.
+
+
+
+
+March 16, 2004
+Poisson Superfish Version 7.11.0006
+
+We removed an extra unused check box from the ConvertF dialog 
+window.
+
+When looking for file SF.INI, codes previously could fail to find 
+SF.INI if the path to the working directory contained the name of 
+the program.  This bug has been fixed.  The error did not occur 
+if the working directory contained a copy of SF.INI, if the file
+was in the location set by environment variable SFINI.
+ 
+
+
+
+February 25, 2004
+Poisson Superfish Version 7.11.0005
+
+Command lines in the sample batch files can now accept path names
+that contain blank characters.  Previously, if a user installed 
+the codes in a directory containing a blank character (e.g., in
+Program Files), these batch files would not work.
+
+ 
+
+February 22, 2004
+Poisson Superfish Version 7.11.0001
+
+Program SF7 can now duplicate the feature in Poisson and Pandira 
+that creates a 2-D field map for input to the Parmela program.
+Using this feature does not require any settings in the Automesh
+input file, nor any settings in file SF.INI. SF7 is now the 
+preferred method for creating all three types of 2-D cylindrically
+symmetric field maps: rf, magnetic, and electrostatic. 
+
+Program SF7 has several new settings in file SF.INI that define
+default values for most entries in the program's dialog window.
+
+The SF7 dialog window now includes a browse button to find an 
+input file when interpolating along a user-supplied curve and 
+when reading a file containing command lines.
+ 
+ 
+
+
+January 29, 2004
+Poisson Superfish Version 7.10.0002
+
+We added a second permeability table for vanadium permendur and 
+updated the documentation (file SFcodes.Doc) to give the source of 
+both vanadium permendur tables.  
+
+
+
+
+January 27, 2004
+Poisson Superfish Version 7.10.0001
+
+We fixed a bug and some other potential problems in programs that 
+invert a tridiagonal matrix (Fish, CFish, Autofish, Pandira and 
+tuning codes).  The changes affect mainly large problems that need 
+to write temporary data to a disk file.  To invert the matrix, the 
+code saves two arrays associated with M submatrices, where M is 
+the larger of Kmax and Lmax.  One array has dimension N x M-1, 
+where N is the smaller of Kmax and Lmax, and the other array has 
+dimension N*N x M-1.  During each cycle, the code saves the arrays
+to either memory or disk, then reads them back in reverse order.  
+Previously, if a disk file were needed, both arrays were saved to 
+the file.  Now the code always allocates memory to save the smaller 
+array.  Some integer arithmetic that could overflow for very large 
+problems has been replaced by floating-point calculations. 
+
+Program ConvertF has a new check box that selects whether or not
+the cavity ambient temperature and gas temperature should change 
+together.
+
+
+
+December 28, 2003
+Poisson Superfish Version 7.09.0001
+
+Poisson Superfish now uses Winteracter version 5.10e. The Fortran 
+compiler remains Lahey/Fujistu Fortran 95 version 5.7d. 
+
+We fixed a serious bug in Automesh that would affect any problem with 
+a very large number of mesh points.  The bug has been in all previous 
+versions of Poisson Superfish, but only became apparent when people 
+began to take advantage of modern powerful computers to run larger 
+meshes than ever attempted in the past.  The trouble was in the part
+of Automesh that was formerly a separate program known as "Lattice."
+When assigning the interior points of the mesh the code included some
+integer arithmetic that multiplied together four numbers that could 
+be as large as (KMAX*LMAX)^2, where KMAX and LMAX are the number 
+of mesh intervals in the X and Y directions.  For a mesh with equal 
+intervals in both directions, this intermediate product would exceed
+the largest positive 4-byte integer if both logical coordinates K and
+L exceeded 215.  Oblong meshes were not as troublesome.  For example, 
+a problem with KMAX = 462 and LMAX = 100 would not cause a problem.
+The symptoms of this bug were varied.  The initial assignments of 
+the interior points could result in a severely distorted mesh, but 
+the successive over-relaxation optimization procedure, which tries 
+to equalize triangle areas, might correct any problems.  In some 
+cases, the problems could be so severe that Automesh was unable to 
+resolve the mess and would issue an error message about overlapping 
+or near-zero-area triangles.  Problems were less likely to occur if 
+the geometry contained line regions.  The worst situation appears to
+have been large expanses that lacked both line regions and features 
+described by closed regions.
+
+We fixed a potential problem in the line parser used in all Poisson
+Superfish codes.  In previous versions, the line parser would attempt
+to read as real variables certain character strings that did not 
+represent numbers.  The codes will now recognize examples such as 
+"100E0.2" or "1.0E+400" or "1.0E-400" as character strings rather 
+than numbers.  Any decimal point must precede the "E" or "D" that 
+signals a number in scientific notation.  Also, for numbers in 
+scientific notation, the exponent must be in the range -307 to +307.  
+This change should result in a useful error message if this sort of 
+typographical error occurs in an input file.  
+
+Poisson and Pandira problems now may select an internal permeability
+table for vanadium permendur.  Potential users of this feature will 
+also be interested in next few paragraphs. 
+
+We have added documentation and some warning messages in Automesh 
+and Poisson related to variable RHOGAM, which is an under-relaxation
+parameter that limits the rate of change in the reluctivity at each
+re-calculation.  The default value of 0.08 is usually near optimum 
+for 1010 steel (the default material table), but it may be too 
+large for some materials, in particular for vanadium permendur.  
+Some problems may not converge if RHOGAM remains at the default 
+value. 
+
+Automesh issues warning 190 if under-relaxation parameter RHOGAM 
+remains at its default setting when the internal permeability table 
+for vanadium permendur is in use.  The pop-up warning is turned ON
+by default, but it may be disabled with the line "ShowWarning=-190"
+in the [Global] section of SF.INI. 
+
+Automesh issues warning 191 if under-relaxation parameter RHOGAM 
+remains at its default setting when a user-supplied permeability 
+table is in use.  The pop-up warning is turned OFF by default, but
+it may be enabled with the line "ShowWarning=191" in the [Global] 
+section of SF.INI. 
+
+Poisson issues warning 192 if the residuals RESIDA or RESIDI do 
+not decrease steadily.  The warning message advises that a possible 
+cause of the oscillation is too large a value for under-relaxation
+parameter RHOGAM.  The pop-up warning is turned ON by default, and
+will occur once after cycle 1000 if a residual has increased more 
+than half the number of times that it has decreased.  The warning 
+may be disabled with the line "ShowWarning=-192" in the [Global] 
+section of SF.INI. 
+
+
+
+
+December 14, 2003
+Poisson Superfish Version 7.08.0001
+
+We fixed a bug in SFO reported by a user at SLAC. If the Automesh
+input file included the NORM=3 option to normalize fields to the  
+value of ASCALE, and if SFO read a .SEG file, the code would set 
+ASCALE = 0 unless the .SEG file included a value for ASCALE.
+
+Program Tablplot now changes the correct scale (X or Y) from 
+linear to log or back when the menu item is selected.       
+ 
+
+
+
+December 10, 2003
+Poisson Superfish Version 7.07.0002
+
+We fixed a bug in several programs that resulted in truncated
+names for some output files if the original Automesh input file 
+had a name longer than 12 characters. The problem affected output 
+files written by SFO, SF7, Poisson, and Pandira.
+
+
+
+December 2, 2003
+Poisson Superfish Version 7.07.0001
+
+We made some changes to the plot file FishScan.TBL written by 
+programs Fish and CFish.  The column of sequence numbers, which 
+was seldom of any use has been omitted.  CFish now writes both 
+real and imaginary parts of D(k^2) and dH1, the field error at 
+the driving point.
+
+We made some changes in the complex root finder used by program 
+CFish.  The code now counts the number of materials that have a 
+nonzero imaginary part of either epsilon or mu.  If there are no 
+complex materials, the root finder and convergence are the same as 
+in program Fish.  With no complex materials, CFish does not attempt 
+to fit a resonance circle to the driving-point field error data.  
+It just returns the usual D(k^2) value.  If there are any complex 
+materials, then the convergence criteria on the slope of D(k^2) 
+being close to -1 is replaced by the requirement that the slope 
+is negative.  During a resonance search, CFish will not test for 
+convergence until it has enough data (3 cycles) to fit a circle 
+to the driving-point field error in the complex plane.  The 
+documentation (in file SFcodes.doc) includes a new section that 
+discusses the complex root finder.
+
+There are two new SF.INI variables related to the changes in the 
+CFish code.  Variable CFishCirclePlot controls whether CFish writes 
+an input file for program Quikplot to display fitted resonance 
+circles at each cycle of a mode search.  Variable ScanFormatComplex 
+controls whether the initial FishScan.TBL display shows a plot of 
+the driving-point field error in the complex plane or a plot of D(k2)
+versus frequency as it does for the results written by program Fish. 
+
+If one uses the Escape key to stop program Fish or CFish while the 
+code is performing a frequency scan, the output file OUTFIS.TXT 
+will now contain all the calculated data.  The file was not closed 
+properly if previous versions, so it was missing several lines of 
+text.    
+
+We failed to assign a number to two SFO error messages when Poisson 
+Superfish version 7 was first released.  Error 600 now occurs if SFO 
+cannot allocate arrays for boundary-point data.  Error 638 occurs if
+the SFO input file contains an unrecognized keyword.
+
+Program Tablplot has two new options.  The code can sort the data 
+table by a specified column, and it can label individual data points 
+by the values from a specified column.  The features can be activated 
+by keywords in the input file or from menu items after the program 
+starts.  When labeling points, the user can select which point to 
+start with, how many points to skip between labeled points, the 
+number of significant digits in the labels, and the label orientation 
+angles. One use of these features is to view a trajectory of points 
+in the X-Y plane as a function of some other variable.  For example, 
+one may plot the rf reflection coefficient in the complex plane, but 
+sort (and label, if desired) the plotted points according to the rf 
+frequency.  
+
+
+
+November 5, 2003
+Poisson Superfish Version 7.06.0002
+
+Poisson Superfish now uses Winteracter version 5.10c. The Fortran 
+compiler remains Lahey/Fujistu Fortran 95 version 5.7d. 
+
+
+
+
+October 2, 2003
+Poisson Superfish Version 7.06.0001
+
+For magnet problems, two new Automesh REG namelist variables instruct
+Poisson and Pandira to compute a series of solutions for different 
+values of the current multiplier XJFACT.  Variable XJFACT itself 
+serves as the starting value for the series.  Variable XJFEND is the 
+ending value and XJSTEPS is the number of steps in the series after 
+the first calculation. The code saves output files with filenames 
+that include the number in the series of calculations.  This feature
+was suggested by a user at Brookhaven National Laboratory.
+
+We noticed that two options from pre-1992 versions of Poisson could 
+not be selected because the appropriate REG namelist variables were 
+not recognized.  It is doubtful that the features are of much use, 
+but nevertheless, we added the variables ICAL, IHDL, and ICYSEN to 
+the REG namelist variables.  The limited documentation we could find 
+for these features appears in sections under "Input options for 
+Poisson and Pandira" in file SFcodes.Doc.
+
+
+
+
+September 22, 2003
+Poisson Superfish Version 7.05.0001
+
+New SF.INI variable Force1MVperMeter controls whether postprocessor
+SF7 normalizes the fields calculated for Parmela to EZERO = 1.0 MV/m
+when running the code with a .IN7 input file.  Previously, in order 
+to turn off the 1-MV/m normalization, the user would have to use the 
+dialog window and uncheck the box labeled "Force E0 = 1 MV/m." 
+Variable Force1MVperMeter also defines the initial setting of the 
+check box in the SF7 dialog window. 
+
+We fixed a bug in the calculation of power losses and stored energy
+for rectangular regions computed by SF7 and WSFplot. The area of 
+some mesh triangles near corners of the rectangular region were 
+being calculated incorrectly.  The bug was encountered only rarely 
+because the only triangles affected were those that had one point 
+outside the rectangular region and that point plus one other point 
+were both exactly on one of the boundaries of the rectangular region.
+
+
+
+September 12, 2003
+Poisson Superfish Version 7.04.0005
+
+Poisson Superfish now uses Lahey/Fujistu Fortran 95 version 5.7d and 
+Winteracter version 5.0g.
+ 
+
+
+August 21, 2003
+Poisson Superfish Version 7.04.0003
+
+Eliminated a divide-by-zero error in ConvertF that occurred when 
+the cavity temperature and operating temperature were equal.  The 
+error had no effect on results, except that the computed value of 
+the expansion coefficient (which is not used in this case) would 
+not correspond to the entered conditions.  The code now displays
+a message indicating that the expansion coefficient is unreliable 
+if the two temperature are equal.
+
+
+
+August 11, 2003
+Poisson Superfish Version 7.04.0002
+
+Error messages 384 and 386 include a clarifying comment about
+the origin of the quantities XMIN, XMAX, YMIN, and YMAX.
+
+
+
+July 3, 2003
+Poisson Superfish Version 7.04.0001
+
+The preference files containing start-up settings written by plotting 
+programs WSFplot, Quikplot, and Tablplot are now text files rather 
+than binary files.  The codes will delete old copies of the binary
+files (WSFDATA.PRF, Quikplot.PRF, Tablplot.PRF, Qplot95.PRF, and
+Tplot95.PRF) when started in a directory contain these files.  The 
+text filenames are WSFPRF.TXT, QplotPRF.TXT, and TplotPRF.TXT.
+
+
+
+June 26, 2003
+Poisson Superfish Version 7.03.0002
+
+We fixed a bug in SF7 that caused the code to crash on electrostatic 
+problems when interpolating on a grid.
+
+Poisson and Pandira now report the correct (positive) sign of the 
+stored energy for electrostatic problems in Cartesian coordinates.  
+
+We made a cosmetic change to the ConvertF dialog box to use a larger
+display region for the results.  If a large Windows font size were 
+in use, the results sometimes used more than one line per item. 
+
+
+
+June 3, 2003
+Poisson Superfish Version 7.03.0001
+
+
+We added a new namelist type in program Automesh. Variables in the 
+POA namelist define a single-point boundary value at location XA,YA. 
+The boundary value ASET corresponds to the vector potential Az (or 
+Aphi) for magnet problems, voltage V for electrostatic problems, or 
+the magnetic field Hz (or Hphi) for rf problems.  This feature restores 
+a capability previously found in older versions of Poisson and Pandira. 
+In version 4 and earlier, users could provide a list of logical 
+coordinates and potential values directly to these solver programs. 
+The present implementation defines the points using their physical 
+coordinates instead of their logical coordinates, and the entries 
+are part of the Automesh input file. 
+
+We made the following improvements in ConvertF, the frequency conversion
+program:
+- Radio buttons replace previous scrolling text boxes to select ambient 
+  gas and cavity material.
+- Cavity material "Other" selects the user-supplied thermal expansion 
+  coefficient in units corresponding to the current temperature input
+  units (e.g., /deg F or /deg C).
+- Results appear in color in a text box that allows the user to 
+  highlight and copy text. 
+- The computed expansion coefficient now appear in the results text
+  box and also in the output file XFREQ.TXT. 
+- Precision of frequency output changed from 10 Hz to 1 Hz.   
+- Dialog box now has buttons to update results or stop the program.    
+  (As in previous versions, changing entry fields also updates the 
+  results automatically.) 
+
+
+April 17, 2003
+Poisson Superfish Version 7.02.0001
+
+We fixed a bug in Automesh that affected input files that use lines 
+regions and also use units other than centimeters (CONV values other 
+than 1.0).  The code could diagnose an error because line-region 
+coordinates in user units were being compared with problem boundaries
+in centimeters.
+
+In Automesh, there is no longer a default value for variable KPROB. 
+Users must set KPROB in the first REG namelist to define the problem
+type.  The only allowed values are KPROB = 0 for a Poisson or Pandira 
+problem, or KPROB = 1 for a Superfish problem. 
+
+
+
+April 15, 2003
+Poisson Superfish Version 7.01.0000
+
+We changed the way Automesh reads title lines from the input file.  The 
+problem title still contains up to ten 80-character title lines, but there
+can now be blank lines or comment lines (starting with a semicolon or an
+exclamation mark) interspersed among title lines.  The code includes more
+error checking when reading title lines and will write a warning message 
+if the file contains no title lines or more than 10 title lines before the 
+first REG namelist. 
+
+The change discussed above also affects tuning programs.  If comment lines
+appear in the Title/EndTitle section of a tuning-code control file, the 
+code transfers these lines to subsequent control files, log files, and to
+each Automesh input file.  Automesh ignores these comment lines and they
+will not appear in output files written by Automesh, Fish or SFO. 
+
+
+
+First release, April 4, 2003
+Poisson Superfish Version 7.00.0006
+
+Poisson Superfish now uses Lahey/Fujistu Fortran 95 version 5.7c and 
+Winteracter version 5.0b.
+
+We now provide files for several language systems that allow users to 
+call the Poisson Superfish field interpolator from their own programs 
+via a Windows dynamic link library (DLL). The supported languages are: 
+- Absoft Fortran version 8.0 and later.
+- Borland C++, version 5.0 and later (also works with Borland C).
+- Borland Delphi, version 2.0 and later.
+- Lahey Fortran 90, version 2.01 and later.
+- Lahey/Fujitsu Fortran 95 (5.0 and later)
+- Microsoft Visual C++, version 2.0 and later.
+- Microsoft Visual Basic, version 4.0 and later.
+Many Fortran compilers support linking with object modules made with one 
+or more of these C languages, which provides a way for your Fortran code 
+to call the DLL. The DLL for each language system appears in its own 
+directory. The directory contains a dynamic link library (DLL), the 
+object module used to create the DLL, an import library, and (if 
+available) an example main program that calls the DLL. We continue to 
+provide source files and a Fortran library for users of Lahey/Fujitsu 
+Fortran 95 (version 5.7).
+
+There is no practical limit except disk space for the size of a scratch 
+file if needed by programs Fish, CFish, Pandira, or the tuning codes. The 
+previous limit under Lahey LF90 was 2 GB.  The LF95 limit is 18 EB, nearly 
+10 billion times larger. 
+
+Variables XMAX, XMIN, YMIN, and YMAX are no longer needed in the Automesh 
+input file.  Automesh computes these quantities from the first region's 
+boundaries.  Automesh will issue warning messages if these variables appear 
+in the input file.  Users may either remove the obsolete variables or 
+disable the warning messages as described below. 
+
+SF.INI settings MaxXLineRegions, MaxYLineRegions, MaxMaterialTables, and
+MaxMaterials have all been eliminated.  Automesh, Autofish and the tuning 
+programs now pre-parse input files to determine the required settings. The 
+settings are passed to other codes in the Poisson Superfish solution file.
+
+Poisson Superfish codes now have numbered error and warning messages. Users 
+can enable or disable the pop-up warning messages.  Warnings still appear in 
+the output text files.  To disable warnings about obsolete variables XMAX, 
+XMIN, YMIN, and YMAX, add line "ShowWarning=-118,-119,-120,-121" to the 
+[Global] section of SF.INI. 
+
+Output text files will include the complete path to the executable file that 
+created it.
+
+Poisson, Pandira, and SF7 allow user configuration of the precision of field 
+data in output files  written by Poisson, Pandira, and SF7 (OUTPOI.TXT, 
+OUTPAN.TXT, and OUTSF7.TXT).
+
+Because of the change in compilers from version 6 to version 7, the format 
+of the Poisson Superfish solution file has changed. Version 7 codes will 
+automatically translate old files to the LF95 binary file format.  The 
+change is irreversible.
+
+Double-clicking and right-clicking on files with registered extensions 
+will now use the complete path to the executable files.  You would need 
+to edit the setting (e.g., under Tools, Folder Options, File Types) if 
+you want the operating system to search the PATH for the program.
+
+When opening file SF.INI, programs no longer look on the PATH.  A code 
+first looks in the current directory. Next, it checks environment variable 
+SFINI for the directory containing SF.INI.  Last, it looks in the directory 
+containing the executable file. The first file found is the one the program 
+will use. 
+
+Fixed a formatting error in Quikplot and Tablplot dialog boxes for displaying 
+fitting results.  If the leading coefficient was negative, the minus sign did 
+not appear.
+
+Fixed the program menu displayed when plotting residuals of a fit in Quikplot 
+and Tablplot.  The Hardcopy and Fit menu items were previously grayed out, but
+are now available.  The only way to return from the residuals plot is to 
+Select Fit, Residuals a second time.
+
+Tablplot now include the option to "Plot only this column" when building a 
+new data column in either the Edit Column dialog window or the Combine Column 
+dialog window.
+
+Error 200 previously stated that a file did not exist if a code could not 
+open it.  The message now also mentions that the file may be in use by another 
+application. 
+
+MDTfish now sets Superfish variable EPSIK = 1.0E-8, which ensures that the 
+solver produces an accurate result for very large problems. 
+
+In the Poisson and Pandira chapter of the documentation, We added discussion 
+about using these codes for conformally mapped problems.  
+
+When SF.INI variable PrintBGammaTables=Yes, programs Poisson and Pandira will
+now create Tablplot input files containing the material tables.  Previously,
+this data would appear in output files OUTPOI.TXT or OUTPAN.TXT.
+
+Programs SFO, SF7, and WSFplot have an improved algorithm for computing rf 
+stored energy and power dissipation in dielectric and magnetic materials. 
+In previous versions, only the power dissipation for problems solved by 
+CFish handled multiple materials correctly, and for that calculation SF7
+and WSFplot only included mesh triangles if the entire triangle was inside 
+the rectangle that defined the integration limits. The stored energy and 
+magnetic flux integrals in SF7 gave incorrect results if the integration 
+grid spanned more than one material. The new procedure handles multiple 
+materials.  If an integration limit cuts through mesh triangles, the codes 
+include the portion of mesh triangles inside the integration area.  Program 
+SF7 uses the same algorithm to compute the magnetic flux. 
+
+ 
+
+
