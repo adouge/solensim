@@ -1,10 +1,9 @@
 # solensim
-Solenoid magnet lens simulation project.
-
-### Goal:
-A comprehensive solenoid lens design tool
-
----
+WIP comprehensive solenoid lens design tool.
+### Aims:
+ - Flexibly and capably calculate solenoid fields with yoke, and analyze their effect on various electron distributions via tracking and "analytic" methods;
+ - optimize magnet design in accordance to given search regions and target functionality demands.
+----
 
 ### Dependencies:
  - numpy, scipy (found in e.g. Conda)
