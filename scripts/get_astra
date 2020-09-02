@@ -31,11 +31,12 @@ fi
 echo "Putting Astra into "$target
 echo "=================="
 
-mkdir $target
 cd $target
 
 wget https://www.desy.de/~mpyflo/Astra_for_64_Bit_Linux/Astra
 wget https://www.desy.de/~mpyflo/Astra_for_64_Bit_Linux/generator
+chmod +x Astra
+chmod +x generator
 
 echo "================="
 echo "Done."

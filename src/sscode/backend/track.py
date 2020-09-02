@@ -1,4 +1,3 @@
-#!/bin/sh
 #########################################################################
 #    Copyright 2020 Anton Douginets
 #    This file is part of solensim.
@@ -17,36 +16,11 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# Release .zip build script
-# for v0.2.1
+import scipy.constants as const
+import numpy as np
 
-# clear previous zip
-rm solensim.zip
+from sscode.units import *
 
-# clean up caches
-rm -rf src/__pycache__
-rm -rf src/sscode/__pycache__
-rm -rf src/sscode/backend/__pycache__
-rm -rf src/plugins/__pycache__
-rm -rf src/plugins/mcode/__pycache__
-rm -rf src/plugins/astra/__pycache__
-rm src/octave-workspace
-rm src/plugins/mcode/octave-workspace
-
-# pack .zip
-mkdir solensim
-cp -r src/* solensim/
-cp LICENSE solensim/
-cp readme.txt solensim/
-
-# pack docs into zip
-#cp tex/doc/doc.pdf solensim/solensim.pdf
-
-# don't pack Astra executables
-rm solensim/plugins/astra/Astra
-rm solensim/plugins/astra/generator
-
-zip -r solensim.zip solensim
-
-# clean tmp build dir
-rm -rf solensim
+class TrackModule():
+    def __init__(self):
+        pass

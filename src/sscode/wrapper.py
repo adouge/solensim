@@ -1,4 +1,3 @@
-#!/bin/sh
 #########################################################################
 #    Copyright 2020 Anton Douginets
 #    This file is part of solensim.
@@ -17,36 +16,32 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# Release .zip build script
-# for v0.2.1
+import sscode.backend.calc as calc
+import sscode.backend.optim as optim
+import sscode.backend.track as track
+from sscode.units import *
 
-# clear previous zip
-rm solensim.zip
+import numpy as np
 
-# clean up caches
-rm -rf src/__pycache__
-rm -rf src/sscode/__pycache__
-rm -rf src/sscode/backend/__pycache__
-rm -rf src/plugins/__pycache__
-rm -rf src/plugins/mcode/__pycache__
-rm -rf src/plugins/astra/__pycache__
-rm src/octave-workspace
-rm src/plugins/mcode/octave-workspace
+def test_load_mcode_plugin():
+    import plugins.mcode.wrapper as mwrapper
+    o = mwrapper.OWrapper()
+    return o
 
-# pack .zip
-mkdir solensim
-cp -r src/* solensim/
-cp LICENSE solensim/
-cp readme.txt solensim/
+def load_ini():
+    wip()
 
-# pack docs into zip
-#cp tex/doc/doc.pdf solensim/solensim.pdf
+class TrackHandle(track.TrackModule):
+    """
+    Interlayer to tracking functionality
+    """
+    def __init__(self):
+        track.TrackModule.__init__(self)
 
-# don't pack Astra executables
-rm solensim/plugins/astra/Astra
-rm solensim/plugins/astra/generator
 
-zip -r solensim.zip solensim
-
-# clean tmp build dir
-rm -rf solensim
+class CoreHandle(calc.Core):
+    """
+    Pre-optim core interlayer
+    """
+    def __init__(self):
+        calc.Core.__init__(self)
