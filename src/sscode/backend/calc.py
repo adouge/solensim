@@ -17,13 +17,15 @@
 #########################################################################
 
 import scipy.constants as const
-from sscode.units import *
 from numpy.lib.scimath import sqrt as csqrt
 from numpy.lib.scimath import power as cpow
 from scipy.integrate import quad as integral
 from scipy.misc import derivative
 import scipy.optimize as opt
 import numpy as np
+
+from sscode.units import *
+import sscode.backend.track as track
 
 class Model():
     """
@@ -118,7 +120,3 @@ class Core():
         f4 = self.fint(p, 4)
         rad = self.R*mm
         return const.e**2*rad**4/4/self.P**2*f3 + const.e**4*rad**4/12/self.P**4*f4
-
-### LEGACY piece of shit
-    def get_Bpeak(self, p):
-        return self.get_Bmax(p)

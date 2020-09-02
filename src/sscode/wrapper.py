@@ -19,7 +19,6 @@
 import sscode.backend.calc as calc
 import sscode.backend.optim as optim
 import sscode.backend.track as track
-import sscode.handle as handle
 from sscode.units import *
 
 import numpy as np
@@ -29,63 +28,20 @@ def test_load_mcode_plugin():
     o = mwrapper.OWrapper()
     return o
 
-class Wrapper(handle.Handle):
-    def __init__(self):
-        handle.Handle.__init__(self)
+def load_ini():
+    wip()
 
-class Old_Wrapper(handle.Legacy):
+class TrackHandle(track.TrackModule):
     """
-    Backend I/O wrap methods
+    Interlayer to tracking functionality
     """
-
-    config_path = "WIP"
-
     def __init__(self):
-        handle.Legacy.__init__(self)
-        self.results = []
+        track.TrackModule.__init__(self)
 
-    def restart(self):
-        """
-        A restart method
-        """
-        print("Clearing result storage...")
-        self.results = []  # flush result storage
-        print("Reloading default settings...")
-        self.load_default_settings()  # WIP
-        print("Done.")
 
-    def load_default_settings(self):
-        """
-            Load default settings from config file @ self.config_path (WIP)
-        """
-        wip()
-        pass
-
-### result storage
-    def append_result(self):
-        result = {
-        "g" : self.g,
-        "s" : self.s,
-        "t_g" : self.target_g,
-        "t_s" : self.target_s,
-        "t_B" : self.target_Bpeak,
-        "t_l" : self.target_l,
-        "t_f" : self.target_f,
-        "t_margin" : self.margin,
-        "gopt": self.g_opt,
-        "sopt": self.s_opt
-        }
-        self.results.append(result)
-
-### main routine interlayer
-    def run_ctr(self, maxiter=100, ptol=9, gtol=9, verbose=2,penalty=0):
-        constraints = self.define_ctr_constraints()
-        out = self.ctr_minimize(constraints,
-            max_iter=maxiter,
-            ptol=ptol, gtol=gtol,
-            penalty=penalty,
-            verbose=verbose)
-        self.s_opt = out.x[0]
-        self.g_opt = out.x[1:]
-        self.last_message = out.message
-        self.last_out = out
+class CoreHandle(calc.Core):
+    """
+    Pre-optim core interlayer
+    """
+    def __init__(self):
+        calc.Core.__init__(self)

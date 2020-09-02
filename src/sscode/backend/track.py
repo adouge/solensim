@@ -16,4 +16,11 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# Placeholder - tracking module
+import scipy.constants as const
+import numpy as np
+
+from sscode.units import *
+
+class TrackModule():
+    def __init__(self):
+        pass

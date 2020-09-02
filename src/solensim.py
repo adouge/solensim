@@ -17,42 +17,21 @@
 
 # main program script
 
-import sscode.wrapper as wrapper
-import sscode.frontend as front
 import numpy as np
 import matplotlib.pyplot as plt
 
+import sscode.wrapper as wrapper
+import sscode.frontend as frontend
+
 # config
+wrapper.load_ini()
 #################
 vstring = "0.2.2"
-def_B = [75,125]
-def_f = [50,np.inf]
-def_l = [45,55]
-def_E = 3.5
-def_Rbeam = 3
-def_minRin = def_Rbeam*3
 #################
 
-print("solensim v%s Solenoid design & optimization tool"%vstring)
+print("solensim v%s solenoid design & optimization tool"%vstring)
 print("========================================")
-e = front.legacy_opt_API()
-e.E = def_E
-e.R = def_Rbeam
-e.minRin = def_minRin
-e.target_Bpeak = def_B
-e.target_l = def_l
-e.target_f = def_f
-print("Legacy interface handle initialized as \"e\".")
-print("\nDefault settings:")
-e.settings()
-print("\nDefault targets:")
-e.targets()
-print("\nUse \"e.help()\" to view the help text.")
-
-import demos
-print("""
-to run a few demos, try:
-    demos.calc_REGAE(e) - describe the REGAE magnet, from T. Gehrke's thesis
-    demos.opt_ok(e) - an OK approach to characteristics originally demanded
-    demos.opt_ok2(e) - a second ok approach from different starting values
-""")
+track = frontend.Tracker()
+print("Tracker initialized as \"track\".")
+do = frontend.Core()
+print("API initialized as \"do\".")
