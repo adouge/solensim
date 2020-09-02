@@ -16,26 +16,17 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-import scipy.constants as const
-import numpy as np
-from numpy.lib.scimath import sqrt as csqrt
-from numpy.lib.scimath import power as cpow
+# Backend handle part of wrapper
 
-mm = 10**(-3)
-MeV = 10**6
+import sscode.backend.calc as calc
+import sscode.backend.optim as optim
+import sscode.backend.track as track
+from sscode.units import *
 
-### Field models
-def twoloop(z, s, g):
-    r_in, a, b = np.array(g, dtype=np.complex128)*mm
-    r = r_in + a/2
-    Rsq = r + a**2/24/r
-    c = csqrt((b**2 - a**2)/12)
-    pterm = (Rsq + c)**2/(z**2+(Rsq+c)**2)**(1.5)
-    mterm = (Rsq - c)**2/(z**2+(Rsq-c)**2)**(1.5)
-    B = 1/4*const.mu_0*s*(pterm + mterm)
-    return np.real(B)  # complex part is 0 anyways
+class Handle():  ### TODO
+    def __init__(self):
+        pass
 
-
-### Beam properties
-def impuls(E):  # [MeV] relativistic impulse
-    return 1/const.c*np.sqrt((E*const.e*MeV)**2 - (const.m_e*const.c**2)**2)
+class Legacy(optim.Legacy):
+    def __init__(self):
+        optim.Legacy.__init__(self)

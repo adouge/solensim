@@ -1,10 +1,10 @@
-0.3.0, 01.09.20:
+0.2.2, 02.09.20:
   - start a changelog
   - add concept flowchart to docs
   - fix get_astra to add executable flag to the downloaded binaries
   - restructuring again, this time final
   - closed #29 (wontfix, getting over my head with all the pointless "cool developer" shenanigans)
-  
+
 0.2.1, 25.08.20:
   - restructure code for future feature expansion
   - lay "structure" for MATLAB, Astra plugins

@@ -17,81 +17,41 @@
 #########################################################################
 
 import scipy.constants as const
+from sscode.units import *
 import scipy.optimize as opt
-from scipy.integrate import quad as integral
-from scipy.misc import derivative
 import numpy as np
-import backend.model as model
-
-
-mm = 10**(-3)
-cm = 10**(-2)
-
-class Core():
-    """
-    TODO
-    """
-    def __init__(self):
-        pass
-
-    field = {
-    "twoloop" : model.twoloop
-    }
-
-# E, P relationship:
-    def get_E(self):
-        return self._E
-    def set_E(self, E):
-        self._E = E
-        if str(E) != "None": self.P = model.impuls(E)
-        else: self.P = 0
-    E = property(get_E, set_E)
-
-# Field description:
-    def FN(self, s, g, n):
-        if n == 3:
-            integrand = lambda z: -1/2*self.field[self.M](z, s, g)*derivative(self.field[self.M], z, n=2, args=(s,g))
-        else:
-            integrand = lambda z: self.field[self.M](z, s, g)**n
-        I, dI = integral(integrand, -np.inf, np.inf)
-        return I
-
-    def get_B(self, s, g, grain=3):
-        z = np.linspace(-1,1,num=2*10**grain+1)
-        return self.field[self.M](z, s, g)
-
-    def get_l(self, s, g):
-        """
-        Assuming a symmetrical field with max at 0
-        """
-        tol = 4  # (0.1 milimeter precision)
-        Bhalb = self.field[self.M](0,s,g)/2
-        f = lambda x: self.field[self.M](x,s,g) - Bhalb
-        return opt.root_scalar(f, bracket=[0,1], xtol=10**(-tol)).root*2
-
-    def get_f(self, s, g):
-        f2 = self.FN(s, g, 2)
-        return 1/((const.e/2/self.P)**2*f2)
-
-    def get_Bpeak(self, s, g):
-        return self.field[self.M](0,s,g)
-
-# Aberrations and the like:
-    def get_cs(self, s, g):  # current opt function
-        f3 = self.FN(s, g, 3)
-        f4 = self.FN(s, g, 4)
-        rad = self.R*mm
-        return const.e**2*rad**4/4/self.P**2*f3 + const.e**4*rad**4/12/self.P**4*f4
+import sscode.backend.calc as calc
+import sscode.backend.track as track
 
 ### OPT section:
 
+class Core():
+    def __init__(self):
+        pass
+
+
+### Old code
+class Legacy(calc.Core):
+    def __init__(self):
+        calc.Core.__init__(self)
+        self.minRin = "None"
+        self.g = "None"
+        self.s = "None"
+        self.target_Bpeak = "None"
+        self.target_l = "None"
+        self.target_f = "None"
+        self.target_g = "None"
+        self.target_s = "None"
+        self.margin = 10
+
+
     def opt(self, p):
-        return self.get_cs(p[0], p[1:])
+        return self.get_cs(p)
 
     def char(self, p):  # characteristic vector for constraints, order Bmax FWHM Focal
-        Bpeak = self.get_Bpeak(p[0], p[1:])
-        l = self.get_l(p[0], p[1:])
-        f = self.get_f(p[0], p[1:])
+        Bpeak = self.get_Bpeak(p)
+        l = self.get_l(p)
+        f = self.get_f(p)
         return (Bpeak, l, f)
 
 

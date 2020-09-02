@@ -25,14 +25,13 @@ rm solensim.zip
 
 # clean up caches
 rm -rf src/__pycache__
-rm -rf src/backend/__pycache__
-rm -rf src/backend/tracking/__pycache__
-rm -rf src/frontend/__pycache__
+rm -rf src/sscode/__pycache__
+rm -rf src/sscode/backend/__pycache__
 rm -rf src/plugins/__pycache__
 rm -rf src/plugins/mcode/__pycache__
 rm -rf src/plugins/astra/__pycache__
 rm src/octave-workspace
-rm src/mcode/octave-workspace
+rm src/plugins/mcode/octave-workspace
 
 # pack .zip
 mkdir solensim

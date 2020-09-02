@@ -17,14 +17,14 @@
 
 # main program script
 
-import wrapper
-import frontend.frontend as front
+import sscode.wrapper as wrapper
+import sscode.frontend as front
 import numpy as np
 import matplotlib.pyplot as plt
 
 # config
 #################
-vstring = "0.2.1"
+vstring = "0.2.2"
 def_B = [75,125]
 def_f = [50,np.inf]
 def_l = [45,55]
@@ -33,16 +33,16 @@ def_Rbeam = 3
 def_minRin = def_Rbeam*3
 #################
 
-print("solensim v%s WIP Solenoid design tool"%vstring)
+print("solensim v%s Solenoid design & optimization tool"%vstring)
 print("========================================")
-e = front.API_iPython()
+e = front.legacy_opt_API()
 e.E = def_E
 e.R = def_Rbeam
 e.minRin = def_minRin
 e.target_Bpeak = def_B
 e.target_l = def_l
 e.target_f = def_f
-print("iPython interface handle initialized as \"e\".")
+print("Legacy interface handle initialized as \"e\".")
 print("\nDefault settings:")
 e.settings()
 print("\nDefault targets:")

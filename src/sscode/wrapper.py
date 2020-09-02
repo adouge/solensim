@@ -16,34 +16,32 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-import backend.backend as backend
-import numpy as np
+import sscode.backend.calc as calc
+import sscode.backend.optim as optim
+import sscode.backend.track as track
+import sscode.handle as handle
+from sscode.units import *
 
-def stop(Wrapper):
-    """
-    Stop the engine, delete handle
-    (not to be used with the core object)
-    """
-    Wrapper.exit()
-    del(Wrapper)
+import numpy as np
 
 def test_load_mcode_plugin():
     import plugins.mcode.wrapper as mwrapper
     o = mwrapper.OWrapper()
     return o
 
-def wip():
-    print("WIP feature, not implemented.")
+class Wrapper(handle.Handle):
+    def __init__(self):
+        handle.Handle.__init__(self)
 
-class Wrapper(backend.Core):
+class Old_Wrapper(handle.Legacy):
     """
     Backend I/O wrap methods
     """
-    
+
     config_path = "WIP"
 
     def __init__(self):
-        backend.Core.__init__(self)
+        handle.Legacy.__init__(self)
         self.results = []
 
     def restart(self):

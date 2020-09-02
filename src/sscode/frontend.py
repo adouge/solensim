@@ -16,30 +16,22 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-import wrapper
+import sscode.wrapper as wrapper
 import numpy as np
 import matplotlib.pyplot as plt
-
-mm = 10**(-3)
-fm = 10**(-15)
-cm = 10**(-2)
+from sscode.units import *
 
 class API_iPython(wrapper.Wrapper):
-
     def __init__(self):
         wrapper.Wrapper.__init__(self)
-        self.M = "twoloop"
-        self.E = "None"
-        self.R = "None"
-        self.minRin = "None"
-        self.g = "None"
-        self.s = "None"
-        self.target_Bpeak = "None"
-        self.target_l = "None"
-        self.target_f = "None"
-        self.target_g = "None"
-        self.target_s = "None"
-        self.margin = 10
+
+##### Legacy code
+
+class legacy_opt_API(wrapper.Old_Wrapper):
+
+    def __init__(self):
+        wrapper.Old_Wrapper.__init__(self)
+
 
 ### Help text
     def help(self):
@@ -87,13 +79,19 @@ class API_iPython(wrapper.Wrapper):
                     - n 0: first result, 1 the second etc.
                 A WIP feature, will be improved.
 
-            handle.get_B(s,g,model):
-                return axial field from -1 to 1 m, using specified field model (default - "twoloop")
+            handle.get_B(s,g):
+                return axial field from -1 to 1 m, using the "twoloop" model
             handle.FN(s, g, n):
                 get the nth field integral of field with parameters s, g
 
         """
         print(helptext)
+
+    def get_B(self, s, g):
+        return self.get_Bz((s, *g))
+
+    def FN(self, s, g, n):
+        return self.fint((s,*g),n)
 
 ### Current settings/targets readout
     def settings(self):
@@ -113,14 +111,14 @@ class API_iPython(wrapper.Wrapper):
 
 ### descriptive methods
     def calc(self, scaling, geometry):
-        f2 = self.FN(scaling, geometry, 2)
-        f3 = self.FN(scaling, geometry, 3)
-        f4 = self.FN(scaling, geometry, 4)
+        f2 = self.fint((scaling, *geometry), 2)
+        f3 = self.fint((scaling, *geometry), 3)
+        f4 = self.fint((scaling, *geometry), 4)
 
-        f = self.get_f(scaling, geometry)
-        cs = self.get_cs(scaling, geometry)
-        l = self.get_l(scaling,geometry)
-        B0 = self.get_Bpeak(scaling, geometry)
+        f = self.get_f((scaling, *geometry))
+        cs = self.get_cs((scaling, *geometry))
+        l = self.get_l((scaling, *geometry))
+        B0 = self.get_Bpeak((scaling, *geometry))
 
         result = (B0, l, f, cs)
         return result
@@ -148,8 +146,8 @@ class API_iPython(wrapper.Wrapper):
         """
         Draw a Bz(x) plot from given s, g
         """
-        B = self.get_B(s, g)*1000
-        z = np.linspace(-1,1,len(B))
+        B = self.get_Bz((s, *g))*1000
+        z = np.linspace(-self.zmax,self.zmax,len(B))
         plt.figure()
         plt.plot(z, B)
         plt.axis([-0.2,0.2, 0, max(B)])
@@ -185,7 +183,7 @@ class API_iPython(wrapper.Wrapper):
             maxiter - maximum number of algorithm iterations (default 1000)
             margin - percent margin for non-interval target values (default 5%)
         """
-        wrapper.Wrapper.run_ctr(self, verbose=verbose,
+        wrapper.Old_Wrapper.run_ctr(self, verbose=verbose,
         ptol=ptol, gtol=gtol, penalty=penalty, maxiter=maxiter)
         self.append_result()
         self.result(-1)
