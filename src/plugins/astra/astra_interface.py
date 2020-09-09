@@ -16,5 +16,58 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-import wrapper
-import f90nml as nml
+import numpy as np
+import pandas as pd
+import f90nml
+import os.path
+
+import sscode.wrapper as wrapper
+from sscode.units import *
+
+
+class Core():
+    """
+    Shared methods?
+    """
+    exedir = os.path.abspath("./plugins/astra/")
+
+    def __init__(self):
+        self.exename = "test"
+        self.exepath = os.path.join(self.exedir, self.exename)
+
+    def run(self, namelist):
+        pass
+
+    def read_output(self, todo):
+        pass
+
+
+class Generator(Core):
+    """
+    Generator-related API
+    """
+    def __init__(self):
+        Core.__init__(self)
+        self.exename = "generator"
+
+class Astra(Core):
+    """
+    ASTRA-related API
+    """
+    def __init__(self):
+        Core.__init__(self)
+        self.exename = "Astra"
+
+class Newrun():
+    """
+    Instances of Newrun will hold information on a particular run
+    and manage it's files
+    """
+    def __init__(self):
+        pass
+
+    def run(self):
+        pass
+
+    def clean(self):
+        pass

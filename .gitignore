@@ -46,9 +46,8 @@ octave-workspace
 aux/.ipynb_checkpoints/*
 .ipynb_checkpoints/*
 
-# helper dev scripts, folder
-dev/*
-src/dev.py
+# Acc101 Presentation & Figures
+tex/Acc101_Prezi/*
 
 # untrack the jupyter notebook
 solensim.ipynb
@@ -61,3 +60,5 @@ src/plugins/astra/generator
 src/plugins/astra/example/*
 # NORRAN
 src/plugins/astra/NORRAN
+# Manual:
+tex/Astra-Manual_V3.2.pdf
