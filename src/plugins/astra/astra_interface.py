@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 import f90nml
 import os.path
+import subprocess
 
 import sscode.wrapper as wrapper
 from sscode.units import *
@@ -27,36 +28,38 @@ from sscode.units import *
 
 class Core():
     """
-    Shared methods?
+    TODO
     """
+    
     exedir = os.path.abspath("./plugins/astra/")
 
-    def __init__(self):
-        self.exename = "test"
-        self.exepath = os.path.join(self.exedir, self.exename)
+    def __init__(self, exename="test"):
+        self.exename = exename
+
+    def get_exename(self):
+        return self._exename
+    def set_exename(self, exename):
+        self._exename = exename
+        self.exepath = os.path.join(self.exedir, exename)
+    exename = property(get_exename, set_exename)
 
     def run(self, namelist):
-        pass
+        """
+            Runs Astra/generator with namelist provided in argument
+            Returns stdout, to be printed
+        """
+        arg = [self.exepath, namelist]
+        Exe = subprocess.Popen(arg,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT)
+        stdout, stderr = Exe.communicate()
+        lines = str(stdout).split("\\n")
+        lines[0] = lines[0][3:]
+        output = "\n".join(lines)
+        return output
 
     def read_output(self, todo):
         pass
-
-
-class Generator(Core):
-    """
-    Generator-related API
-    """
-    def __init__(self):
-        Core.__init__(self)
-        self.exename = "generator"
-
-class Astra(Core):
-    """
-    ASTRA-related API
-    """
-    def __init__(self):
-        Core.__init__(self)
-        self.exename = "Astra"
 
 class Newrun():
     """
