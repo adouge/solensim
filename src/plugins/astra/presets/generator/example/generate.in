@@ -1,0 +1,17 @@
+&INPUT
+  FNAME = 'beam.ini'
+  Add=FALSE,	N_add=0,
+  IPart=500,	Species='electrons'
+  Probe=True,	Noise_reduc=T,		Cathode=F
+  Q_total=1.0E0
+
+  Ref_zpos=0.0E0,	Ref_Ekin=2.0E0
+
+  Dist_z='gauss',    	sig_z=1.0E0,	C_sig_z=2.0
+  Dist_pz='g',  	    	sig_Ekin=1.5,	cor_Ekin=0.0E0
+
+  Dist_x='gauss',  	sig_x=0.75E0,
+  Dist_px='g', 		Nemit_x=1.0E0,	cor_px=0.0E0
+  Dist_y='g',  		sig_y=0.75E0,
+  Dist_py='g', 		Nemit_y=1.0E0,	cor_py=0.0E0
+ /

@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 import f90nml
 import os.path
+from os import listdir
 import subprocess
 
 import sscode.wrapper as wrapper
@@ -30,36 +31,84 @@ class Core():
     """
     TODO
     """
-    
-    exedir = os.path.abspath("./plugins/astra/")
-
-    def __init__(self, exename="test"):
-        self.exename = exename
-
+# Astra/generator path setup
+    plugindir = os.path.abspath("./plugins/astra/")
+    workdir  = os.path.abspath("./plugins/astra/workspace")
+    ssdir = os.path.abspath(".")
     def get_exename(self):
         return self._exename
     def set_exename(self, exename):
         self._exename = exename
-        self.exepath = os.path.join(self.exedir, exename)
+        self.exepath = os.path.join(self.workdir, exename)
+        self.presetsdir = os.path.join(self.plugindir, "presets", exename)
     exename = property(get_exename, set_exename)
 
+    def __init__(self, exename="test"):
+        self.exename = exename
+        self.preset = "manual_example"
+
+# Presets
+    def presets(self):
+        return listdir(self.presetsdir)
+
+    def load_preset(self, preset):
+        #self.clean()
+        toload = os.path.join(self.presetsdir, preset)
+        cp = "cp %s/* %s"%(toload, self.workdir)
+        os.system(cp)
+        self._preset = preset
+
+    def get_preset(self):
+        return self._preset
+    preset = property(get_preset, load_preset)
+
+    def clean(self):
+        def mop(filename):
+            file = os.path.join(self.workdir, filename)
+            os.system("rm %s"%(file))
+        if self.exename == "generator":
+            mop("generate.in")
+            mop("beam.ini")
+        else:
+            mop("beam.ini")
+            mop("run.*")
+            mop("solenoid.dat")
+
+# Current namelist access
+## TODO
+
+# Run
     def run(self, namelist):
         """
             Runs Astra/generator with namelist provided in argument
             Returns stdout, to be printed
         """
-        arg = [self.exepath, namelist]
-        Exe = subprocess.Popen(arg,
+        cmd = "cd %s; %s %s"%(self.workdir, self.exepath, namelist)
+        Exe = subprocess.Popen(cmd,
+            shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
         stdout, stderr = Exe.communicate()
         lines = str(stdout).split("\\n")
-        lines[0] = lines[0][3:]
+        lines[0] = lines[0][2:]
+        lines[-1] = lines[-1][0:-2]
         output = "\n".join(lines)
         return output
 
+# Output
+# Column headers: TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    _beam_labels = ["x", "y", "z", "px", "py", "pz", "?", "??", "flag?", "flag??"]
+# Beam:
+    def get_beam(self):
+        path = os.path.join(self.workdir, "beam.ini")
+        beam = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
+        return beam
+
+# Astra output:
     def read_output(self, todo):
         pass
+
+
 
 class Newrun():
     """
