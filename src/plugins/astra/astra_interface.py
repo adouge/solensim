@@ -175,9 +175,10 @@ class Core():
         return self.run(namelist=namelist, exe="generator")
 
 # Output
-# Column headers: TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Column headers:
     _beam_labels = ["x", "y", "z", "px", "py", "pz", "t", "q", "type", "flag"]
-
+    _zemit_labels = ["z", "t", "E", "zrms", "dErms", "epszrms", "z*dEbar/dz"]
+    _tracking_labels = ["n", "flag", "z", "x", "y", "Fz", "Fx", "Fy"]
 # Beam:
     def get_beam(self):
         path = os.path.join(self._workdir, "beam.ini")
@@ -185,5 +186,29 @@ class Core():
         return beam
 
 # Astra output:
-    def read_output(self, todo):
-        pass
+    def read_screens(self):
+        """
+        Reads beam states at screens as defined in runfile
+        """
+        screens = self.runfile["output"]["screen"].copy()
+        idents = []
+        for zpos in screens:
+            ident = str(zpos/cm)[0:-2]
+            if len(ident) == 2: ident = "00"+ident
+            elif len(ident) == 3: ident = "0"+ident
+            ident = "run."+ident+".001"
+            idents.append(ident)
+        screenshots = {}
+        for i in range(len(idents)):
+            path = os.path.join(self._workdir, idents[i])
+            aufnahme = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
+            screenshots[screens[i]] = aufnahme
+        return screenshots
+
+    def read_zemit(self):
+        zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
+        return zemit
+
+    def read_trajectories(self):
+        traj = pd.read_table(path, names=self._tracking_labels, skipinitialspace=True, sep=" +", engine="python")
+        return traj
