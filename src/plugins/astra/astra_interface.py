@@ -135,14 +135,15 @@ class Core():
     def read_beam(self):
         self.beam = self.get_beam()
 
+    def mop(self, filename):
+        file = os.path.join(self._workdir, filename)
+        os.system("rm %s"%(file))
+
     def clean(self):
-        def mop(filename):
-            file = os.path.join(self._workdir, filename)
-            os.system("rm %s"%(file))
-        mop("beam.ini")
-        mop("run.*")
-        mop("generator.in")
-        mop("solenoid.dat")
+        self.mop("beam.ini")
+        self.mop("run.*")
+        self.mop("generator.in")
+        self.mop("solenoid.dat")
 
     def workspace(self):
         files =  listdir(self._workdir)

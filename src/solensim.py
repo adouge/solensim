@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 
 import sscode.wrapper as wrapper
 import sscode.frontend as frontend
-import plugins.astra.astra_interface as astra_interface
 
 # config
 wrapper.load_ini()
@@ -37,5 +36,6 @@ track = frontend.Tracker()
 print("Tracker initialized as \"track\".")
 do = frontend.Core()
 print("API initialized as \"do\".")
-astra = astra_interface.Core()
+
 print("Astra interface initialized as astra")
+astra = frontend.Astra_Interface()
