@@ -102,6 +102,17 @@ class Core():
 
 
 # Current workspace access
+    def write_field(self, z, Bz):
+        field = {"z":z, "Bz":Bz}
+        fielddf = pd.DataFrame.from_dict(field)
+        fielddf.to_csv(os.path.join(self._workdir, "solenoid.dat"), sep="\t", index=False, header=False)
+
+    def get_field(self):
+        fielddf = pd.read_table(os.path.join(self._workdir,"solenoid.dat"), names=["z", "Bz"])
+        z = fielddf["z"].values
+        Bz = fielddf["Bz"].values
+        return z, Bz
+
     def read_nml(self, file):
         return f90nml.read(os.path.join(self._workdir, file))
 
@@ -168,7 +179,7 @@ class Core():
 
 # Beam:
     def get_beam(self):
-        path = os.path.join(self.workdir, "beam.ini")
+        path = os.path.join(self._workdir, "beam.ini")
         beam = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
         return beam
 
