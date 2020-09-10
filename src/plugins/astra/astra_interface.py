@@ -32,41 +32,38 @@ class Core():
     TODO
     """
 # Astra/generator path setup
-    plugindir = os.path.abspath("./plugins/astra/")
-    workdir  = os.path.abspath("./plugins/astra/workspace")
-    ssdir = os.path.abspath(".")
-    beamsdir = os.path.abspath("./plugins/astra/presets/beams")
+    _plugindir = os.path.abspath("./plugins/astra/")
+    _workdir  = os.path.abspath("./plugins/astra/workspace")
+    _ssdir = os.path.abspath(".")
+    _beamsdir = os.path.abspath("./plugins/astra/presets/beams")
+    _tpresetsdir = os.path.abspath("./plugins/astra/presets/track")
+    _genpresetsdir = os.path.abspath("./plugins/astra/presets/generator")
 
-    def get_exename(self):
-        return self._exename
-    def set_exename(self, exename):
-        self._exename = exename
-        self.exepath = os.path.join(self.workdir, exename)
-        self.presetsdir = os.path.join(self.plugindir, "presets", exename)
-    exename = property(get_exename, set_exename)
 
-    def __init__(self, exename="Astra"):
-        self.exename = exename
-        #self.preset = "example"
-        #self.beam_preset = "example"
+#    def get_exename(self):
+#        return self._exename
+#    def set_exename(self, exename):
+#        self._exename = exename
+#        self.exepath = os.path.join(self._workdir, exename)
+#        self.presetsdir = os.path.join(self._plugindir, "presets", exename)
+#    exename = property(get_exename, set_exename)
 
-    def workspace(self):
-        files =  listdir(self.workdir)
-        files.remove("Astra")
-        files.remove("generator")
-        files.remove("NORRAN")
-        return files
+    def __init__(self):
+        pass
 
 # Presets, beams
     def beams(self):
-        return listdir(self.beamsdir)
+        return listdir(self._beamsdir)
 
-    def read_beam(self):
-        self.beam = self.get_beam()
+    def track_presets(self):
+        return listdir(self._tpresetsdir)
+
+    def gen_presets(self):
+        return listdir(self._genpresetsdir)
 
     def load_beam_preset(self, beam):
-        toload = os.path.join(self.beamsdir, beam)
-        cp = "cp %s/* %s"%(toload, self.workdir)
+        toload = os.path.join(self._beamsdir, beam)
+        cp = "cp %s/* %s"%(toload, self._workdir)
         os.system(cp)
         self._beam_preset = beam
         self.beam = self.get_beam()
@@ -76,56 +73,81 @@ class Core():
 
     beam_preset = property(loaded_beam_preset, load_beam_preset)
 
-
-    def presets(self):
-        return listdir(self.presetsdir)
-
-    def load_preset(self, preset):
-        toload = os.path.join(self.presetsdir, preset)
-        cp = "cp %s/* %s"%(toload, self.workdir)
+    def load_track_preset(self, preset):
+        toload = os.path.join(self._tpresetsdir, preset)
+        cp = "cp %s/* %s"%(toload, self._workdir)
         os.system(cp)
-        self._preset = preset
-        if preset in self.beams() and self.exename=="Astra": self.beam_preset = preset
+        self._track_preset = preset
+        if preset in self.beams(): self.beam_preset = preset
         self.read_runfile()
 
-    def get_preset(self):
-        return self._preset
+    def get_track_preset(self):
+        return self._track_preset
 
-    preset = property(get_preset, load_preset)
+    track_preset = property(get_track_preset, load_track_preset)
+
+    def load_gen_preset(self, preset):
+        toload = os.path.join(self._genpresetsdir, preset)
+        cp = "cp %s/* %s"%(toload, self._workdir)
+        os.system(cp)
+        self._gen_preset = preset
+        self.read_genfile()
+
+    def get_gen_preset(self):
+        return self._gen_preset
+
+    gen_preset = property(get_gen_preset, load_gen_preset)
 
 
 
 
-    def clean(self):
-        def mop(filename):
-            file = os.path.join(self.workdir, filename)
-            os.system("rm %s"%(file))
-        mop("beam.ini")
-        mop("run.*")
-        mop("solenoid.dat")
-
-# Current namelist access
+# Current workspace access
     def read_nml(self, file):
-        return f90nml.read(os.path.join(self.workdir, file))
+        return f90nml.read(os.path.join(self._workdir, file))
 
     def write_nml(self, nml, file):
-        outpath = os.path.join(self.workdir, file)
+        outpath = os.path.join(self._workdir, file)
         nml.write(outpath, force=True)
 
     def read_runfile(self):
         self.runfile = self.read_nml("run.in")
 
-    def update_runfile(self):
-        self.runfile.write(os.path.join(self.workdir,"run.in"), force=True)
+    def read_genfile(self):
+        self.genfile = self.read_nml("generator.in")
 
+    def update_runfile(self):
+        self.runfile.write(os.path.join(self._workdir,"run.in"), force=True)
+
+    def update_genfile(self):
+        self.genfile.write(os.path.join(self._workdir,"generator.in"), force=True)
+
+    def read_beam(self):
+        self.beam = self.get_beam()
+
+    def clean(self):
+        def mop(filename):
+            file = os.path.join(self._workdir, filename)
+            os.system("rm %s"%(file))
+        mop("beam.ini")
+        mop("run.*")
+        mop("generator.in")
+        mop("solenoid.dat")
+
+    def workspace(self):
+        files =  listdir(self._workdir)
+        files.remove("Astra")
+        files.remove("generator")
+        files.remove("NORRAN")
+        return files
 
 # Run
-    def run(self, namelist="run.in"):
+    def run(self, namelist="run.in", exe="Astra"):
         """
             Runs Astra/generator with namelist provided in argument
             Returns stdout, to be printed
         """
-        cmd = "cd %s; %s %s"%(self.workdir, self.exepath, namelist)
+        exepath = os.path.join(self._workdir, exe)
+        cmd = "cd %s; %s %s"%(self._workdir, exepath, namelist)
         Exe = subprocess.Popen(cmd,
             shell=True,
             stdout=subprocess.PIPE,
@@ -136,6 +158,9 @@ class Core():
         lines[-1] = lines[-1][0:-2]
         output = "\n".join(lines)
         return output
+
+    def generate(self, namelist="generator.in"):
+        return self.run(namelist=namelist, exe="generator")
 
 # Output
 # Column headers: TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!
