@@ -31,12 +31,28 @@ class Core(wrapper.CoreHandle):
     def __init__(self):
         wrapper.CoreHandle.__init__(self)
 
+    _helptext = """
+        This is a helptext.
+    """
+
+    def help(self):
+        print(self._helptext)
+
+
 class Tracker(wrapper.TrackHandle):
     """
         Dedicated tracking functionality interface
     """
     def __init__(self):
         wrapper.TrackHandle.__init__(self)
+
+    _helptext = """
+        This is a helptext.
+    """
+
+    def help(self):
+        print(self._helptext)
+
 
 class Astra_Interface(astra_interface.Core):
     """
