@@ -22,11 +22,13 @@ import matplotlib.pyplot as plt
 
 import sscode.wrapper as wrapper
 import sscode.frontend as frontend
+import plugins.astra.astra_interface as astra_interface
 
 # config
 wrapper.load_ini()
+print("(tried loading config)")
 #################
-vstring = "0.2.2"
+vstring = "0.3.0"
 #################
 
 print("solensim v%s solenoid design & optimization tool"%vstring)
@@ -35,3 +37,6 @@ track = frontend.Tracker()
 print("Tracker initialized as \"track\".")
 do = frontend.Core()
 print("API initialized as \"do\".")
+gen = astra_interface.Core("generator")
+astra = astra_interface.Core("Astra")
+print("Generator, Astra handles initialized as gen, astra")

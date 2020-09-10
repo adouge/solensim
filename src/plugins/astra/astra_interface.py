@@ -45,14 +45,23 @@ class Core():
 
     def __init__(self, exename="test"):
         self.exename = exename
-        self.preset = "manual_example"
+        self.preset = "example"
+
+    def workspace(self):
+        "Returns workspace contents"
+        ls = subprocess.Popen(["ls", self.workdir],
+            stdout=subprocess.PIPE)
+        files, stderr = ls.communicate()
+        files = str(files).split("\\n")[0:-1]
+        files[0] = files[0][2:]
+        return files
 
 # Presets
     def presets(self):
         return listdir(self.presetsdir)
 
     def load_preset(self, preset):
-        #self.clean()
+        self.clean()
         toload = os.path.join(self.presetsdir, preset)
         cp = "cp %s/* %s"%(toload, self.workdir)
         os.system(cp)
@@ -97,7 +106,7 @@ class Core():
 
 # Output
 # Column headers: TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    _beam_labels = ["x", "y", "z", "px", "py", "pz", "?", "??", "flag?", "flag??"]
+    _beam_labels = ["x", "y", "z", "px", "py", "pz", "t", "q", "type", "flag"]
 # Beam:
     def get_beam(self):
         path = os.path.join(self.workdir, "beam.ini")
