@@ -45,9 +45,9 @@ class Astra_Interface(astra_interface.Core):
 
     def __init__(self):
         astra_interface.Core.__init__(self);
-        self.track_preset = "example"
-        self.gen_preset = "example"
-        print("Loaded example track & generator presets")
+        self.track_preset = "default"
+        self.gen_preset = "default"
+        print("Loaded default track & generator presets")
 
     _helptext = """
         This is a helptext.

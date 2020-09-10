@@ -25,7 +25,7 @@ import sscode.frontend as frontend
 
 # config
 wrapper.load_ini()
-print("(tried loading config)")
+print("(tried loading config)\n")
 #################
 vstring = "0.3.0"
 #################
@@ -39,3 +39,7 @@ print("API initialized as \"do\".")
 
 print("Astra interface initialized as astra")
 astra = frontend.Astra_Interface()
+print("\n")
+
+import demos
+demos.field_REGAE(do, astra)

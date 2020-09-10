@@ -97,7 +97,7 @@ class Core():
         z = np.linspace(-self.zmax, self.zmax, num=2*10**self.grain+1)
         return self.Model.field[self.FM](z, p)
 
-    def get_l(self, p):
+    def get_fwhm(self, p):
         """
         Get z(FWHM), assuming a field symmetrical around 0, small enough to contain FWHM within 1 meter
         """
