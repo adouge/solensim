@@ -35,6 +35,8 @@ class Core():
     plugindir = os.path.abspath("./plugins/astra/")
     workdir  = os.path.abspath("./plugins/astra/workspace")
     ssdir = os.path.abspath(".")
+    beamsdir = os.path.abspath("./plugins/astra/presets/beams")
+
     def get_exename(self):
         return self._exename
     def set_exename(self, exename):
@@ -43,51 +45,82 @@ class Core():
         self.presetsdir = os.path.join(self.plugindir, "presets", exename)
     exename = property(get_exename, set_exename)
 
-    def __init__(self, exename="test"):
+    def __init__(self, exename="Astra"):
         self.exename = exename
-        self.preset = "example"
+        #self.preset = "example"
+        #self.beam_preset = "example"
 
     def workspace(self):
-        "Returns workspace contents"
-        ls = subprocess.Popen(["ls", self.workdir],
-            stdout=subprocess.PIPE)
-        files, stderr = ls.communicate()
-        files = str(files).split("\\n")[0:-1]
-        files[0] = files[0][2:]
+        files =  listdir(self.workdir)
+        files.remove("Astra")
+        files.remove("generator")
+        files.remove("NORRAN")
         return files
 
-# Presets
+# Presets, beams
+    def beams(self):
+        return listdir(self.beamsdir)
+
+    def read_beam(self):
+        self.beam = self.get_beam()
+
+    def load_beam_preset(self, beam):
+        toload = os.path.join(self.beamsdir, beam)
+        cp = "cp %s/* %s"%(toload, self.workdir)
+        os.system(cp)
+        self._beam_preset = beam
+        self.beam = self.get_beam()
+
+    def loaded_beam_preset(self):
+        return self._beam_preset
+
+    beam_preset = property(loaded_beam_preset, load_beam_preset)
+
+
     def presets(self):
         return listdir(self.presetsdir)
 
     def load_preset(self, preset):
-        self.clean()
         toload = os.path.join(self.presetsdir, preset)
         cp = "cp %s/* %s"%(toload, self.workdir)
         os.system(cp)
         self._preset = preset
+        if preset in self.beams() and self.exename=="Astra": self.beam_preset = preset
+        self.read_runfile()
 
     def get_preset(self):
         return self._preset
+
     preset = property(get_preset, load_preset)
+
+
+
 
     def clean(self):
         def mop(filename):
             file = os.path.join(self.workdir, filename)
             os.system("rm %s"%(file))
-        if self.exename == "generator":
-            mop("generate.in")
-            mop("beam.ini")
-        else:
-            mop("beam.ini")
-            mop("run.*")
-            mop("solenoid.dat")
+        mop("beam.ini")
+        mop("run.*")
+        mop("solenoid.dat")
 
 # Current namelist access
-## TODO
+    def read_nml(self, file):
+        return f90nml.read(os.path.join(self.workdir, file))
+
+    def write_nml(self, nml, file):
+        outpath = os.path.join(self.workdir, file)
+        nml.write(outpath, force=True)
+
+    def read_runfile(self):
+        self.runfile = self.read_nml("run.in")
+
+    def update_runfile(self):
+        self.runfile.write(os.path.join(self.workdir,"run.in"), force=True)
+
 
 # Run
-    def run(self, namelist):
+    def run(self, namelist="run.in"):
         """
             Runs Astra/generator with namelist provided in argument
             Returns stdout, to be printed
@@ -107,6 +140,7 @@ class Core():
 # Output
 # Column headers: TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     _beam_labels = ["x", "y", "z", "px", "py", "pz", "t", "q", "type", "flag"]
+
 # Beam:
     def get_beam(self):
         path = os.path.join(self.workdir, "beam.ini")
@@ -115,20 +149,4 @@ class Core():
 
 # Astra output:
     def read_output(self, todo):
-        pass
-
-
-
-class Newrun():
-    """
-    Instances of Newrun will hold information on a particular run
-    and manage it's files
-    """
-    def __init__(self):
-        pass
-
-    def run(self):
-        pass
-
-    def clean(self):
         pass
