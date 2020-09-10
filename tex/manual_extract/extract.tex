@@ -1,0 +1,104 @@
+\documentclass[a4paper,12pt]{article}
+%\usepackage{ngerman}
+\usepackage{soul}
+\usepackage{mathtools}
+\usepackage{amssymb,amsmath,amsfonts}
+\usepackage{cancel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage[autostyle=true,german=quotes]{csquotes}
+\usepackage{gensymb}
+\usepackage{units}
+\usepackage{fancyhdr}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage{abstract}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{pdfpages}
+\usepackage[
+%style=alphabetic,
+%citestyle=alphabetic,
+citestyle=numeric,
+sorting=nty
+]{biblatex}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+\newcommand{\todo}{\textbf{\textit{TODO}} }
+
+%\addbibresource{./../lib/lib.bib}
+%\addbibresource{../solensim.bib}
+\graphicspath{ {figures/} }
+
+\geometry{a4paper, left=25mm, right=25mm, top=20mm, bottom=20mm}
+
+\pagestyle{plain}
+%\pagestyle{fancy}
+%\lhead{Left header}
+%\rhead{Right header}
+%\lfoot{left footer}
+%\rfoot{right footer}
+
+
+\title{ASTRA Manual extract}
+%\author{}
+
+%\date{\today}
+
+\begin{document}
+\maketitle
+%\thispagestyle{empty}
+
+\tableofcontents
+\pagenumbering{arabic}
+\newpage
+
+\phantomsection
+\addcontentsline{toc}{section}{ASTRA Control \& Output}
+\phantomsection
+\addcontentsline{toc}{subsection}{NEWRUN Namelist}
+\includepdf[pages={54-56},addtotoc={2, 1, section, NEWRUN Namelist, newrun}]{../Astra-Manual_V3.2.pdf}  % Newrun
+\newpage
+\phantomsection
+\addcontentsline{toc}{subsection}{OUTPUT Namelist}
+\includepdf[pages={57-59},addtotoc={5, 1, section, OUTPUT Namelist, output}]{../Astra-Manual_V3.2.pdf}  % Output
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{subsection}{ASTRA Output}
+\includepdf[pages={29-32}, addtotoc={10, 1, section, ASTRA Output, astra_out}]{../Astra-Manual_V3.2.pdf}  % Output tables
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{subsection}{Particle distribution file structure, flags}
+\includepdf[pages={7-8}]{../Astra-Manual_V3.2.pdf}  % Output tables
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{subsection}{SOLENOID Namelist}
+\includepdf[pages={84-85},addtotoc={8, 1, section, SOLENOID Namelist, solenoid}]{../Astra-Manual_V3.2.pdf}  % Solenoid
+
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{section}{Generator Control}
+\includepdf[pages={98-102}, addtotoc={14, 1, section, Generator control, generator}]{../Astra-Manual_V3.2.pdf}  % Generator
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{subsection}{Various distributions}
+\includepdf[pages={103-111}, addtotoc={19, 2, subsection, Various distributions, distributions}]{../Astra-Manual_V3.2.pdf}  % Distributions
+
+%\printbibliography[
+%heading=bibintoc,
+%title={References}
+%]
+
+\end{document}

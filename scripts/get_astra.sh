@@ -1,5 +1,7 @@
+#!/bin/sh
 #########################################################################
-#    Copyright 2020 Anton Douginets, Andrii Yanovets
+#    Copyright 2020 Anton Douginets
+#    This file is part of solensim.
 #
 #    solensim is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,31 +17,26 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-# main program script
+# Pull Astra executables
+# Run get_astra path/to/solensim/root
+# If none specified, the current directory is used.
 
-import numpy as np
-import matplotlib.pyplot as plt
+if [ -z $1 ]
+then
+  target="./plugins/astra/workspace"
+else
+  target=$1/plugins/astra/workspace
+fi
 
-import sscode.wrapper as wrapper
-import sscode.frontend as frontend
+echo "Putting Astra into "$target
+echo "=================="
 
-# config
-wrapper.load_ini()
-print("(tried loading config)\n")
-#################
-vstring = "0.3.0"
-#################
+cd $target
 
-print("solensim v%s solenoid design & optimization tool"%vstring)
-print("========================================")
-track = frontend.Tracker()
-print("Tracker initialized as \"track\".")
-do = frontend.Core()
-print("API initialized as \"do\".")
+wget https://www.desy.de/~mpyflo/Astra_for_64_Bit_Linux/Astra
+wget https://www.desy.de/~mpyflo/Astra_for_64_Bit_Linux/generator
+chmod +x Astra
+chmod +x generator
 
-print("Astra interface initialized as astra")
-astra = frontend.Astra_Interface()
-print("\n")
-
-import demos
-demos.field_REGAE(do, astra)
+echo "================="
+echo "Done."

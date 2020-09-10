@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 
 from sscode.units import *
 import sscode.wrapper as wrapper
+import plugins.astra.astra_interface as astra_interface
 
 
 class Core(wrapper.CoreHandle):
@@ -30,9 +31,51 @@ class Core(wrapper.CoreHandle):
     def __init__(self):
         wrapper.CoreHandle.__init__(self)
 
+    _helptext = """
+        This is a helptext.
+    """
+
+    def help(self):
+        print(self._helptext)
+
+
 class Tracker(wrapper.TrackHandle):
     """
         Dedicated tracking functionality interface
     """
     def __init__(self):
         wrapper.TrackHandle.__init__(self)
+
+    _helptext = """
+        This is a helptext.
+    """
+
+    def help(self):
+        print(self._helptext)
+
+
+class Astra_Interface(astra_interface.Core):
+    """
+        Direct access to the astra interface
+    """
+
+    def __init__(self):
+        astra_interface.Core.__init__(self);
+        self.track_preset = "default"
+        self.gen_preset = "default"
+        print("Loaded default track & generator presets")
+
+    _helptext = """
+        This is a helptext.
+    """
+
+    def help(self):
+        print(self._helptext)
+
+    def run(self, namelist="run.in", exe="Astra"):
+        out = astra_interface.Core.run(self, namelist, exe)
+        print(out)
+
+    def generate(self, namelist="generator.in"):
+        out = astra_interface.Core.run(self, namelist, "generator")
+        print(out)

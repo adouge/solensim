@@ -1,0 +1,38 @@
+&newrun
+    head = 'Modified Example of ASTRA users manual - only solenoid'
+    run = 1
+    distribution = 'beam.ini'
+    xoff = 0.0
+    yoff = 0.0
+    track_all = .true.
+    auto_phase = .true.
+    h_max = 0.001
+    h_min = 0.0
+/
+
+&output
+    zstart = 0.0
+    zstop = 1.5
+    zemit = 500
+    zphase = 1
+    refs = .true.
+    emits = .true.
+    phases = .true.
+/
+
+&charge
+    lspch = .false.
+    nrad = 10
+    cell_var = 2.0
+    nlong_in = 10
+    min_grid = 0.0
+    max_scale = 0.05
+/
+
+&solenoid
+    lbfield = .true.
+    file_bfield(1) = 'solenoid.dat'
+    s_pos(1) = 1.2
+    maxb(1) = 0.35
+    s_smooth(1) = 10
+/

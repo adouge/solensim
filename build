@@ -42,9 +42,10 @@ cp readme.txt solensim/
 # pack docs into zip
 #cp tex/doc/doc.pdf solensim/solensim.pdf
 
-# don't pack Astra executables
-rm solensim/plugins/astra/Astra
-rm solensim/plugins/astra/generator
+# don't pack Astra workspace
+rm solensim/plugins/astra/workspace/*
+# pack Astra install script
+cp scripts/get_astra.sh solensim
 
 zip -r solensim.zip solensim
 

@@ -1,14 +1,6 @@
-solensim v0.2.1
+solensim v0.3.0
 -------------------------------------------------------------------
-To use, please run solensim.py in an iPython environment of choice;
-the displayed instructions will help further.
-
-The .zip contains all of the source code,
-including extremely WIP, undone and unsuable segments:
-  - MATLAB plugin
-  - Tracking backend
-  - Astra interface & plugin
-They are included for completeness.
+To use, please run solensim.py in an iPython environment of choice.
 -------------------------------------------------------------------
 License notice:
 

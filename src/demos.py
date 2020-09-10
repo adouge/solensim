@@ -19,3 +19,31 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from sscode.units import *
+
+def field_REGAE(handle, astra):
+    print("Describing REGAE solenoid field (no yoke) via two-loop-approximation.")
+    g_REGAE = [30, 99.5, 41.8]
+    s_REGAE = 9*1000
+    print("Rin, a, b [cm]:")
+    print(g_REGAE)
+    print("Scaling factor [A]: %d"%s_REGAE)
+
+    p = (s_REGAE, *g_REGAE)
+    z = np.linspace(-handle.zmax, handle.zmax, num = 2*10**handle.grain+1)
+    B = handle.get_Bz(p)
+    Bmax = handle.get_Bmax(p)
+    fwhm = handle.get_fwhm(p)
+    print("Maximum field strength: %.3f mT, FWHM %.1f mm"%(Bmax/mm, fwhm/mm))
+    plt.figure()
+    plt.plot(z/cm, B/mm, "-k", label="Bz(z)")
+    plt.xlabel("Axial position [cm]")
+    plt.ylabel("On-axis field strength [mT]")
+    plt.axis([-handle.zmax/cm, handle.zmax/cm, 0, Bmax*1.05/mm])
+    plt.show()
+    astra.write_field(z, B)
+    print("Field saved to solenoid.dat (don't forget scaling in ASTRA runfile!)")
+    #print("\n Running generator...")
+    #astra.generate()
+    #print("\n Running ASTRA...")
+    #astra.run()
