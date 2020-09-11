@@ -39,15 +39,6 @@ class Core():
     _tpresetsdir = os.path.abspath("./plugins/astra/presets/track")
     _genpresetsdir = os.path.abspath("./plugins/astra/presets/generator")
 
-
-#    def get_exename(self):
-#        return self._exename
-#    def set_exename(self, exename):
-#        self._exename = exename
-#        self.exepath = os.path.join(self._workdir, exename)
-#        self.presetsdir = os.path.join(self._plugindir, "presets", exename)
-#    exename = property(get_exename, set_exename)
-
     def __init__(self):
         pass
 
@@ -151,8 +142,6 @@ class Core():
         os.system(rm)
 
         return flag, existed
-
-
 
 
 # Current workspace access

@@ -27,7 +27,7 @@ import sscode.frontend as frontend
 wrapper.load_ini()
 print("(tried loading config)\n")
 #################
-vstring = "0.3.0"
+vstring = "0.3.1"
 #################
 
 print("solensim v%s solenoid design & optimization tool"%vstring)
@@ -43,3 +43,4 @@ print("\n")
 
 import demos
 demos.field_REGAE(do, astra)
+astra.presets()
