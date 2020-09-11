@@ -118,7 +118,7 @@ class Core():
 
     def write_nml(self, nml, file):
         outpath = os.path.join(self._workdir, file)
-        nml.write(outpath, force=True)
+        nml.write(outpath, force=True, sort=True)
 
     def read_runfile(self):
         self.runfile = self.read_nml("run.in")
