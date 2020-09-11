@@ -66,6 +66,7 @@ class Astra_Interface(astra_interface.Core):
         self.track_preset = "default"
         self.gen_preset = "default"
         self.beam_preset = "default"
+        self.verbose = True
 
     _helptext = """
         Main commands:
@@ -111,6 +112,8 @@ class Astra_Interface(astra_interface.Core):
                 keyed according to screen positions; essentially a collection of .beam dataframes
             .read_trajectories() - returns contents of the trajectory tracking output
             .read_zemit() - returns contents of the Zemit file output
+
+        Set .verbose to False to suppress ASTRA output
     """
 
     def help(self):
@@ -118,11 +121,11 @@ class Astra_Interface(astra_interface.Core):
 
     def run(self, namelist="run.in", exe="Astra"):
         out = astra_interface.Core.run(self, namelist, exe)
-        print(out)
+        if self.verbose: print(out)
 
     def generate(self, namelist="generator.in"):
         out = astra_interface.Core.run(self, namelist, "generator")
-        print(out)
+        if self.verbose: print(out)
 
     def presets(self):
         print("Available presets:")

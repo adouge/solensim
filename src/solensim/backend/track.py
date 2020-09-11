@@ -22,5 +22,6 @@ import numpy as np
 from solensim.units import *
 
 class TrackModule():
-    def __init__(self):
-        pass
+    def __init__(self, astra_interface):
+        self.astra = astra_interface  # use Astra Frontend, same as the one provided in main script
+        
