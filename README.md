@@ -16,6 +16,7 @@ Comprehensive solenoid lens design tool.
 **Dependencies**:
  - numpy, pandas
  - ASTRA
+ - Has not been tested/configured to work with Windows, i.e. linux only
 
 To get ASTRA executables, sh get_astra.sh inside the (main) solensim directory
 
