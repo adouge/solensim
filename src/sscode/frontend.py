@@ -18,6 +18,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from os import listdir
+import os.path
 
 from sscode.units import *
 import sscode.wrapper as wrapper
@@ -79,3 +81,43 @@ class Astra_Interface(astra_interface.Core):
     def generate(self, namelist="generator.in"):
         out = astra_interface.Core.run(self, namelist, "generator")
         print(out)
+
+    def presets(self):
+        print("Available presets:")
+        print("beam:", self.beam_presets())
+        print("track:", self.track_presets())
+        print("gen:", self.gen_presets())
+        print("Set presets:")
+        print("beam:", self.beam_preset)
+        print("track:", self.track_preset)
+        print("gen:", self.gen_preset)
+
+    def save_preset(self, preset, type="track"):
+        if type=="track": pot_targets = self.track_presets()
+        elif type=="gen": pot_targets = self.gen_presets()
+        elif type=="beam": pot_targets = self.beam_presets()
+        else: pot_targets = []  # let later error core handle it
+
+        if preset in pot_targets:
+            yn = input("Are you sure you want to overwrite %s preset %s? [yes/no]\n"%(type, preset))
+        else: yn = "yes"
+
+        if yn == "yes":
+            flag, new = astra_interface.Core.save_preset(self, preset, type)
+            newstr = "new" if new else "existing"
+            if flag:
+                print("Failed to save %s %s preset \"%s\""%(newstr, type, preset))
+            else:
+                print("Successfully saved %s %s preset \"%s\""%(newstr, type, preset))
+        else: pass
+
+    def delete_preset(self, preset, type):
+        yn = input("Are you sure you want to delete %s preset %s? [yes/no]\n"%(type, preset))
+        if yn != "yes": pass
+        else:
+            flag, existed = astra_interface.Core.delete_preset(self, preset, type)
+            if flag:
+                exstr = "" if existed else "- preset does not exist!"
+                print("Failed to delete %s preset \"%s\" %s"%(type, preset, exstr))
+            else:
+                print("Successfully deleted %s preset \"%s\""%(type, preset))

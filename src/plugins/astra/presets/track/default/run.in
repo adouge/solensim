@@ -1,41 +1,41 @@
 &newrun
-    head = 'Default setup: 0.5 m before/after a 2-m symmetrical solenoid field'
-    run = 1
-    distribution = 'beam.ini'
-    xoff = 0.0
-    yoff = 0.0
-    zoff = 0.0
-    xrms = -1.0
-    yrms = -1.0
-    xyrms = -1.0
-    zrms = -1.0
-    qbunch = 0.0
-    track_all = .true.
     check_ref_part = .true.
+    distribution = 'beam.ini'
     h_max = 0.001
     h_min = 0.0001
+    head = 'Default setup: 0.5 m before/after a 2-m symmetrical solenoid field'
     max_step = 100000
+    qbunch = 0.0
+    run = 1
+    track_all = .true.
+    xoff = 0.0
+    xrms = -1.0
+    xyrms = -1.0
+    yoff = 0.0
+    yrms = -1.0
+    zoff = 0.0
+    zrms = -1.0
 /
 
 &output
-    screen(1:3) = 0.5, 1.5, 2.5
-    zstart = 0.0
-    zstop = 3
-    zemit = 100
-    zphase = 1
-    phases = .true.
-    refs = .true.
-    tracks = .true.
     emits = .true.
     high_res = .true.
+    phases = .true.
+    refs = .true.
+    screen = 0.5, 1.0, 1.5, 2.0, 2.5
+    tracks = .true.
+    zemit = 100
+    zphase = 1
+    zstart = 0.0
+    zstop = 3
 /
 
 &solenoid
+    file_bfield = 'solenoid.dat'
     lbfield = .true.
-    file_bfield(1) = 'solenoid.dat'
-    maxb(1) = 0.060855
+    maxb = 0.060855
+    s_higher_order = .true.
     s_noscale = .false.
-    s_higher_order(1) = .true.
-    s_smooth(1) = 10
-    s_pos(1) = 1.5
+    s_pos = 1.5
+    s_smooth = 10
 /
