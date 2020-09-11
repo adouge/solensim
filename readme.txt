@@ -1,4 +1,4 @@
-solensim v0.3.0
+solensim v0.3.1
 -------------------------------------------------------------------
 To use, please run solensim.py in an iPython environment of choice.
 -------------------------------------------------------------------

@@ -7,6 +7,6 @@ WIP comprehensive solenoid lens design tool.
 ----
 
 ### Dependencies:
- - numpy, scipy (found in e.g. Conda)
+ - numpy, scipy, pandas (found in e.g. Conda)
  - WIP MATLAB plugin: oct2py package, MATLAB Python interface - ***not used currently***
- - WIP Tracking module: Astra - ***WIP***
+ - ASTRA, for tracking functionality

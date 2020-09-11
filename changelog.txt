@@ -1,3 +1,7 @@
+0.3.1, 11.09.20:
+  - implemented preset management in ASTRA plugin
+  - finished default ASTRA plugin setups
+
 0.3.0, 10.09.20:
   - start a changelog
   - add concept flowchart to docs
