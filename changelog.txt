@@ -4,7 +4,12 @@
     - changing track preset no longer tries to load the corresponding beam
     - changed interface formatting a bit
     - added ability to write beam.ini from beam dataframe
+    - added verbosity control to frontend
     - is pretty much done for now, aside from, eventually, loading other output files
+  - Tracking presets:
+    - added cross, square box beams
+    - added skewed and symmetrical gaussian rings beams
+    - turned off field scaling in default runfile
   - General:
     - main script is "production-ready", for what it can do now;
     - changelog should be more structured

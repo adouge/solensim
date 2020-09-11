@@ -45,8 +45,8 @@ class Tracker(wrapper.TrackHandle):
     """
         Dedicated tracking functionality interface
     """
-    def __init__(self):
-        wrapper.TrackHandle.__init__(self)
+    def __init__(self, astra):
+        wrapper.TrackHandle.__init__(self, astra)
 
     _helptext = """
         This is a helptext.

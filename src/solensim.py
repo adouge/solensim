@@ -40,7 +40,7 @@ astra.help()
 astra.presets()
 print("\n")
 
-track = frontend.Tracker()
+track = frontend.Tracker(astra)
 print("Tracker initialized as \"track\".")
 core = frontend.Core()
 print("API initialized as \"core\".")

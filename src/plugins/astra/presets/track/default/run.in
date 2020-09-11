@@ -35,7 +35,7 @@
     lbfield = .true.
     maxb = 0.060855
     s_higher_order = .true.
-    s_noscale = .false.
+    s_noscale = .true.
     s_pos = 1.5
     s_smooth = 10
 /

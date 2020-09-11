@@ -35,8 +35,8 @@ class TrackHandle(track.TrackModule):
     """
     Interlayer to tracking functionality
     """
-    def __init__(self):
-        track.TrackModule.__init__(self)
+    def __init__(self, astra):
+        track.TrackModule.__init__(self, astra)
 
 
 class CoreHandle(calc.Core):

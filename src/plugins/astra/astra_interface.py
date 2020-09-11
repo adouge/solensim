@@ -178,7 +178,7 @@ class Core():
         self.beam = self.get_beam()
 
     def write_beam(self, beam):
-        beam.to_csv(os.path.join(self._workdir, "beam.ini"), sep="\t", index=False, header=False)
+        beam.to_csv(os.path.join(self._workdir, "beam.ini"), sep=" ", index=False, header=False)
 
     def mop(self, filename):
         file = os.path.join(self._workdir, filename)
