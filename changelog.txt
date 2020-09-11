@@ -1,3 +1,17 @@
+0.3.2, WIP:
+  - ASTRA plugin:
+    - wrote a helptext documenting the ASTRA plugin
+    - changing track preset no longer tries to load the corresponding beam
+    - changed interface formatting a bit
+    - added ability to write beam.ini from beam dataframe
+    - is pretty much done for now, aside from, eventually, loading other output files
+  - General:
+    - main script is "production-ready", for what it can do now;
+    - changelog should be more structured
+    - changed sscode package to solensim; having a solensim folder inside a solensim folder is not too bad, but looks better in the code.
+    - expanded the readme.txt
+  - TBA
+
 0.3.1, 11.09.20:
   - implemented preset management in ASTRA plugin
   - finished default ASTRA plugin setups

@@ -17,10 +17,13 @@
 #########################################################################
 
 import scipy.constants as const
+import scipy.optimize as opt
 import numpy as np
 
-from sscode.units import *
+from solensim.units import *
+import solensim.backend.calc as calc
+import solensim.backend.track as track
 
-class TrackModule():
+class OptimModule():
     def __init__(self):
         pass

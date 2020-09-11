@@ -21,8 +21,8 @@ import matplotlib.pyplot as plt
 from os import listdir
 import os.path
 
-from sscode.units import *
-import sscode.wrapper as wrapper
+from solensim.units import *
+import solensim.wrapper as wrapper
 import plugins.astra.astra_interface as astra_interface
 
 
@@ -65,10 +65,52 @@ class Astra_Interface(astra_interface.Core):
         astra_interface.Core.__init__(self);
         self.track_preset = "default"
         self.gen_preset = "default"
-        print("Loaded default track & generator presets")
+        self.beam_preset = "default"
 
     _helptext = """
-        This is a helptext.
+        Main commands:
+            .run(namelist) - run a particular ASTRA input deck, defaults to run.in
+            .generate(namelist) - run generator on a distro specification, defaults to generator.in
+
+        Presets:
+            .presets() - list available and loaded presets
+            .track_preset = "preset" to set ASTRA runfile preset,
+            .beam_preset = "beam" to choose beam,
+            .gen_preset = "preset" to load generator preset.
+
+        Current run setup editing:
+            .read_runfile(),
+            .read_genfile() - load input namelists into handle object;
+                editable as dictionary-type objects.
+
+            .update_genfile(),
+            .update_runfile() to save changes into loaded setup
+
+            .get_beam() - returns starting beam distribution as pd dataframe
+            .read_beam() - loads beam into handle.beam
+            .beam - direct access to loaded starting distribution (beam)
+            .write_beam(beam_dataframe) - wrie beam_dataframe to current beam (for, say, tracking same beam multiple times)
+
+        Preset saving/deletion:
+            .save_preset(preset_name, preset_type) to create new or overwrite existing preset from loaded setup.
+            .delete_preset(preset_name, preset_type) to delete;
+
+        Workspace control:
+            .workspace() to view ASTRA workdir
+            .clean() to clean everything in workspace
+            .mop(filename) to delete particular file; works with asterisk patterns (e.g. *.001)
+
+            .read_nml(file) - return contents of file (in workspace) as namelist object
+            .write_nml(nml, file) - write nml namelist to file
+
+            .get_field() - return z, Bz from solenoid.dat file
+            .write_field(z, Bz) - write solenoid to solenoid.dat
+
+        Output readin:
+            .read_screens() - returns dictionary of screen output based on screens specified in &OUTPUT namelist;
+                keyed according to screen positions; essentially a collection of .beam dataframes
+            .read_trajectories() - returns contents of the trajectory tracking output
+            .read_zemit() - returns contents of the Zemit file output
     """
 
     def help(self):
@@ -87,7 +129,7 @@ class Astra_Interface(astra_interface.Core):
         print("beam:", self.beam_presets())
         print("track:", self.track_presets())
         print("gen:", self.gen_presets())
-        print("Set presets:")
+        print("\nSet presets:")
         print("beam:", self.beam_preset)
         print("track:", self.track_preset)
         print("gen:", self.gen_preset)

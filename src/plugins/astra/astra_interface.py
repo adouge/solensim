@@ -23,8 +23,8 @@ import os.path
 from os import listdir
 import subprocess
 
-import sscode.wrapper as wrapper
-from sscode.units import *
+import solensim.wrapper as wrapper
+from solensim.units import *
 
 
 class Core():
@@ -57,7 +57,7 @@ class Core():
         cp = "cp -f %s/* %s"%(toload, self._workdir)
         os.system(cp)
         self._beam_preset = beam
-        self.beam = self.get_beam()
+        self.read_beam()
 
     def loaded_beam_preset(self):
         return self._beam_preset
@@ -69,7 +69,6 @@ class Core():
         cp = "cp -f %s/* %s"%(toload, self._workdir)
         os.system(cp)
         self._track_preset = preset
-        if preset in self.beam_presets(): self.beam_preset = preset
         self.read_runfile()
 
     def get_track_preset(self):
@@ -177,6 +176,9 @@ class Core():
 
     def read_beam(self):
         self.beam = self.get_beam()
+
+    def write_beam(self, beam):
+        beam.to_csv(os.path.join(self._workdir, "beam.ini"), sep="\t", index=False, header=False)
 
     def mop(self, filename):
         file = os.path.join(self._workdir, filename)
