@@ -108,9 +108,10 @@ class Core():
 
         path = os.path.join(target, preset)
         if preset in listdir(target):
+            new = False
+        else:
             mkdir = "mkdir %s"%path
             os.system(mkdir)
-            new = False
 
         cp = "cp -f %s %s"%(source, path)
         os.system(cp)
@@ -188,7 +189,9 @@ class Core():
         self.mop("beam.ini")
         self.mop("run.*")
         self.mop("generator.in")
-        self.mop("solenoid.dat")
+        self.track_preset = self.track_preset
+        self.gen_preset = self.gen_preset
+        self.beam_preset = self.beam_preset
 
     def workspace(self):
         files =  listdir(self._workdir)
@@ -217,8 +220,9 @@ class Core():
         return output
 
     def generate(self, namelist="generator.in"):
-        return self.run(namelist=namelist, exe="generator")
-
+        out = self.run(namelist=namelist, exe="generator")
+        self.read_beam()
+        return out
 # Output
 # Column headers:
     _beam_labels = ["x", "y", "z", "px", "py", "pz", "t", "q", "type", "flag"]

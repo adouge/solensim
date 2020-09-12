@@ -69,15 +69,16 @@ class Astra_Interface(astra_interface.Core):
         self.verbose = True
 
     _helptext = """
-        Main commands:
-            .run(namelist) - run a particular ASTRA input deck, defaults to run.in
-            .generate(namelist) - run generator on a distro specification, defaults to generator.in
-
-        Presets:
+        General options, presets:
+            .verbose - True default, set to False to supress ASTRA stdout piping.
             .presets() - list available and loaded presets
             .track_preset = "preset" to set ASTRA runfile preset,
             .beam_preset = "beam" to choose beam,
             .gen_preset = "preset" to load generator preset.
+
+        Main commands:
+            .run(namelist) - run a particular ASTRA input deck, defaults to run.in
+            .generate(namelist) - run generator on a distro specification, defaults to generator.in
 
         Current run setup editing:
             .read_runfile(),
@@ -98,7 +99,7 @@ class Astra_Interface(astra_interface.Core):
 
         Workspace control:
             .workspace() to view ASTRA workdir
-            .clean() to clean everything in workspace
+            .clean() to clean everything in workspace and reload presets
             .mop(filename) to delete particular file; works with asterisk patterns (e.g. *.001)
 
             .read_nml(file) - return contents of file (in workspace) as namelist object

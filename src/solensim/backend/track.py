@@ -24,3 +24,10 @@ from solensim.units import *
 class TrackModule():
     def __init__(self, astra_interface):
         self.astra = astra_interface  # use Astra Frontend, same as the one provided in main script
+
+    def read_screens(self):
+        screens = self.astra.read_screens()
+        spos = screens.keys()
+        return spos, screens
+
+    

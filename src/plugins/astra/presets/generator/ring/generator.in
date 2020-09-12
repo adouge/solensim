@@ -1,6 +1,6 @@
 &input
     add = .false.
-    c_sig_z = 2.0
+    c_sig_z = 0.0
     cathode = .false.
     cor_ekin = 0.0
     cor_px = 0.0
@@ -19,13 +19,13 @@
     noise_reduc = .true.
     probe = .true.
     q_total = 1.0
-    rad = 5
+    rad = 3
     ref_ekin = 3.0
     ref_zpos = 0.0
-    sig_ekin = 30.0
-    sig_x = 0.75
-    sig_y = 1.5
-    sig_z = 1.0
+    sig_ekin = 300
+    sig_x = 0.0
+    sig_y = 0.0
+    sig_z = 0.0
     species = 'electrons'
     type = 'ring'
 /
