@@ -19,10 +19,10 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from sscode.units import *
+from solensim.units import *
 
 def field_REGAE(handle, astra):
-    print("Describing REGAE solenoid field (no yoke) via two-loop-approximation.")
+    print("Describing REGAE solenoid field (no yoke) via two-loop-approximation. (demos.field_REGAE(core, astra))")
     g_REGAE = [30, 99.5, 41.8]
     s_REGAE = 9*1000
     print("Rin, a, b [cm]:")

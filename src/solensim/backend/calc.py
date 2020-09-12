@@ -24,8 +24,8 @@ from scipy.misc import derivative
 import scipy.optimize as opt
 import numpy as np
 
-from sscode.units import *
-import sscode.backend.track as track
+from solensim.units import *
+import solensim.backend.track as track
 
 class Model():
     """

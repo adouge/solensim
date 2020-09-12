@@ -23,8 +23,8 @@ import os.path
 from os import listdir
 import subprocess
 
-import sscode.wrapper as wrapper
-from sscode.units import *
+import solensim.wrapper as wrapper
+from solensim.units import *
 
 
 class Core():
@@ -57,7 +57,7 @@ class Core():
         cp = "cp -f %s/* %s"%(toload, self._workdir)
         os.system(cp)
         self._beam_preset = beam
-        self.beam = self.get_beam()
+        self.read_beam()
 
     def loaded_beam_preset(self):
         return self._beam_preset
@@ -69,7 +69,6 @@ class Core():
         cp = "cp -f %s/* %s"%(toload, self._workdir)
         os.system(cp)
         self._track_preset = preset
-        if preset in self.beam_presets(): self.beam_preset = preset
         self.read_runfile()
 
     def get_track_preset(self):
@@ -109,9 +108,10 @@ class Core():
 
         path = os.path.join(target, preset)
         if preset in listdir(target):
+            new = False
+        else:
             mkdir = "mkdir %s"%path
             os.system(mkdir)
-            new = False
 
         cp = "cp -f %s %s"%(source, path)
         os.system(cp)
@@ -178,6 +178,9 @@ class Core():
     def read_beam(self):
         self.beam = self.get_beam()
 
+    def write_beam(self, beam):
+        beam.to_csv(os.path.join(self._workdir, "beam.ini"), sep=" ", index=False, header=False)
+
     def mop(self, filename):
         file = os.path.join(self._workdir, filename)
         os.system("rm %s"%(file))
@@ -186,7 +189,9 @@ class Core():
         self.mop("beam.ini")
         self.mop("run.*")
         self.mop("generator.in")
-        self.mop("solenoid.dat")
+        self.track_preset = self.track_preset
+        self.gen_preset = self.gen_preset
+        self.beam_preset = self.beam_preset
 
     def workspace(self):
         files =  listdir(self._workdir)
@@ -215,8 +220,9 @@ class Core():
         return output
 
     def generate(self, namelist="generator.in"):
-        return self.run(namelist=namelist, exe="generator")
-
+        out = self.run(namelist=namelist, exe="generator")
+        self.read_beam()
+        return out
 # Output
 # Column headers:
     _beam_labels = ["x", "y", "z", "px", "py", "pz", "t", "q", "type", "flag"]

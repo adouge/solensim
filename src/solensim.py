@@ -20,27 +20,32 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-import sscode.wrapper as wrapper
-import sscode.frontend as frontend
+import solensim.wrapper as wrapper
+import solensim.frontend as frontend
 
 # config
 wrapper.load_ini()
 print("(tried loading config)\n")
 #################
-vstring = "0.3.1"
+vstring = "0.3.2"
 #################
 
 print("solensim v%s solenoid design & optimization tool"%vstring)
 print("========================================")
-track = frontend.Tracker()
-print("Tracker initialized as \"track\".")
-do = frontend.Core()
-print("API initialized as \"do\".")
 
-print("Astra interface initialized as astra")
+print("Astra interface initialized as \"astra\"")
 astra = frontend.Astra_Interface()
+print("astra.help():")
+astra.help()
+astra.presets()
 print("\n")
 
+track = frontend.Tracker(astra)
+print("Tracker initialized as \"track\".")
+core = frontend.Core()
+print("API initialized as \"core\".")
+
 import demos
-demos.field_REGAE(do, astra)
+demos.field_REGAE(core, astra)
+astra.help()
 astra.presets()

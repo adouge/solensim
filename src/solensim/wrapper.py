@@ -16,10 +16,10 @@
 #    along with solensim.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-import sscode.backend.calc as calc
-import sscode.backend.optim as optim
-import sscode.backend.track as track
-from sscode.units import *
+import solensim.backend.calc as calc
+import solensim.backend.optim as optim
+import solensim.backend.track as track
+from solensim.units import *
 
 import numpy as np
 
@@ -35,8 +35,8 @@ class TrackHandle(track.TrackModule):
     """
     Interlayer to tracking functionality
     """
-    def __init__(self):
-        track.TrackModule.__init__(self)
+    def __init__(self, astra):
+        track.TrackModule.__init__(self, astra)
 
 
 class CoreHandle(calc.Core):

@@ -17,13 +17,17 @@
 #########################################################################
 
 import scipy.constants as const
-import scipy.optimize as opt
 import numpy as np
 
-from sscode.units import *
-import sscode.backend.calc as calc
-import sscode.backend.track as track
+from solensim.units import *
 
-class OptimModule():
-    def __init__(self):
-        pass
+class TrackModule():
+    def __init__(self, astra_interface):
+        self.astra = astra_interface  # use Astra Frontend, same as the one provided in main script
+
+    def read_screens(self):
+        screens = self.astra.read_screens()
+        spos = screens.keys()
+        return spos, screens
+
+    
