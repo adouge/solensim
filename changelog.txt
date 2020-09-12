@@ -1,4 +1,4 @@
-0.3.2, WIP:
+0.3.2, 12.09.20:
   - ASTRA plugin:
     - wrote a helptext documenting the ASTRA plugin
     - changing track preset no longer tries to load the corresponding beam
