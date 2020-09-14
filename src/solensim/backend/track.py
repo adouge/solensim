@@ -25,9 +25,31 @@ class TrackModule():
     def __init__(self, astra_interface):
         self.astra = astra_interface  # use Astra Frontend, same as the one provided in main script
 
-    def read_screens(self):
-        screens = self.astra.read_screens()
-        spos = screens.keys()
-        return spos, screens
 
-    
+    def screens_trafo(self):
+        """
+        Read astra output and add polar coordinates and respective impulses;
+        drops q, t, type and flags
+        """
+        s = self.astra.read_screens()
+        refs = s.query("particle==0")
+        s.loc[:, "r"] = abs(s["x"].values**2 + s["y"].values**2)**0.5
+        todrop = s.query("r==0").index
+        s = s.drop(todrop)
+        def get_phi(cos, y):
+            if y >=0: return np.arccos(cos)
+            else: return np.arcsin(cos) + np.pi*3/2
+        get_phi_v = np.vectorize(get_phi)
+        s.loc[:, "cosphi"] = s["x"].values/s["r"].values
+        s.loc[:, "sinphi"] = s["y"].values/s["r"].values
+        s.loc[:, "phi"] = get_phi_v(s["cosphi"].values, s["y"].values)
+        s.loc[:, "pr"] = s["cosphi"].values*s["px"].values + s["sinphi"].values*s["py"].values
+        s.loc[:, "pphi"] = - s["sinphi"].values*s["px"].values + s["cosphi"].values*s["py"].values
+        refs = refs.drop(columns = ["q", "t", "type", "flag"])
+        s = s.drop(columns = ["sinphi", "cosphi", "q", "t", "type", "flag"])
+        zpos = s.index.levels[0]
+        return zpos, s, refs
+
+    def monochrome_sweep(self, Emin, Emax, n=10):
+        Es = np.linspace(Emin, Emax, num=n)
+        pass

@@ -253,12 +253,14 @@ class Core():
             elif len(ident) == 3: ident = "0"+ident
             ident = "run."+ident+".001"
             idents.append(ident)
-        screenshots = {}
-        for i in range(len(idents)):
-            path = os.path.join(self._workdir, idents[i])
+        screenshots = []
+        for i in idents:
+            path = os.path.join(self._workdir, i)
             aufnahme = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
-            screenshots[screens[i]] = aufnahme
-        screenshots[0.0] = self.beam
+            screenshots.append(aufnahme)
+        screenshots.append(self.beam.copy())
+        screens.append(0.0)
+        screenshots = pd.concat(screenshots, keys=screens, names=["zpos", "particle"]).sort_index()
         return screenshots
 
 #    def read_zemit(self):
