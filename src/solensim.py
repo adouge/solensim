@@ -47,5 +47,3 @@ print("API initialized as \"core\".")
 
 import demos
 demos.field_REGAE(core, astra)
-astra.help()
-astra.presets()

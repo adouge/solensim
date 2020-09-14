@@ -1,3 +1,12 @@
+0.3.3, WIP:
+  - ASTRA plugin:
+    - renamed .get_field() to .read_field()
+    - introduced .field field - .read_field() now also stores the field aside from returning z, Bz,
+        and write_field analogously writes it to astra.field
+    - expanded helptext to describe the handle's data fields
+    - fixed read_zemit and trajectories not working (kek blunder)
+    - temporarily disabled read_zemit, because no clue what the numbers mean, yet
+
 0.3.2, 12.09.20:
   - ASTRA plugin:
     - wrote a helptext documenting the ASTRA plugin
@@ -19,7 +28,6 @@
     - changelog should be more structured
     - changed sscode package to solensim; having a solensim folder inside a solensim folder is not too bad, but looks better in the code.
     - expanded the readme.txt
-  - TBA
 
 0.3.1, 11.09.20:
   - implemented preset management in ASTRA plugin

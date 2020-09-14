@@ -148,10 +148,12 @@ class Core():
     def write_field(self, z, Bz):
         field = {"z":z, "Bz":Bz}
         fielddf = pd.DataFrame.from_dict(field)
+        self.field = fielddf
         fielddf.to_csv(os.path.join(self._workdir, "solenoid.dat"), sep="\t", index=False, header=False)
 
-    def get_field(self):
+    def read_field(self):
         fielddf = pd.read_table(os.path.join(self._workdir,"solenoid.dat"), names=["z", "Bz"])
+        self.field = fielddf
         z = fielddf["z"].values
         Bz = fielddf["Bz"].values
         return z, Bz
@@ -254,10 +256,12 @@ class Core():
             screenshots[screens[i]] = aufnahme
         return screenshots
 
-    def read_zemit(self):
-        zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
-        return zemit
+#    def read_zemit(self):
+#        path = os.path.join(self._workdir, "run.Zemit.001")
+#        zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
+#        return zemit
 
     def read_trajectories(self):
+        path = os.path.join(self._workdir, "run.track.001")
         traj = pd.read_table(path, names=self._tracking_labels, skipinitialspace=True, sep=" +", engine="python")
         return traj
