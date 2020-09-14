@@ -12,7 +12,7 @@
     - ring preset: change default radius from 3mm to 1 mm; - 3 MeV Ekin, 10% sigma, uniform E distribution
     - added line preset: uniform line from -1 to 1 mm; monochromatic
     - default beam + gen: gaussian bundle, 1x1x3mm (x,y,z); 3 MeV Ekin 1 % sigma; nemit_x,y 1
-    - default runfile: disabled ref output;
+    - default runfile: disabled ref output; track from 0 to 4 m, screens every 0.5 m
 
 0.3.2, 12.09.20:
   - ASTRA plugin:

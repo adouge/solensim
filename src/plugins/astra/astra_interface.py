@@ -258,7 +258,7 @@ class Core():
             path = os.path.join(self._workdir, idents[i])
             aufnahme = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
             screenshots[screens[i]] = aufnahme
-        screenshots[0] = self.beam
+        screenshots[0.0] = self.beam
         return screenshots
 
 #    def read_zemit(self):

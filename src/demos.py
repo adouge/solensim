@@ -48,10 +48,24 @@ def field_REGAE(handle, astra):
     #print("\n Running ASTRA...")
     #astra.run()
 
-def analyze_default(astra):
-    print("Loading default presets...")
-    astra.gen_preset = "default"
-    astra.track_preset = "default"
-    astra.beam_preset = "default"
+def analyze_default(astra, preset):
+    print("Loaded %s beam"%preset)
+    astra.beam_preset = preset
     astra.verbose = False
-    
+    print("Running ASTRA...")
+    astra.run()
+    screens = astra.read_screens()
+    print("Screens saved as screens")
+    for key in screens.keys():
+        s = screens[key]
+        ref = s.query("index==0")
+        s["r"] = abs(s["x"]**2 + s["y"]**2)**0.5
+        screens[key] = s.query("r>0")
+        s = screens[key]
+        s["sinphi"] = s["y"]/s["r"]
+        s["cosphi"] = s["x"]/s["r"]
+        s["phi"] = np.arcsin(s["sinphi"])
+        s["pr"] = s["cosphi"]*s["px"] + s["sinphi"]*s["py"]
+        s["pphi"] = - s["sinphi"]*s["px"] + s["cosphi"]*s["py"]
+    print("calculated r, phi, Pr and Pphi")
+    return screens
