@@ -29,6 +29,7 @@ class TrackModule():
     def screens_trafo(self):
         """
         Read astra output and add polar coordinates and respective impulses;
+        returns new data, reference particle and screen positions (indices)
         drops q, t, type and flags
         """
         s = self.astra.read_screens()

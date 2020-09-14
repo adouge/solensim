@@ -6,7 +6,7 @@
     - expanded helptext to describe the handle's data fields
     - fixed read_zemit and trajectories not working (kek blunder)
     - temporarily disabled read_zemit, because no clue what the numbers mean, yet
-    - .read_screens also adds start and end beam states to output
+    - .read_screens also adds start and end beam states to output, and now does everything via dataframes
 
   - Tracking presets:
     - ring preset: change default radius from 3mm to 1 mm; - 3 MeV Ekin, 10% sigma, uniform E distribution

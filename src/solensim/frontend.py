@@ -115,7 +115,8 @@ class Astra_Interface(astra_interface.Core):
             .write_field(z, Bz) - write solenoid to solenoid.dat, update stored .field
 
         Output readin:
-            .read_screens() - returns dictionary of screen output based on screens specified in &OUTPUT namelist;
+            .read_screens() - returns dataframe with screen output based on screens specified in &OUTPUT namelist, 
+                as well as initial and final tracked states;
                 keyed according to screen positions; essentially a collection of .beam dataframes
             .read_trajectories() - returns contents of the trajectory tracking output
             .read_zemit() - returns contents of the Zemit file output
