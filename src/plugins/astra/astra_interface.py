@@ -225,6 +225,7 @@ class Core():
         out = self.run(namelist=namelist, exe="generator")
         self.read_beam()
         return out
+
 # Output
 # Column headers:
     _beam_labels = ["x", "y", "z", "px", "py", "pz", "t", "q", "type", "flag"]
@@ -242,6 +243,9 @@ class Core():
         Reads beam states at screens as defined in runfile
         """
         screens = self.runfile["output"]["screen"].copy()
+        zstop = self.runfile["output"]["zstop"]
+        if zstop not in screens:
+            screens.append(zstop)
         idents = []
         for zpos in screens:
             ident = str(zpos/cm)[0:-2]
@@ -254,6 +258,7 @@ class Core():
             path = os.path.join(self._workdir, idents[i])
             aufnahme = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
             screenshots[screens[i]] = aufnahme
+        screenshots[0] = self.beam
         return screenshots
 
 #    def read_zemit(self):

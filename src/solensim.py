@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt
 
 import solensim.wrapper as wrapper
 import solensim.frontend as frontend
+from solensim.units import *
+import scipy.constants as const
 
 # config
 wrapper.load_ini()

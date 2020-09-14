@@ -12,18 +12,18 @@
     dist_y = 'gauss'
     dist_z = 'gauss'
     fname = 'beam.ini'
-    ipart = 500
+    ipart = 100
     n_add = 0
-    nemit_x = 0.0
-    nemit_y = 0.0
+    nemit_x = 1
+    nemit_y = 1
     noise_reduc = .true.
     probe = .true.
-    q_total = 1.0
+    q_total = 1.602176634e-08
     ref_ekin = 3.0
     ref_zpos = 0.0
-    sig_ekin = 30.0
-    sig_x = 0.75
-    sig_y = 1.5
-    sig_z = 1.0
+    sig_ekin = 3
+    sig_x = 1.0
+    sig_y = 1.0
+    sig_z = 3.0
     species = 'electrons'
 /

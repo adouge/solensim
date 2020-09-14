@@ -47,3 +47,11 @@ def field_REGAE(handle, astra):
     #astra.generate()
     #print("\n Running ASTRA...")
     #astra.run()
+
+def analyze_default(astra):
+    print("Loading default presets...")
+    astra.gen_preset = "default"
+    astra.track_preset = "default"
+    astra.beam_preset = "default"
+    astra.verbose = False
+    

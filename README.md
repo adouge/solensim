@@ -14,7 +14,7 @@ Comprehensive solenoid lens design tool.
  - ASTRA interface
 
 **Dependencies**:
- - numpy, pandas
+ - numpy, pandas, scipy
  - ASTRA
  - Has not been tested/configured to work with Windows, i.e. linux only
 

@@ -21,7 +21,7 @@
     emits = .true.
     high_res = .true.
     phases = .true.
-    refs = .true.
+    refs = .false.
     screen = 0.5, 1.0, 1.5, 2.0, 2.5
     tracks = .true.
     zemit = 100

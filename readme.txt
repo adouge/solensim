@@ -14,7 +14,7 @@ Currently 100% usable:
  - ASTRA interface
 
 Dependencies:
- - numpy, pandas
+ - numpy, pandas, scipy
  - ASTRA
  - Has not been tested/configured to work with Windows, i.e. linux only
 

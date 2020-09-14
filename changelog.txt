@@ -6,6 +6,13 @@
     - expanded helptext to describe the handle's data fields
     - fixed read_zemit and trajectories not working (kek blunder)
     - temporarily disabled read_zemit, because no clue what the numbers mean, yet
+    - .read_screens also adds start and end beam states to output
+
+  - Tracking presets:
+    - ring preset: change default radius from 3mm to 1 mm; - 3 MeV Ekin, 10% sigma, uniform E distribution
+    - added line preset: uniform line from -1 to 1 mm; monochromatic
+    - default beam + gen: gaussian bundle, 1x1x3mm (x,y,z); 3 MeV Ekin 1 % sigma; nemit_x,y 1
+    - default runfile: disabled ref output;
 
 0.3.2, 12.09.20:
   - ASTRA plugin:

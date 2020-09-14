@@ -129,7 +129,8 @@ class Astra_Interface(astra_interface.Core):
         if self.verbose: print(out)
 
     def generate(self, namelist="generator.in"):
-        out = astra_interface.Core.run(self, namelist, "generator")
+        out = astra_interface.Core.run(self, namelist=namelist, exe="generator")
+        self.read_beam()
         if self.verbose: print(out)
 
     def presets(self):
