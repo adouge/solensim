@@ -44,11 +44,11 @@ class TrackModule():
         else:
             return phi - phi0
 
-    def screens_trafo(self, s):
+    def process_states(self, s):
         """
-        Read astra output and add polar coordinates and respective impulses;
+        take astra output and add polar coordinates and respective impulses;
         returns new data, reference particle and screen positions (indices)
-        drops q, t, type and flags
+        (drops q, t, type and flags - disabled)
         """
         refs = s.query("particle==0")
         s.loc[:, "r"] = np.sqrt(s["x"].values**2 + s["y"].values**2)
@@ -59,8 +59,9 @@ class TrackModule():
         s.loc[:, "phi"] = self.calc_phi_v(s["cosphi"].values, s["y"].values)
         s.loc[:, "pr"] = s["cosphi"].values*s["px"].values + s["sinphi"].values*s["py"].values
         s.loc[:, "pphi"] = - s["sinphi"].values*s["px"].values + s["cosphi"].values*s["py"].values
-        refs = refs.drop(columns = ["q", "t", "type", "flag"])
-        s = s.drop(columns = ["sinphi", "cosphi", "q", "t", "type", "flag"])
+#        refs = refs.drop(columns = ["q", "t", "type", "flag"])
+#        s = s.drop(columns = ["sinphi", "cosphi", "q", "t", "type", "flag"])
+        s = s.drop(columns = ["sinphi", "cosphi"])
         zpos = s.index.levels[0]
         return zpos, s, refs
 

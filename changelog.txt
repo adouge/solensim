@@ -6,17 +6,18 @@
     - expanded helptext to describe the handle's data fields
     - fixed read_zemit and trajectories not working (kek blunder)
     - temporarily disabled read_zemit, because no clue what the numbers mean, yet
-    - .read_screens also adds start and end beam states to output, and now does everything via dataframes
-    - added .read_last to only grab the final beam state
+    - .read_screens rewritten as .read_states - not dependent on runfile, flexible (regex & dataframes), and with initial beam state as well
+    - added .read_last to only grab the first and last beam states only
+    - .workspace() now sorts its output
 
   - Tracking presets:
     - ring preset: change default radius from 3mm to 1 mm; - 3 MeV Ekin, 10% sigma, uniform E distribution
-    - added line preset: uniform line from -1 to 1 mm; monochromatic
+    - added line preset: uniform line from -10 to 10 mm (sigmas); monochromatic
     - default beam + gen: gaussian bundle, 1x1x3mm (x,y,z); 3 MeV Ekin 1 % sigma; nemit_x,y 1
-    - default runfile: disabled ref output; track from 0 to 4 m, screens every 0.5 m
+    - default runfile: disabled ref output; track from 0 to 4 m, state image every 10 cm
 
   - Track module:
-    - can do screen trafo to polar
+    - can do state trafo to polar
     - correct phi and delta phi calculations
 
   - Demos:
