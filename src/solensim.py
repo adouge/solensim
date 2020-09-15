@@ -40,12 +40,19 @@ astra = frontend.Astra_Interface()
 print("astra.help():")
 astra.help()
 astra.presets()
+
 print("\n")
 
 track = frontend.Tracker(astra)
-print("Tracker initialized as \"track\".")
+print("Tracker initialized as \"track\" (WIP).")
 core = frontend.Core()
-print("API initialized as \"core\".")
+print("Core handle initialized as \"core\".")
 
+print("\n")
+print("BA section:")
+
+from importlib import reload
 import demos
+import bachelor
+
 demos.field_REGAE(core, astra)

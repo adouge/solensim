@@ -1,4 +1,7 @@
 0.3.3, 15.09.20:
+  - General:
+    - separated demos and BA-relevant routines; I want to make a clear distinction between solensim and my thesis work.
+
   - ASTRA plugin:
     - renamed .get_field() to .read_field()
     - introduced .field field - .read_field() now also stores the field aside from returning z, Bz,
@@ -9,6 +12,7 @@
     - .read_screens rewritten as .read_states - not dependent on runfile, flexible (regex & dataframes), and with initial beam state as well
     - added .read_last to only grab the first and last beam states only
     - .workspace() now sorts its output
+    - won't say final (again), but looks like it (kek)
 
   - Tracking presets:
     - ring preset: change default radius from 3mm to 1 mm; - 3 MeV Ekin, 10% sigma, uniform E distribution
