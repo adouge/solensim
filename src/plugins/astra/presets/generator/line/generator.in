@@ -12,20 +12,19 @@
     dist_y = 'uniform'
     dist_z = 'uniform'
     fname = 'beam.ini'
-    ipart = 100
+    ipart = 300
     n_add = 0
     noise_reduc = .true.
     probe = .false.
-    q_total = 1.602176634e-08
-    rad = 1
+    q_total = 4.8065299019999996e-08
     ref_ekin = 3.0
     ref_zpos = 0.0
-    sig_ekin = 300
+    sig_ekin = 0
     sig_px = 0.0
     sig_py = 0.0
-    sig_x = 0.0
+    sig_x = 10
     sig_y = 0.0
     sig_z = 0.0
     species = 'electrons'
-    type = 'ring'
+    type = 'standard'
 /

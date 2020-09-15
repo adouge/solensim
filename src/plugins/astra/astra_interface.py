@@ -22,6 +22,7 @@ import f90nml
 import os.path
 from os import listdir
 import subprocess
+import re
 
 import solensim.wrapper as wrapper
 from solensim.units import *
@@ -148,10 +149,12 @@ class Core():
     def write_field(self, z, Bz):
         field = {"z":z, "Bz":Bz}
         fielddf = pd.DataFrame.from_dict(field)
+        self.field = fielddf
         fielddf.to_csv(os.path.join(self._workdir, "solenoid.dat"), sep="\t", index=False, header=False)
 
-    def get_field(self):
+    def read_field(self):
         fielddf = pd.read_table(os.path.join(self._workdir,"solenoid.dat"), names=["z", "Bz"])
+        self.field = fielddf
         z = fielddf["z"].values
         Bz = fielddf["Bz"].values
         return z, Bz
@@ -198,6 +201,7 @@ class Core():
         files.remove("Astra")
         files.remove("generator")
         files.remove("NORRAN")
+        files = sorted(files)
         return files
 
 # Run
@@ -223,6 +227,7 @@ class Core():
         out = self.run(namelist=namelist, exe="generator")
         self.read_beam()
         return out
+
 # Output
 # Column headers:
     _beam_labels = ["x", "y", "z", "px", "py", "pz", "t", "q", "type", "flag"]
@@ -235,29 +240,48 @@ class Core():
         return beam
 
 # Astra output:
-    def read_screens(self):
+    def read_states(self):
         """
-        Reads beam states at screens as defined in runfile
+        Reads beam states from all run.pos.001 files
         """
-        screens = self.runfile["output"]["screen"].copy()
-        idents = []
-        for zpos in screens:
-            ident = str(zpos/cm)[0:-2]
-            if len(ident) == 2: ident = "00"+ident
-            elif len(ident) == 3: ident = "0"+ident
-            ident = "run."+ident+".001"
-            idents.append(ident)
-        screenshots = {}
-        for i in range(len(idents)):
-            path = os.path.join(self._workdir, idents[i])
-            aufnahme = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
-            screenshots[screens[i]] = aufnahme
-        return screenshots
+        pattern = re.compile("run.[0-9]+.001")
+        files = list(filter(pattern.match, self.workspace()))
+        states = []
+        zpos = []
+        for file in files:
+            ident = file.split(".")[1]
+            z = float(ident)/10**(len(ident)-1)
+            path = os.path.join(self._workdir, file)
+            state = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
+            states.append(state)
+            zpos.append(z)
+        states.append(self.beam.copy())
+        zpos.append(0.0)
+        states = pd.concat(states, keys=zpos, names=["zpos", "particle"]).sort_index()
+        return states
 
-    def read_zemit(self):
-        zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
-        return zemit
+    def read_last(self):
+        """
+        Reads beam state last zpos defined in runfile
+        """
+        zstop = self.runfile["output"]["zstop"]
+        ident = str(zstop/cm)[0:-2]
+        if len(ident) == 2: ident = "00"+ident
+        elif len(ident) == 3: ident = "0"+ident
+        ident = "run."+ident+".001"
+        path = os.path.join(self._workdir, ident)
+        screen = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
+        screens = pd.concat([self.beam.copy(), screen], keys = [0.0, zstop], names=["zpos", "particle"])
+        return screens
+
+
+
+#    def read_zemit(self):
+#        path = os.path.join(self._workdir, "run.Zemit.001")
+#        zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
+#        return zemit
 
     def read_trajectories(self):
+        path = os.path.join(self._workdir, "run.track.001")
         traj = pd.read_table(path, names=self._tracking_labels, skipinitialspace=True, sep=" +", engine="python")
         return traj

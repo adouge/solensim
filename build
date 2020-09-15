@@ -25,8 +25,8 @@ rm solensim.zip
 
 # clean up caches
 rm -rf src/__pycache__
-rm -rf src/sscode/__pycache__
-rm -rf src/sscode/backend/__pycache__
+rm -rf src/solensim/__pycache__
+rm -rf src/solensim/backend/__pycache__
 rm -rf src/plugins/__pycache__
 rm -rf src/plugins/mcode/__pycache__
 rm -rf src/plugins/astra/__pycache__

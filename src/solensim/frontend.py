@@ -80,6 +80,12 @@ class Astra_Interface(astra_interface.Core):
             .run(namelist) - run a particular ASTRA input deck, defaults to run.in
             .generate(namelist) - run generator on a distro specification, defaults to generator.in
 
+        Data handles:
+            .runfile - loaded ASTRA runfile in dict form, see current setup editing
+            .genfile - analogously
+            .beam - currently loaded beam file as pandas dataframe
+            .field - currently loaded field as pandas dataframe
+
         Current run setup editing:
             .read_runfile(),
             .read_genfile() - load input namelists into handle object;
@@ -105,16 +111,15 @@ class Astra_Interface(astra_interface.Core):
             .read_nml(file) - return contents of file (in workspace) as namelist object
             .write_nml(nml, file) - write nml namelist to file
 
-            .get_field() - return z, Bz from solenoid.dat file
-            .write_field(z, Bz) - write solenoid to solenoid.dat
+            .read_field() - return z, Bz from solenoid.dat file, update stored .field
+            .write_field(z, Bz) - write solenoid to solenoid.dat, update stored .field
 
         Output readin:
-            .read_screens() - returns dictionary of screen output based on screens specified in &OUTPUT namelist;
+            .read_screens() - returns dataframe with screen output based on screens specified in &OUTPUT namelist, 
+                as well as initial and final tracked states;
                 keyed according to screen positions; essentially a collection of .beam dataframes
             .read_trajectories() - returns contents of the trajectory tracking output
             .read_zemit() - returns contents of the Zemit file output
-
-        Set .verbose to False to suppress ASTRA output
     """
 
     def help(self):
@@ -125,7 +130,8 @@ class Astra_Interface(astra_interface.Core):
         if self.verbose: print(out)
 
     def generate(self, namelist="generator.in"):
-        out = astra_interface.Core.run(self, namelist, "generator")
+        out = astra_interface.Core.run(self, namelist=namelist, exe="generator")
+        self.read_beam()
         if self.verbose: print(out)
 
     def presets(self):

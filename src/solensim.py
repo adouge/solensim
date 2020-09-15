@@ -22,12 +22,14 @@ import matplotlib.pyplot as plt
 
 import solensim.wrapper as wrapper
 import solensim.frontend as frontend
+from solensim.units import *
+import scipy.constants as const
 
 # config
 wrapper.load_ini()
 print("(tried loading config)\n")
 #################
-vstring = "0.3.2"
+vstring = "0.3.3"
 #################
 
 print("solensim v%s solenoid design & optimization tool"%vstring)
@@ -38,14 +40,19 @@ astra = frontend.Astra_Interface()
 print("astra.help():")
 astra.help()
 astra.presets()
+
 print("\n")
 
 track = frontend.Tracker(astra)
-print("Tracker initialized as \"track\".")
+print("Tracker initialized as \"track\" (WIP).")
 core = frontend.Core()
-print("API initialized as \"core\".")
+print("Core handle initialized as \"core\".")
 
+print("\n")
+print("BA section:")
+
+from importlib import reload
 import demos
+import bachelor
+
 demos.field_REGAE(core, astra)
-astra.help()
-astra.presets()

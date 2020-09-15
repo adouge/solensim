@@ -22,9 +22,11 @@
     high_res = .true.
     phases = .true.
     refs = .false.
+    screen = 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75,
+             3.0, 3.25, 3.5, 3.75, 4.0
     tracks = .true.
-    zemit = 400
-    zphase = 40
+    zemit = 100
+    zphase = 1
     zstart = 0.0
     zstop = 4.0
 /
@@ -32,9 +34,9 @@
 &solenoid
     file_bfield = 'solenoid.dat'
     lbfield = .true.
-    maxb = 0.060855
+    maxb = 0.5000000000000001
     s_higher_order = .true.
-    s_noscale = .true.
+    s_noscale = .false.
     s_pos = 1.5
-    s_smooth = 10
+    s_smooth = 100
 /

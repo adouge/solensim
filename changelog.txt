@@ -1,3 +1,34 @@
+0.3.3, 15.09.20:
+  - General:
+    - separated demos and BA-relevant routines; I want to make a clear distinction between solensim and my thesis work.
+
+  - ASTRA plugin:
+    - renamed .get_field() to .read_field()
+    - introduced .field field - .read_field() now also stores the field aside from returning z, Bz,
+        and write_field analogously writes it to astra.field
+    - expanded helptext to describe the handle's data fields
+    - fixed read_zemit and trajectories not working (kek blunder)
+    - temporarily disabled read_zemit, because no clue what the numbers mean, yet
+    - .read_screens rewritten as .read_states - not dependent on runfile, flexible (regex & dataframes), and with initial beam state as well
+    - added .read_last to only grab the first and last beam states only
+    - .workspace() now sorts its output
+    - won't say final (again), but looks like it (kek)
+
+  - Tracking presets:
+    - ring preset: change default radius from 3mm to 1 mm; - 3 MeV Ekin, 10% sigma, uniform E distribution
+    - added line preset: uniform line from -10 to 10 mm (sigmas); monochromatic
+    - default beam + gen: gaussian bundle, 1x1x3mm (x,y,z); 3 MeV Ekin 1 % sigma; nemit_x,y 1
+    - default runfile: disabled ref output; track from 0 to 4 m, state image every 10 cm
+
+  - Track module:
+    - can do state trafo to polar
+    - correct phi and delta phi calculations
+
+  - Demos:
+    - Rotation from radius demo (via line, no correlation)
+    - Rotation from energy demo (via ring)
+    - Field scaling sweep demo - need to use ASTRA's loop controls.
+
 0.3.2, 12.09.20:
   - ASTRA plugin:
     - wrote a helptext documenting the ASTRA plugin
@@ -19,7 +50,6 @@
     - changelog should be more structured
     - changed sscode package to solensim; having a solensim folder inside a solensim folder is not too bad, but looks better in the code.
     - expanded the readme.txt
-  - TBA
 
 0.3.1, 11.09.20:
   - implemented preset management in ASTRA plugin

@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 from solensim.units import *
 
 def field_REGAE(handle, astra):
-    print("Describing REGAE solenoid field (no yoke) via two-loop-approximation. (demos.field_REGAE(core, astra))")
+    print("Describing REGAE solenoid field (no yoke)\n via two-loop-approximation. (demos.field_REGAE(core, astra))")
     g_REGAE = [30, 99.5, 41.8]
     s_REGAE = 9*1000
     print("Rin, a, b [cm]:")
@@ -35,7 +35,7 @@ def field_REGAE(handle, astra):
     Bmax = handle.get_Bmax(p)
     fwhm = handle.get_fwhm(p)
     print("Maximum field strength: %.3f mT, FWHM %.1f mm"%(Bmax/mm, fwhm/mm))
-    plt.figure()
+    plt.figure(figsize=(7,4))
     plt.plot(z/cm, B/mm, "-k", label="Bz(z)")
     plt.xlabel("Axial position [cm]")
     plt.ylabel("On-axis field strength [mT]")

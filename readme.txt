@@ -1,4 +1,4 @@
-solensim v0.3.2
+solensim v0.3.3
 Comprehensive solenoid lens design tool.
 -------------------------------------------------------------------
 Aims:
@@ -14,7 +14,7 @@ Currently 100% usable:
  - ASTRA interface
 
 Dependencies:
- - numpy, pandas
+ - numpy, pandas, scipy, f90nml
  - ASTRA
  - Has not been tested/configured to work with Windows, i.e. linux only
 
