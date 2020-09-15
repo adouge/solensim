@@ -1,0 +1,72 @@
+\documentclass{beamer}
+%\usepackage{ngerman}
+\usepackage{soul}
+\usepackage{mathtools}
+\usepackage{amssymb,amsmath,amsfonts}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[autostyle=true,german=quotes]{csquotes}
+\usepackage{gensymb}
+\usepackage{units}
+\usepackage{fancyhdr}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage[%backend=biber,
+citestyle=authortitle,
+sorting=nty
+]{biblatex}
+
+
+\addbibresource{../../lib/lib.bib}
+\addbibresource{../../solensim.bib}
+\graphicspath{{./figures/}}
+
+\setbeamertemplate{navigation symbols}{}
+%\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{section in toc}[square]
+\setbeamertemplate{subsection in toc}[square]
+\setbeamertemplate{footline}[frame number]
+
+\title{TITLE}
+\subtitle{Subtitle}
+\author{Author 1 \and Author 2}
+\date{DATE \today}
+
+\begin{document}
+%Title slide:
+%\begin{frame}[plain]
+%  \titlepage
+%\end{frame}
+
+%TOC slide:
+\begin{frame}
+  \frametitle{Structure}
+  \tableofcontents%[currentsection]
+\end{frame}
+
+\section{}
+\begin{frame}
+  \frametitle{Title}
+  \framesubtitle{Subtitle}
+  This is how one cites. \footcite{Blobel1998}
+
+\end{frame}
+
+\section{Section 2}
+\begin{frame}
+  \frametitle{Title}
+  \framesubtitle{Subtitle}
+\end{frame}
+
+\section{Summary}
+\begin{frame}
+  \frametitle{Summary}
+  \framesubtitle{Subtitle}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+  \printbibliography
+\end{frame}
+
+\end{document}
