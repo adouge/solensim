@@ -1,4 +1,4 @@
-0.3.3, WIP:
+0.3.3, 15.09.20:
   - ASTRA plugin:
     - renamed .get_field() to .read_field()
     - introduced .field field - .read_field() now also stores the field aside from returning z, Bz,
@@ -7,6 +7,7 @@
     - fixed read_zemit and trajectories not working (kek blunder)
     - temporarily disabled read_zemit, because no clue what the numbers mean, yet
     - .read_screens also adds start and end beam states to output, and now does everything via dataframes
+    - added .read_last to only grab the final beam state
 
   - Tracking presets:
     - ring preset: change default radius from 3mm to 1 mm; - 3 MeV Ekin, 10% sigma, uniform E distribution
@@ -15,7 +16,13 @@
     - default runfile: disabled ref output; track from 0 to 4 m, screens every 0.5 m
 
   - Track module:
-    - can perform transformation from x,y to polar (and?????)
+    - can do screen trafo to polar
+    - correct phi and delta phi calculations
+
+  - Demos:
+    - Rotation from radius demo (via line, no correlation)
+    - Rotation from energy demo (via ring)
+    - Field scaling sweep demo - need to use ASTRA's loop controls.
 
 0.3.2, 12.09.20:
   - ASTRA plugin:

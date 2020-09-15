@@ -263,6 +263,22 @@ class Core():
         screenshots = pd.concat(screenshots, keys=screens, names=["zpos", "particle"]).sort_index()
         return screenshots
 
+    def read_last(self):
+        """
+        Reads beam state at screen last defined in runfile
+        """
+        zstop = self.runfile["output"]["zstop"]
+        ident = str(zstop/cm)[0:-2]
+        if len(ident) == 2: ident = "00"+ident
+        elif len(ident) == 3: ident = "0"+ident
+        ident = "run."+ident+".001"
+        path = os.path.join(self._workdir, ident)
+        screen = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
+        screens = pd.concat([self.beam.copy(), screen], keys = [0.0, zstop], names=["zpos", "particle"])
+        return screens
+
+
+
 #    def read_zemit(self):
 #        path = os.path.join(self._workdir, "run.Zemit.001")
 #        zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
