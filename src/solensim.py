@@ -29,7 +29,7 @@ import scipy.constants as const
 wrapper.load_ini()
 print("(tried loading config)\n")
 #################
-vstring = "0.3.2"
+vstring = "0.3.3"
 #################
 
 print("solensim v%s solenoid design & optimization tool"%vstring)

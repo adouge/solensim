@@ -1,4 +1,4 @@
-solensim v0.3.2
+solensim v0.3.3
 Comprehensive solenoid lens design tool.
 -------------------------------------------------------------------
 Aims:
