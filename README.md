@@ -13,6 +13,9 @@ Comprehensive solenoid lens design tool.
 **Currently 100% usable**:
  - ASTRA interface
 
+**Documentation**:
+ - WIP/TODO
+
 **Dependencies**:
  - numpy, pandas, scipy, f90nml
  - ASTRA
