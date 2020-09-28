@@ -34,7 +34,10 @@ def field_REGAE(handle, astra):
     B = handle.get_Bz(p)
     Bmax = handle.get_Bmax(p)
     fwhm = handle.get_fwhm(p)
+    handle.E = 3.5
+    focal = handle.get_f(p)
     print("Maximum field strength: %.3f mT, FWHM %.1f mm"%(Bmax/mm, fwhm/mm))
+    print("Focal length for %.2f MeV energy: %.3f m"%(handle.E, focal))
     plt.figure(figsize=(7,4))
     plt.plot(z/cm, B/mm, "-k", label="Bz(z)")
     plt.xlabel("Axial position [cm]")

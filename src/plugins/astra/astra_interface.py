@@ -248,9 +248,11 @@ class Core():
         files = list(filter(pattern.match, self.workspace()))
         states = []
         zpos = []
+        zstop = self.runfile["output"]["zstop"]
+        divisor = float(files[-1].split(".")[1])/zstop
         for file in files:
             ident = file.split(".")[1]
-            z = float(ident)/10**(len(ident)-2)
+            z = float(ident)/divisor
             path = os.path.join(self._workdir, file)
             state = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
             states.append(state)

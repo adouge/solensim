@@ -19,7 +19,7 @@
 import scipy.constants as const
 from numpy.lib.scimath import sqrt as csqrt
 from numpy.lib.scimath import power as cpow
-from scipy.integrate import quad as integral
+import scipy.integrate as integrate
 from scipy.misc import derivative
 import scipy.optimize as opt
 import numpy as np
@@ -90,8 +90,24 @@ class Core():
             integrand = lambda z: -1/2*self.Model.field[self.FM](z, p)*derivative(self.Model.field[self.FM], z, n=2, args=[p])
         else:
             integrand = lambda z: self.Model.field[self.FM](z, p)**n
-        I, dI = integral(integrand, -np.inf, np.inf)
+        I, dI = integrate.quad(integrand, -np.inf, np.inf)
         return I
+
+    def fint_num(self, z, Bz, n):
+        """
+        Compute nth field integral, numerically from field samples
+        """
+        if n == 3:
+            dz = np.mean(np.diff(z))
+            dBz = np.diff(np.float128(Bz))/dz
+            ddBz = np.diff(dBz)/dz
+            x = z[1:-1]
+            integrand = -1/2*Bz[1:-1]*ddBz
+        else:
+            integrand = np.float128(Bz)**n
+            x = z
+        integral = integrate.simps(integrand, x, even="avg")
+        return integral
 
     def get_Bz(self, p):
         z = np.linspace(-self.zmax, self.zmax, num=2*10**self.grain+1)

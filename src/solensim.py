@@ -43,10 +43,12 @@ astra.presets()
 
 print("\n")
 
-track = frontend.Tracker(astra)
-print("Tracker initialized as \"track\" (WIP).")
 core = frontend.Core()
-print("Core handle initialized as \"core\".")
+print("Core handle initialized as \"core\" (WIP).")
+
+track = frontend.Tracker(astra)
+track.linked_core = core  # bind core and track together
+print("Tracker initialized as \"track\" (WIP).")
 
 print("\n")
 print("BA section:")

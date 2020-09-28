@@ -1,8 +1,19 @@
 0.3.4, WIP:
   - ASTRA plugin:
-    - fixed .read_states() getting wrong zpos (order of magnitude smaller labels)
+    - rewrote .read_states() to accomodate for any zphase (simple trick)
+    - added warning to helptext about .clean() possibly overwriting unsaved runfiles
+
   - track module:
-    - .process_states() now adds dphi information (relative to starting beam state) to each state --> split into total dphi and dphi change?
+    - .process_states() now adds dphi information (relative to starting beam state ("turn") and to the previous state ("dphi")) to each state
+    - .process_states() now adds z, pz and t from reference particles to the rest, eliminating the need for a separate "refs" object
+
+  - core module:
+    - added numerical field integration, based on Simpsons' method. F3 is bad - "second derivative" from slopes 0.1-1 mm steps is, well, bad.
+    - Renamed calc.py into core.py, for less confusion
+
+  - General:
+    - Added some code to wrapper to streamline binding various modules to each other; since nothing will invoke the backend going around the interfaces (wrapper, at least),
+      it is safe to not declare these connections explicitly and use "undefined" objects in backend code.
 
 
 0.3.3, 15.09.20:

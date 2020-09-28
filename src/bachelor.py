@@ -30,15 +30,17 @@ def line_rot(astra, track):
     print("Running ASTRA...")
     astra.run()
     states = astra.read_states()
-    zpos, s, refs = track.process_states(states)
+    zpos, s0, refs = track.process_states(states)
+    s = s0.loc[0:2.4].copy()
+    zpos = zpos[zpos<2.5]
     beam = s.loc[zpos[-1]]
     beam0 = s.loc[zpos[0]]
     rs = beam0["r"].values
     dphis = beam["dphi"].values
-
+    turns = beam["turn"].values
     plt.figure(figsize=(8,5))
-    plt.plot(rs*10**3, dphis, ".k", label="%.2f MeV monochrome, N = 300, \nuniform horizontal line distribution"%(refs.get("pz").values[0]/10**6))
-    plt.axis([0,17.5,min(dphis),max(dphis)])
+    plt.plot(rs*10**3, turns, ".k", label="%.2f MeV monochrome, N = 300, \nuniform horizontal line distribution"%(refs.get("pz").values[0]/10**6))
+    #plt.axis([0, np.max(rs)*1.05, np.min(turns)-np.max(dphis), np.max(turns)+np.max(dphis)])
     plt.tick_params(axis="both",labelsize=12)
     plt.xlabel("Radial particle position at start [mm]", fontsize=20)
     plt.ylabel("Particle rotation [rad/pi]", fontsize=20)
