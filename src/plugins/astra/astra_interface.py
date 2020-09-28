@@ -250,7 +250,7 @@ class Core():
         zpos = []
         for file in files:
             ident = file.split(".")[1]
-            z = float(ident)/10**(len(ident)-1)
+            z = float(ident)/10**(len(ident)-2)
             path = os.path.join(self._workdir, file)
             state = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
             states.append(state)

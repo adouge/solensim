@@ -1,3 +1,28 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from solensim.units import *
+import scipy.constants as const
+
+
+def linefit(x, y, dy):
+  # Lineare Regression (y = ax + b) mit Gewichtung nach dem Skript von U. Müller, S.41.
+  # straightforward and easy, but has some drawbacks. (See Ref. 2)
+  # takes:
+  # x, y, dy vectors, with dy = s(y);
+  # returns:
+  # A, B - fit parameters,
+  # dA, dB - their uncertainties.
+  # Direct calculation by formulas in Mueller's Script (Ref. 1, p. 41)
+
+  D = np.sum((x**2)/dy**2)*np.sum(1/dy**2) - (np.sum(x/dy**2))**2;
+  A = (np.sum(x*y/dy**2)*np.sum(1/dy**2) - np.sum(x/dy**2)*np.sum(y/dy**2))/D;
+  B = (np.sum((x**2)/dy**2)*np.sum(y/dy**2) - np.sum(x*y/dy**2)*np.sum(x/dy**2))/D;
+  dA = np.sqrt(np.sum(1/dy**2)/D);
+  dB = np.sqrt(np.sum((x**2)/dy**2)/D);
+
+  return A, dA, B, dB
+
+
 def line_rot(astra, track):
     print("Loaded line beam")
     astra.beam_preset = "line"
@@ -8,16 +33,24 @@ def line_rot(astra, track):
     zpos, s, refs = track.process_states(states)
     beam = s.loc[zpos[-1]]
     beam0 = s.loc[zpos[0]]
-    dphis = track.calc_dphi_v(beam["phi"], beam0["phi"])
-    print("Passed output to track handle")
+    rs = beam0["r"].values
+    dphis = beam["dphi"].values
+
     plt.figure(figsize=(8,5))
-    plt.plot(beam0["r"].values*10**3, dphis, ".k", label="%.2f MeV monochrome, N = 300, \nuniform horizontal line distribution"%(refs.get("pz").values[0]/10**6))
-    plt.axis([0,17.5,1,1.25])
+    plt.plot(rs*10**3, dphis, ".k", label="%.2f MeV monochrome, N = 300, \nuniform horizontal line distribution"%(refs.get("pz").values[0]/10**6))
+    plt.axis([0,17.5,min(dphis),max(dphis)])
     plt.tick_params(axis="both",labelsize=12)
     plt.xlabel("Radial particle position at start [mm]", fontsize=20)
     plt.ylabel("Particle rotation [rad/pi]", fontsize=20)
-    plt.legend(loc = "lower left", fontsize=16)
+    plt.legend(loc = "upper left", fontsize=16)
     plt.show()
+
+    index_rmin = beam0["r"].idxmin()
+    index_rmax = beam0["r"].idxmax()
+
+    print("Rotation at %.3f: %.6f"%(rs[index_rmin], dphis[index_rmin]))
+    print("Rotation at %.3f: %.6f"%(rs[index_rmax], dphis[index_rmax]))
+
 
 def ring_rot(astra, track):
     print("Loaded ring beam")
@@ -98,4 +131,4 @@ def pphi_visual(astra, track):
     plt.xlabel("Radial particle position at start [m]", fontsize=20)
     plt.ylabel("Particle rotation impulse [keV]", fontsize=20)
     plt.legend(loc = "lower right", fontsize=12)
-    plt.show()    
+    plt.show()

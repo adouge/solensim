@@ -1,4 +1,9 @@
 0.3.4, WIP:
+  - ASTRA plugin:
+    - fixed .read_states() getting wrong zpos (order of magnitude smaller labels)
+  - track module:
+    - .process_states() now adds dphi information (relative to starting beam state) to each state --> split into total dphi and dphi change?
+
 
 0.3.3, 15.09.20:
   - General:

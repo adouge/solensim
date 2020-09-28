@@ -57,6 +57,10 @@ class TrackModule():
         s.loc[:, "cosphi"] = s["x"].values/s["r"].values
         s.loc[:, "sinphi"] = s["y"].values/s["r"].values
         s.loc[:, "phi"] = self.calc_phi_v(s["cosphi"].values, s["y"].values)
+        s.loc[0, "dphi"] = 0
+        zpos = s.index.levels[0]
+        for z in zpos[1:]:
+            s.loc[z, "dphi"] = self.calc_dphi_v(s.loc[z, "phi"].values, s.loc[0, "phi"].values)
         s.loc[:, "pr"] = s["cosphi"].values*s["px"].values + s["sinphi"].values*s["py"].values
         s.loc[:, "pphi"] = - s["sinphi"].values*s["px"].values + s["cosphi"].values*s["py"].values
 #        refs = refs.drop(columns = ["q", "t", "type", "flag"])
