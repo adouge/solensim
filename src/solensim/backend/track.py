@@ -41,7 +41,7 @@ class TrackModule():
         """
         Get phase shift, accounting for cyclicity of phi; assume phis in units of pi
         """
-        if np.round(phi1) > np.round(phi2):
+        if np.round(phi1, decimals=0) > np.round(phi2, decimals=0):
             return phi2 - phi1 + 2
         else:
             return phi2 - phi1
@@ -81,7 +81,7 @@ class TrackModule():
 #        refs = refs.drop(columns = ["q", "t", "type", "flag"])
 #        s = s.drop(columns = ["sinphi", "cosphi", "q", "t", "type", "flag"])
         s = s.drop(columns = ["sinphi", "cosphi"])
-        return zpos, s
+        return zpos, s, refs
 
     def monochrome_sweep(self, Emin, Emax, n=10):
         Es = np.linspace(Emin, Emax, num=n)

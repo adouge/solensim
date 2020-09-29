@@ -30,9 +30,8 @@ def line_rot(astra, track):
     print("Running ASTRA...")
     astra.run()
     states = astra.read_states()
-    zpos, s0, refs = track.process_states(states)
-    s = s0.loc[0:2.4].copy()
-    zpos = zpos[zpos<2.5]
+    zpos, s, refs = track.process_states(states)
+
     beam = s.loc[zpos[-1]]
     beam0 = s.loc[zpos[0]]
     rs = beam0["r"].values
@@ -50,8 +49,8 @@ def line_rot(astra, track):
     index_rmin = beam0["r"].idxmin()
     index_rmax = beam0["r"].idxmax()
 
-    print("Rotation at %.3f: %.6f"%(rs[index_rmin], dphis[index_rmin]))
-    print("Rotation at %.3f: %.6f"%(rs[index_rmax], dphis[index_rmax]))
+    print("Rotation at %.3f: %.6f"%(rs[index_rmin], turns[index_rmin]))
+    print("Rotation at %.3f: %.6f"%(rs[index_rmax], turns[index_rmax]))
 
 
 def ring_rot(astra, track):

@@ -3,6 +3,10 @@
     - rewrote .read_states() to accomodate for any zphase (simple trick)
     - added warning to helptext about .clean() possibly overwriting unsaved runfiles
 
+  - Tracking presets:
+    - default now takes beam states every 0.01 m, assuming field 2 m wide @ z = 1m (particles immediately fly into the field);
+      track 1 m afterwards, i.e. focal length of up to 2 m
+
   - track module:
     - .process_states() now adds dphi information (relative to starting beam state ("turn") and to the previous state ("dphi")) to each state
     - .process_states() now adds z, pz and t from reference particles to the rest, eliminating the need for a separate "refs" object
