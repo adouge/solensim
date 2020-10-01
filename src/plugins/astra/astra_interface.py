@@ -242,7 +242,8 @@ class Core():
 # Astra output:
     def read_states(self):
         """
-        Reads beam states from all run.pos.001 files
+        Reads beam states from all run.pos.001 files;
+        outputs a massive dataframe, indexed by state z positions and particle indices
         """
         pattern = re.compile("run.[0-9]+.001")
         files = list(filter(pattern.match, self.workspace()))

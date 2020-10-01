@@ -19,6 +19,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import solensim.wrapper as wrapper
 import solensim.frontend as frontend
