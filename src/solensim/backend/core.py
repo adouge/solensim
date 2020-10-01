@@ -22,6 +22,7 @@ from numpy.lib.scimath import power as cpow
 import scipy.integrate as integrate
 from scipy.misc import derivative
 import scipy.optimize as opt
+import scipy.interpolate as interpolate
 import numpy as np
 
 from solensim.units import *
@@ -31,11 +32,12 @@ class Model():
     """
     TODO - fiedl calculation & beam model subblock
     """
-    def __init__(self):
+    def __init__(self, linked_core):
         self.field = {
             "twoloop" : self.twoloop,
-            "data" : self.data_interpol
+            "interpol" : self.data_interpol
         }
+        self.linked_core = linked_core
 
 #### Native field calculation
     def twoloop(self, z, p):
@@ -50,9 +52,8 @@ class Model():
         B = 1/4*const.mu_0*s*(pterm + mterm)
         return np.real(B)  # complex part is 0 anyways
 
-    def data_interpol(self, z, p):  # TODO - use provided field as model (for characterization purposes)
-        wip()
-        return np.zeros(np.len(z))
+    def data_interpol(self, z, p):
+        return self.linked_core.interpol_field(z)
 
 #### Beam properties for characterization
     def impuls(self, E):  # [MeV] relativistic impulse
@@ -65,13 +66,14 @@ class Core():
     TODO - main class
     """
     def __init__(self):
-        self.Model = Model()
+        self.Model = Model(self)
         self.FM = "twoloop"  # default field model
         self.zmax = 1
         self.grain = 4  # 0.1 mm precision
         # Beam:
         self.E = "None"
         self.R = 1  # 1 mm beam "radius"
+        self.sample_field(np.zeros(10), np.zeros(10))
 
 # E, P relationship:
     def get_E(self):
@@ -81,6 +83,14 @@ class Core():
         if str(E) != "None": self.P = self.Model.impuls(E)
         else: self.P = 0
     E = property(get_E, set_E)
+
+    def sample_field(self, z, Bz):
+        """
+        enter z, Bz to create an interpolator.
+        Use core.FM = "interpol" to calculate field based on samples
+        (the p parameters are then irrelevant)
+        """
+        self.interpol_field = interpolate.interp1d(z, Bz, fill_value="extrapolate")
 
     def fint(self, p, n):
         """
@@ -92,22 +102,6 @@ class Core():
             integrand = lambda z: self.Model.field[self.FM](z, p)**n
         I, dI = integrate.quad(integrand, -np.inf, np.inf)
         return I
-
-    def fint_num(self, z, Bz, n):
-        """
-        Compute nth field integral, numerically from field samples
-        """
-        if n == 3:
-            dz = np.mean(np.diff(z))
-            dBz = np.diff(np.float128(Bz))/dz
-            ddBz = np.diff(dBz)/dz
-            x = z[1:-1]
-            integrand = -1/2*Bz[1:-1]*ddBz
-        else:
-            integrand = np.float128(Bz)**n
-            x = z
-        integral = integrate.simps(integrand, x, even="avg")
-        return integral
 
     def get_Bz(self, p):
         z = np.linspace(-self.zmax, self.zmax, num=2*10**self.grain+1)

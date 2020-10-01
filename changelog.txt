@@ -15,7 +15,7 @@
 
 
   - core module:
-    - added numerical field integration, based on Simpsons' method. F3 is bad - "second derivative" from slopes 0.1-1 mm steps is, well, bad.
+    - Can now feed field samples and describe them (approximately) with interpolation; runs seamlessly.
     - Renamed calc.py into core.py, for less confusion
 
   - General:
