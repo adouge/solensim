@@ -22,15 +22,15 @@ import matplotlib.pyplot as plt
 from solensim.units import *
 
 def field_REGAE(handle, astra):
-    print("Describing REGAE solenoid field (no yoke)\n via two-loop-approximation. (demos.field_REGAE(core, astra))")
+    print("Describing REGAE magnet (no yoke)\n via two-loop-approximation.")
     g_REGAE = [30, 99.5, 41.8]
-    s_REGAE = 9*1000
+    s_REGAE = 10*1000
     print("Rin, a, b [cm]:")
     print(g_REGAE)
     print("Scaling factor [A]: %d"%s_REGAE)
 
     p = (s_REGAE, *g_REGAE)
-    z = np.linspace(-handle.zmax, handle.zmax, num = 2*10**handle.grain+1)
+    z = np.linspace(-handle.zmax, handle.zmax, num = 2*10**handle.zgrain+1)
     B = handle.get_Bz(p)
     Bmax = handle.get_Bmax(p)
     fwhm = handle.get_fwhm(p)

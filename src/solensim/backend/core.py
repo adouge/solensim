@@ -69,7 +69,7 @@ class Core():
         self.Model = Model(self)
         self.FM = "twoloop"  # default field model
         self.zmax = 1
-        self.grain = 4  # 0.1 mm precision
+        self.zgrain = 4  # 0.1 mm precision
         # Beam:
         self.E = "None"
         self.R = 1  # 1 mm beam "radius"
@@ -96,7 +96,7 @@ class Core():
         popt, pcov = opt.curve_fit(model, x, y, p0=p0)
         dp = np.sqrt(np.diag(pcov))
         return popt, dp
-        
+
     def fint(self, p, n):
         """
         Compute nth field integral
@@ -109,7 +109,7 @@ class Core():
         return I
 
     def get_Bz(self, p):
-        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.grain+1)
+        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
         return self.Model.field[self.FM](z, p)
 
     def get_fwhm(self, p):
@@ -118,14 +118,14 @@ class Core():
         """
         Bhalb = self.get_Bmax(p)/2
         f = lambda z: self.Model.field[self.FM](z,p) - Bhalb
-        return opt.root_scalar(f, bracket=[0,self.zmax], xtol=10**(-self.grain)).root*2
+        return opt.root_scalar(f, bracket=[0,self.zmax], xtol=10**(-self.zgrain)).root*2
 
     def get_f(self, p):
         f2 = self.fint(p, 2)
         return 1/((const.e/2/self.P)**2*f2)
 
     def get_Bmax(self, p):
-        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.grain+1)
+        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
         return np.max(self.Model.field[self.FM](z,p))
 
 # Aberrations and the like:

@@ -6,9 +6,12 @@
   - Tracking presets:
     - default now takes beam states every 0.01 m, assuming field 2 m wide @ z = 1m (particles immediately fly into the field);
       track 1 m afterwards, i.e. focal length of up to 2 m
+    - added "mono" beam preset - a smaller (100) line with spread in z-direction (i.e. flying carpet);
+      the additional spread provides for much better spatial resolution in z
 
   - track module:
     - rewrote .process_states() to be slightly faster
+    - switched from own contraption to np.arctan2() for phase calculation; changed the whole phase business around a bit in general
     - .process_states() now adds dphi information (relative to starting beam state ("turn") and to the previous state ("dphi")) to each state
     - .process_states() now adds z, pz and t from reference particles to the rest, eliminating the need for a separate "refs" object
     - added make_heads() that gets some general statistics for individual states

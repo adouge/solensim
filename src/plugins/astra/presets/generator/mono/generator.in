@@ -1,6 +1,6 @@
 &input
     add = .false.
-    c_sig_z = 0.0
+    c_sig_z = 2
     cathode = .false.
     cor_ekin = 0.0
     cor_px = 0.0
@@ -23,8 +23,8 @@
     sig_px = 0.0
     sig_py = 0.0
     sig_x = 10
-    sig_y = 0.0
-    sig_z = 0.0
+    sig_y = 0
+    sig_z = 5
     species = 'electrons'
     type = 'standard'
 /

@@ -30,31 +30,22 @@ class TrackModule():
         self.astra = astra_interface  # use Astra Frontend, same as the one provided in main script
         self.calc_phi_v = np.vectorize(self.calc_phi)
         self.calc_dphi_v = np.vectorize(self.calc_dphi)
-        self.round_phase_v = np.vectorize(self.round_phase)
 
-    def calc_phi(self, cos, y):
+    def calc_phi(self, x, y):
         """
          Get true angle in [0, 2pi] from cosine and y-coordinate, in uniits of pi (!)
         """
-
-        if y >=0: return np.arccos(cos)/np.pi
-        else: return np.arcsin(cos)/np.pi + 3/2
-
-    def round_phase(self, phase):
-        rounded = np.round(phase)
-        if rounded == 2 or rounded == 0: return 0
-        else: return 1
+        phi = np.arctan2(y, x)/np.pi
+        return 2 + phi if phi < 0 else phi
 
     def calc_dphi(self, phi2, phi1):
         """
-        Get phase shift, accounting for cyclicity of phi; assume phis in units of pi
+        Get phase shift, accounting for cyclicity of phi; assume phis in units of pi, and only rotate in one direction
         """
-        if self.round_phase_v(phi2) < self.round_phase_v(phi1):
+        if np.sign(phi2-1) < np.sign(phi1-1):
             return phi2 - phi1 + 2
         else:
             return phi2 - phi1
-        #return phi2 - phi1
-
 
     def process_states(self, s):
         """
@@ -84,14 +75,11 @@ class TrackModule():
 
         s.loc[:, "r"] = np.sqrt(s["x"].values**2 + s["y"].values**2)
         s.loc[:, "onaxis"] = s["r"].values==0
-        modr = s.loc[:, "r"].values
-        modr[s.loc[:, "onaxis"].values] = 1  # avoid 0-division
-        cosphi = s.loc[:, "x"].values/modr
-        sinphi = s.loc[:, "y"].values/modr
 
-        s.loc[:, "phi"] = self.calc_phi_v(cosphi, s.loc[:, "y"].values)
-        s.loc[:, "pr"] = cosphi*s.loc[:, "px"].values + sinphi*s.loc[:, "py"].values
-        s.loc[:, "pphi"] = - sinphi*s["px"].values + cosphi*s["py"].values
+        phi = self.calc_phi_v(s.get("x").values, s.get("y").values)
+        s.loc[:, "phi"] = phi
+        s.loc[:, "pr"] = np.cos(phi*np.pi)*s.loc[:, "px"].values + np.sin(phi*np.pi)*s.loc[:, "py"].values
+        s.loc[:, "pphi"] = - np.sin(phi*np.pi)*s["px"].values + np.cos(phi*np.pi)*s["py"].values
 
         zpos = s.index.levels[0]
         z0 = zpos[0]
