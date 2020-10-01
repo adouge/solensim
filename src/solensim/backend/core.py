@@ -92,6 +92,11 @@ class Core():
         """
         self.interpol_field = interpolate.interp1d(z, Bz, fill_value="extrapolate")
 
+    def fit_to_model(self, model, x, y, p0=None):
+        popt, pcov = opt.curve_fit(model, x, y, p0=p0)
+        dp = np.sqrt(np.diag(pcov))
+        return popt, dp
+        
     def fint(self, p, n):
         """
         Compute nth field integral
