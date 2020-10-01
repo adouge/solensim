@@ -17,6 +17,7 @@
   - core module:
     - Can now feed field samples and describe them (approximately) with interpolation; runs seamlessly.
     - Renamed calc.py into core.py, for less confusion
+    - added a thin wrapper for scipy.curve_fit
 
   - General:
     - Added some code to wrapper to streamline binding various modules to each other; since nothing will invoke the backend going around the interfaces (wrapper, at least),
