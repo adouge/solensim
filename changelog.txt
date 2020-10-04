@@ -1,4 +1,14 @@
-0.3.4, WIP:
+0.4.0, WIP:
+  - Tracking presets:
+    - renamed stuff around to better reflect on their purpose; generator presets are now mostly for beam shapes,
+      with the intention that they will be modified for specific uses;
+      also made beam presets somewhat more descriptive, I guess.
+    - dropped the cross, box, square shapes
+
+  - frontend:
+    - updated ASTRA interface's helptext
+
+0.3.4, 04.10.20:
   - ASTRA plugin:
     - rewrote .read_states() to accomodate for any zphase (simple trick) and zstart/zstop
     - added warning to helptext about .clean() possibly overwriting unsaved runfiles

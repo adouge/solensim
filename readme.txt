@@ -9,6 +9,7 @@ Aims:
 Currently implemented:
  - ASTRA interface
  - Basic field calculations and characterization
+ - Field characterization via track module
 
 Currently 100% usable:
  - ASTRA interface
