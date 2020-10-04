@@ -18,8 +18,12 @@
 
 import scipy.constants as const
 import numpy as np
+import pandas as pd
 
 from solensim.units import *
+
+# debug
+#import pysnooper
 
 class TrackModule():
     def __init__(self, astra_interface):
@@ -27,43 +31,105 @@ class TrackModule():
         self.calc_phi_v = np.vectorize(self.calc_phi)
         self.calc_dphi_v = np.vectorize(self.calc_dphi)
 
-
-    def calc_phi(self, cos, y):
+    def calc_phi(self, x, y):
         """
          Get true angle in [0, 2pi] from cosine and y-coordinate, in uniits of pi (!)
         """
-        if y >=0: return np.arccos(cos)/np.pi
-        else: return np.arcsin(cos)/np.pi + 3/2
+        phi = np.arctan2(y, x)/np.pi
+        return 2 + phi if phi < 0 else phi
 
-    def calc_dphi(self, phi, phi0):
+    def calc_dphi(self, phi2, phi1):
         """
-        Get phase shift, accounting for cyclicity of phi; assume phis in units of pi
+        Get phase shift, accounting for cyclicity of phi; assume phis in units of pi, and only rotate in one direction
         """
-        if phi0 > phi:
-            return phi - phi0 + 2
+        if np.sign(phi2-1) < np.sign(phi1-1):
+            return phi2 - phi1 + 2
         else:
-            return phi - phi0
+            return phi2 - phi1
 
     def process_states(self, s):
         """
-        take astra output and add polar coordinates and respective impulses;
-        returns new data, reference particle and screen positions (indices)
-        (drops q, t, type and flags - disabled)
+        Process ASTRA beam state output
+            s, zpos, parts, pref = process_states(s)
+        returns:
+            s - new dataframe (state-sorted)
+            zpos - state z-coordinate list,
+            parts - particle index list,
+            pref - reference particle states
+        Does:
+            - add polar coordinates (r, phi) and respective impulses (pr, pphi);
+            - calculates phase change relative to start (turn) and previous state (dphi)
+            -updates particle z, pz, t with ref particle values
+                --> transform into system static relative to field/"lab"; eliminates need for reference particle
+            - drops charge, flag, type columns, but leaves them in pref for redundancy
         """
-        refs = s.query("particle==0")
+
+        pref = s.query("particle==0")
+        N = len(s.index.levels[1])
+        s = s.query("particle>0").copy()
+
+        pref_broadcast = pd.concat([pref]*(N-1)).sort_index() # replicate each ref row N-1 times, since the ref particle is out
+        s.loc[:, "z"] = s.loc[:, "z"].values + pref_broadcast.get("z").values
+        s.loc[:, "pz"] = s.loc[:, "pz"].values + pref_broadcast.get("pz").values
+        s.loc[:, "t"] = s.loc[:, "t"].values + pref_broadcast.get("t").values
+
         s.loc[:, "r"] = np.sqrt(s["x"].values**2 + s["y"].values**2)
-        todrop = s.query("r==0").index
-        s = s.drop(todrop)
-        s.loc[:, "cosphi"] = s["x"].values/s["r"].values
-        s.loc[:, "sinphi"] = s["y"].values/s["r"].values
-        s.loc[:, "phi"] = self.calc_phi_v(s["cosphi"].values, s["y"].values)
-        s.loc[:, "pr"] = s["cosphi"].values*s["px"].values + s["sinphi"].values*s["py"].values
-        s.loc[:, "pphi"] = - s["sinphi"].values*s["px"].values + s["cosphi"].values*s["py"].values
-#        refs = refs.drop(columns = ["q", "t", "type", "flag"])
-#        s = s.drop(columns = ["sinphi", "cosphi", "q", "t", "type", "flag"])
-        s = s.drop(columns = ["sinphi", "cosphi"])
+        s.loc[:, "onaxis"] = s["r"].values==0
+
+        phi = self.calc_phi_v(s.get("x").values, s.get("y").values)
+        s.loc[:, "phi"] = phi
+        s.loc[:, "pr"] = np.cos(phi*np.pi)*s.loc[:, "px"].values + np.sin(phi*np.pi)*s.loc[:, "py"].values
+        s.loc[:, "pphi"] = - np.sin(phi*np.pi)*s["px"].values + np.cos(phi*np.pi)*s["py"].values
+
         zpos = s.index.levels[0]
-        return zpos, s, refs
+        z0 = zpos[0]
+        s.loc[z0, "turn"] = 0
+        s.loc[z0, "dphi"] = 0
+        beam_start = s.loc[z0].copy()
+        beam_start_broadcast = pd.concat([beam_start]*(len(zpos)-1))
+        zs = zpos[1:]
+        z0s = zpos[:-1]
+        s.loc[zs, "turn"] = self.calc_dphi_v(s.loc[zs, "phi"].values, beam_start_broadcast.get("phi").values)
+        s.loc[zs, "dphi"] = self.calc_dphi_v(s.loc[zs, "phi"].values, s.loc[z0s, "phi"].values)
+
+        parts = np.arange(1, N, 1)
+        todrop = ["type", "flag", "q"]
+        s = s.drop(columns=todrop)
+
+
+        return s, zpos, parts, pref
+
+    def make_heads(self, s, zpos):
+        """
+            makes some "statistics" on each state
+        """
+        headers = {}
+        for z in zpos:
+            r_avg = s.loc[z, "r"].mean()
+            r_std = s.loc[z, "r"].std()
+            pr_avg = s.loc[z, "pr"].mean()
+            pr_std = s.loc[z, "pr"].std()
+            pphi_avg = s.loc[z, "pphi"].mean()
+            pphi_std = s.loc[z, "pphi"].std()
+            dphi_avg = s.loc[z, "dphi"].mean()
+            dphi_std = s.loc[z, "dphi"].std()
+            turn_avg = s.loc[z, "turn"].mean()
+            turn_std = s.loc[z, "turn"].std()
+            header = {
+                "r_avg" : r_avg,
+                "r_std" : r_std,
+                "pr_avg" : pr_avg,
+                "pr_std" : pr_std,
+                "pphi_avg" : pphi_avg,
+                "pphi_std" : pphi_std,
+                "dphi_avg" : dphi_avg,
+                "dphi_std" : dphi_std,
+                "turn_avg" : turn_avg,
+                "turn_std" : turn_std
+            }
+        headers[z] = header
+        heads = pd.DataFrame.from_dict(headers).transpose()
+        return heads
 
     def monochrome_sweep(self, Emin, Emax, n=10):
         Es = np.linspace(Emin, Emax, num=n)

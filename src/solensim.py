@@ -19,6 +19,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import solensim.wrapper as wrapper
 import solensim.frontend as frontend
@@ -29,7 +30,7 @@ import scipy.constants as const
 wrapper.load_ini()
 print("(tried loading config)\n")
 #################
-vstring = "0.3.3"
+vstring = "0.3.4"
 #################
 
 print("solensim v%s solenoid design & optimization tool"%vstring)
@@ -43,16 +44,15 @@ astra.presets()
 
 print("\n")
 
-track = frontend.Tracker(astra)
-print("Tracker initialized as \"track\" (WIP).")
 core = frontend.Core()
-print("Core handle initialized as \"core\".")
+print("Core handle initialized as \"core\" (WIP).")
 
-print("\n")
-print("BA section:")
+track = frontend.Tracker(astra)
+track.linked_core = core  # bind core and track together
+print("Tracker initialized as \"track\" (WIP).")
+
+### BA section
 
 from importlib import reload
 import demos
 import bachelor
-
-demos.field_REGAE(core, astra)

@@ -3,7 +3,7 @@
     distribution = 'beam.ini'
     h_max = 0.001
     h_min = 0.0001
-    head = 'Screen every 0.5 m, 2-m symmetrical field at 1.5 m, track up to 4 m'
+    head = 'Symmetrical 2m field at z = 1m, track up to a meter afterwards (3 m), log beam state every 0.01 m'
     max_step = 100000
     qbunch = 0.0
     run = 1
@@ -23,10 +23,10 @@
     phases = .true.
     refs = .false.
     tracks = .true.
-    zemit = 400
-    zphase = 40
+    zemit = 300
+    zphase = 300
     zstart = 0.0
-    zstop = 4.0
+    zstop = 3
 /
 
 &solenoid
@@ -35,6 +35,6 @@
     maxb = 0.060855
     s_higher_order = .true.
     s_noscale = .true.
-    s_pos = 1.5
+    s_pos = 1
     s_smooth = 10
 /

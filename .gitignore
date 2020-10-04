@@ -49,6 +49,9 @@ aux/.ipynb_checkpoints/*
 # Acc101 Presentation & Figures
 tex/Acc101_Prezi/*
 
+# Bachelorarbeit
+tex/bachelor/*
+
 # untrack the jupyter notebook
 solensim.ipynb
 

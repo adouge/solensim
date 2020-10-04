@@ -19,9 +19,10 @@
 import scipy.constants as const
 from numpy.lib.scimath import sqrt as csqrt
 from numpy.lib.scimath import power as cpow
-from scipy.integrate import quad as integral
+import scipy.integrate as integrate
 from scipy.misc import derivative
 import scipy.optimize as opt
+import scipy.interpolate as interpolate
 import numpy as np
 
 from solensim.units import *
@@ -31,11 +32,12 @@ class Model():
     """
     TODO - fiedl calculation & beam model subblock
     """
-    def __init__(self):
+    def __init__(self, linked_core):
         self.field = {
             "twoloop" : self.twoloop,
-            "data" : self.data_interpol
+            "interpol" : self.data_interpol
         }
+        self.linked_core = linked_core
 
 #### Native field calculation
     def twoloop(self, z, p):
@@ -50,9 +52,8 @@ class Model():
         B = 1/4*const.mu_0*s*(pterm + mterm)
         return np.real(B)  # complex part is 0 anyways
 
-    def data_interpol(self, z, p):  # TODO - use provided field as model (for characterization purposes)
-        wip()
-        return np.zeros(np.len(z))
+    def data_interpol(self, z, p):
+        return self.linked_core.interpol_field(z)
 
 #### Beam properties for characterization
     def impuls(self, E):  # [MeV] relativistic impulse
@@ -65,13 +66,14 @@ class Core():
     TODO - main class
     """
     def __init__(self):
-        self.Model = Model()
+        self.Model = Model(self)
         self.FM = "twoloop"  # default field model
         self.zmax = 1
-        self.grain = 4  # 0.1 mm precision
+        self.zgrain = 4  # 0.1 mm precision
         # Beam:
         self.E = "None"
         self.R = 1  # 1 mm beam "radius"
+        self.sample_field(np.zeros(10), np.zeros(10))
 
 # E, P relationship:
     def get_E(self):
@@ -82,6 +84,19 @@ class Core():
         else: self.P = 0
     E = property(get_E, set_E)
 
+    def sample_field(self, z, Bz):
+        """
+        enter z, Bz to create an interpolator.
+        Use core.FM = "interpol" to calculate field based on samples
+        (the p parameters are then irrelevant)
+        """
+        self.interpol_field = interpolate.interp1d(z, Bz, fill_value="extrapolate")
+
+    def fit_to_model(self, model, x, y, p0=None):
+        popt, pcov = opt.curve_fit(model, x, y, p0=p0)
+        dp = np.sqrt(np.diag(pcov))
+        return popt, dp
+
     def fint(self, p, n):
         """
         Compute nth field integral
@@ -90,11 +105,11 @@ class Core():
             integrand = lambda z: -1/2*self.Model.field[self.FM](z, p)*derivative(self.Model.field[self.FM], z, n=2, args=[p])
         else:
             integrand = lambda z: self.Model.field[self.FM](z, p)**n
-        I, dI = integral(integrand, -np.inf, np.inf)
+        I, dI = integrate.quad(integrand, -np.inf, np.inf)
         return I
 
     def get_Bz(self, p):
-        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.grain+1)
+        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
         return self.Model.field[self.FM](z, p)
 
     def get_fwhm(self, p):
@@ -103,14 +118,14 @@ class Core():
         """
         Bhalb = self.get_Bmax(p)/2
         f = lambda z: self.Model.field[self.FM](z,p) - Bhalb
-        return opt.root_scalar(f, bracket=[0,self.zmax], xtol=10**(-self.grain)).root*2
+        return opt.root_scalar(f, bracket=[0,self.zmax], xtol=10**(-self.zgrain)).root*2
 
     def get_f(self, p):
         f2 = self.fint(p, 2)
         return 1/((const.e/2/self.P)**2*f2)
 
     def get_Bmax(self, p):
-        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.grain+1)
+        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
         return np.max(self.Model.field[self.FM](z,p))
 
 # Aberrations and the like:
