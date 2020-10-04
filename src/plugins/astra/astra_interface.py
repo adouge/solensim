@@ -250,10 +250,12 @@ class Core():
         states = []
         zpos = []
         zstop = self.runfile["output"]["zstop"]
-        divisor = float(files[-1].split(".")[1])/zstop
+        zstart = self.runfile["output"]["zstart"]
+
+        divisor = float(files[-1].split(".")[1])/(zstop-zstart)
         for file in files:
             ident = file.split(".")[1]
-            z = float(ident)/divisor
+            z = float(ident)/divisor + zstart
             path = os.path.join(self._workdir, file)
             state = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
             states.append(state)
@@ -263,26 +265,26 @@ class Core():
         states = pd.concat(states, keys=zpos, names=["zpos", "particle"]).sort_index()
         return states
 
-    def read_last(self):
-        """
-        Reads beam state last zpos defined in runfile
-        """
-        zstop = self.runfile["output"]["zstop"]
-        ident = str(zstop/cm)[0:-2]
-        if len(ident) == 2: ident = "00"+ident
-        elif len(ident) == 3: ident = "0"+ident
-        ident = "run."+ident+".001"
-        path = os.path.join(self._workdir, ident)
-        screen = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
-        screens = pd.concat([self.beam.copy(), screen], keys = [0.0, zstop], names=["zpos", "particle"])
-        return screens
+#    def read_last(self):
+#        """
+#        Reads beam state last zpos defined in runfile
+#        """
+#        zstop = self.runfile["output"]["zstop"]
+#        ident = str(zstop/cm)[0:-2]
+#        if len(ident) == 2: ident = "00"+ident
+#        elif len(ident) == 3: ident = "0"+ident
+#        ident = "run."+ident+".001"
+#        path = os.path.join(self._workdir, ident)
+#        screen = pd.read_table(path, names=self._beam_labels, skipinitialspace=True, sep=" +", engine="python")
+#        screens = pd.concat([self.beam.copy(), screen], keys = [0.0, zstop], names=["zpos", "particle"])
+#        return screens
 
 
 
-#    def read_zemit(self):
-#        path = os.path.join(self._workdir, "run.Zemit.001")
-#        zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
-#        return zemit
+    def read_zemit(self):
+        path = os.path.join(self._workdir, "run.Zemit.001")
+        zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
+        return zemit
 
     def read_trajectories(self):
         path = os.path.join(self._workdir, "run.track.001")

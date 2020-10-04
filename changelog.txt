@@ -1,13 +1,14 @@
 0.3.4, WIP:
   - ASTRA plugin:
-    - rewrote .read_states() to accomodate for any zphase (simple trick);
+    - rewrote .read_states() to accomodate for any zphase (simple trick) and zstart/zstop
     - added warning to helptext about .clean() possibly overwriting unsaved runfiles
 
   - Tracking presets:
     - default now takes beam states every 0.01 m, assuming field 2 m wide @ z = 1m (particles immediately fly into the field);
       track 1 m afterwards, i.e. focal length of up to 2 m
+    - re-added tracking flag to default
     - added "mono" beam preset - a smaller (100) line with spread in z-direction (i.e. flying carpet);
-      the additional spread provides for much better spatial resolution in z
+      the additional spread provides for somewhat better spatial resolution in z; probe flag set to true
 
   - track module:
     - rewrote .process_states() to be slightly faster

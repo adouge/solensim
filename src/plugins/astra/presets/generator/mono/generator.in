@@ -15,7 +15,7 @@
     ipart = 100
     n_add = 0
     noise_reduc = .true.
-    probe = .false.
+    probe = .true.
     q_total = 1.602176634e-08
     ref_ekin = 3.0
     ref_zpos = 0.0

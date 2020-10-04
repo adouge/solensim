@@ -22,7 +22,7 @@
     high_res = .true.
     phases = .true.
     refs = .false.
-    tracks = .false.
+    tracks = .true.
     zemit = 300
     zphase = 300
     zstart = 0.0
