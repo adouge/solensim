@@ -141,7 +141,7 @@ class TrackModule():
             Do an overview run at a particular energy
         """
         self.msg("Doing overview ASTRA run for %.2f MeV electrons."%E)
-        kinE_MeV = E - const.m_e/const.e*const.c/MeV
+        kinE_MeV = E - const.m_e/const.e*const.c**2/MeV
         self.astra.clean()
         self.astra.verbose = False
         self.astra.gen_preset = beam_type
