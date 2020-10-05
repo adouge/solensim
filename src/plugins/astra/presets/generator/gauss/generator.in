@@ -17,7 +17,7 @@
     nemit_x = 1
     nemit_y = 1
     noise_reduc = .true.
-    probe = .true.
+    probe = .false.
     q_total = 1.602176634e-08
     ref_ekin = 3.0
     ref_zpos = 0.0

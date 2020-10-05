@@ -32,6 +32,7 @@ class Core(wrapper.CoreHandle):
     """
     def __init__(self):
         wrapper.CoreHandle.__init__(self)
+        self.verbose = True  # verbose by default
 
     _helptext = """
         This is a helptext.
@@ -47,6 +48,7 @@ class Tracker(wrapper.TrackHandle):
     """
     def __init__(self, astra):
         wrapper.TrackHandle.__init__(self, astra)
+        self.verbose = True  # verbose by default
 
     _helptext = """
         This is a helptext.
@@ -63,10 +65,11 @@ class Astra_Interface(astra_interface.Core):
 
     def __init__(self):
         astra_interface.Core.__init__(self);
-        self.track_preset = "default"
-        self.gen_preset = "default"
-        self.beam_preset = "default"
-        self.verbose = True
+        self.track_preset = "overview"
+        self.gen_preset = "line"
+        self.beam_preset = "mono_line"
+        self.verbose = True  # verbose by default
+        self.clean()
 
     _helptext = """
         General options, presets:

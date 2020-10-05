@@ -56,10 +56,8 @@ class Model():
         return self.linked_core.interpol_field(z)
 
 #### Beam properties for characterization
-    def impuls(self, E):  # [MeV] relativistic impulse
+    def impuls_SI(self, E):  # SI relativistic impulse from MeV total energy
         return 1/const.c*np.sqrt((E*const.e*MeV)**2 - (const.m_e*const.c**2)**2)
-
-
 
 class Core():
     """
@@ -80,7 +78,7 @@ class Core():
         return self._E
     def set_E(self, E):
         self._E = E
-        if str(E) != "None": self.P = self.Model.impuls(E)
+        if str(E) != "None": self.P = self.Model.impuls_SI(E)
         else: self.P = 0
     E = property(get_E, set_E)
 

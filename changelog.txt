@@ -4,9 +4,28 @@
       with the intention that they will be modified for specific uses;
       also made beam presets somewhat more descriptive, I guess.
     - dropped the cross, box, square shapes
+    - turned off trajectory mapping, redundant / unhelpful
+    - reclassified gen/beam "default" presets as "gauss", since they haven't been even close to "default" so far
+    - reclassified default track preset to "overview"
+    - Decided that using 1-D lines is better than 2-D carpets, in terms of header info accuracy
 
   - frontend:
-    - updated ASTRA interface's helptext
+    - updated ASTRA interface's helptext, default presets
+    - ASTRA handle cleans workspace upon initiation
+
+  - wrapper:
+    - added rudimentary feedback ("logging") via track/core.msg("msg") + verbosity settings
+    - added DF and auto-numbering label -based expandable result storage to track.
+      Plan to use it to incrementally add data via subroutines.
+
+  - track module:
+    - added access to astra's read/write field methods (w/ "logging")
+    - implemented an overview routine which, for a given energy / generator preset, runs astra,
+      loads and pre-processes state data, estimates focus location and width, gives maximum larmor angle,
+      and neatly saves everything with a label of choice (or counter).
+
+  - core module:
+    - renamed .Model.impuls() to .Model.impuls_SI() to clarify output units
 
 0.3.4, 04.10.20:
   - ASTRA plugin:

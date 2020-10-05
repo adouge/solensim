@@ -17,6 +17,7 @@
 #########################################################################
 
 import scipy.constants as const
+import scipy.signal as signal
 import numpy as np
 import pandas as pd
 
@@ -31,6 +32,7 @@ class TrackModule():
         self.calc_phi_v = np.vectorize(self.calc_phi)
         self.calc_dphi_v = np.vectorize(self.calc_dphi)
 
+# State processing
     def calc_phi(self, x, y):
         """
          Get true angle in [0, 2pi] from cosine and y-coordinate, in uniits of pi (!)
@@ -105,32 +107,107 @@ class TrackModule():
         """
         headers = {}
         for z in zpos:
-            r_avg = s.loc[z, "r"].mean()
-            r_std = s.loc[z, "r"].std()
-            pr_avg = s.loc[z, "pr"].mean()
-            pr_std = s.loc[z, "pr"].std()
-            pphi_avg = s.loc[z, "pphi"].mean()
-            pphi_std = s.loc[z, "pphi"].std()
-            dphi_avg = s.loc[z, "dphi"].mean()
-            dphi_std = s.loc[z, "dphi"].std()
-            turn_avg = s.loc[z, "turn"].mean()
-            turn_std = s.loc[z, "turn"].std()
             header = {
-                "r_avg" : r_avg,
-                "r_std" : r_std,
-                "pr_avg" : pr_avg,
-                "pr_std" : pr_std,
-                "pphi_avg" : pphi_avg,
-                "pphi_std" : pphi_std,
-                "dphi_avg" : dphi_avg,
-                "dphi_std" : dphi_std,
-                "turn_avg" : turn_avg,
-                "turn_std" : turn_std
+                "z" : z,
+                "r_avg" : s.loc[z, "r"].mean(),
+                "r_std" : s.loc[z, "r"].std(),
+                "r_min" : s.loc[z, "r"].min(),
+                "r_max" : s.loc[z, "r"].max(),
+                "pr_avg" : s.loc[z, "pr"].mean(),
+                "pr_std" : s.loc[z, "pr"].std(),
+                "pr_min" : s.loc[z, "pr"].min(),
+                "pr_max" : s.loc[z, "pr"].max(),
+                "pphi_avg" : s.loc[z, "pphi"].mean(),
+                "pphi_std" : s.loc[z, "pphi"].std(),
+                "pphi_min" : s.loc[z, "pphi"].min(),
+                "pphi_max" : s.loc[z, "pphi"].max(),
+                "dphi_avg" : s.loc[z, "dphi"].mean(),
+                "dphi_std" : s.loc[z, "dphi"].std(),
+                "dphi_min" : s.loc[z, "dphi"].min(),
+                "dphi_max" : s.loc[z, "dphi"].max(),
+                "turn_avg" : s.loc[z, "turn"].mean(),
+                "turn_std" : s.loc[z, "turn"].std(),
+                "turn_min" : s.loc[z, "turn"].min(),
+                "turn_max" : s.loc[z, "turn"].max()
             }
-        headers[z] = header
+            headers[z] = header
         heads = pd.DataFrame.from_dict(headers).transpose()
         return heads
 
-    def monochrome_sweep(self, Emin, Emax, n=10):
-        Es = np.linspace(Emin, Emax, num=n)
+### Run variants & corresponding subroutines
+# Overview run:
+    def overview_run(self, E, label=None, beam_type="line"):
+        """
+            Do an overview run at a particular energy
+        """
+        self.msg("Doing overview ASTRA run for %.2f MeV electrons."%E)
+        kinE_MeV = E - const.m_e/const.e*const.c/MeV
+        self.astra.clean()
+        self.astra.verbose = False
+        self.astra.gen_preset = beam_type
+        self.astra.genfile["input"]["ref_ekin"] = kinE_MeV
+        self.astra.update_genfile()
+        self.astra.generate()
+        self.astra.track_preset = "overview"
+        z_solenoid = self.astra.runfile["solenoid"]["s_pos"]
+        self.astra.verbose = False
+        self.msg("Running ASTRA...")
+        self.astra.run()
+
+        self.msg("Processing ASTRA output...")
+        s = self.astra.read_states()
+        s, zpos, parts, pref = self.process_states(s)
+        heads = self.make_heads(s, zpos)
+        z_neck, dz_neck, r_neck, sigma_neck = self.get_focal_region(heads)
+        self.msg(("Beam neck approx. at z: (%.3f +- %.3f)m (+- focal region)"%(z_neck, dz_neck)))
+        self.msg("Mean radius @ neck: %.3f mm, sigma %.3f mm"%(r_neck/mm, sigma_neck/mm))
+
+        prefocal = s.query("z>@z_solenoid and z<(@z_neck - @dz_neck)")
+        larmor = prefocal.get("turn").max()
+        self.msg("Maximum Larmor angle: %.3f rad/pi"%larmor)
+
+        result = {"E":E, "beam_preset":self.astra.beam_preset, "z_solenoid":z_solenoid, "z_neck":z_neck, "dz_neck":dz_neck, "max_larmor":larmor}
+        data = {"s":s, "heads":heads, "zpos":zpos, "parts":parts, "pref":pref}
+
+        if label==None:
+            lbl = self._run_ticker
+            self._run_ticker += 1
+        else:
+            lbl = label
+            self._run_ticker += 1
+        self.msg("Saving results under \"%s\"."%lbl)
+        result = pd.DataFrame(result, index=[lbl])
+        self.results = self.results.append(result)
+        self.data[lbl] = data
+
+
+    def get_focal_region(self, heads, method="pphi"):
+        """
+            todo
+        """
+        if method == "pr":  # Broken?
+            z_solenoid = self.astra.runfile["solenoid"]["s_pos"]
+            left = heads.query("z>@z_solenoid and pr_max == 0").get("z").max()
+            right =  heads.query("z>@z_solenoid and pr_min == 0").get("z").min()
+
+        elif method == "pphi":
+            pphi = heads["pphi_avg"].values
+            width_info = signal.peak_widths(np.abs(pphi), np.where(pphi==pphi.min())[0])
+            lind = np.floor(width_info[2])
+            rind = np.floor(width_info[3]) + 1
+            left = heads["z"].values[int(lind)]
+            right = heads["z"].values[int(rind)]
+
+        z_neck = heads.get("r_avg").idxmin()
+        r_neck = heads.loc[z_neck, "r_avg"]
+        sigma_neck = heads.loc[z_neck, "r_std"]
+
+        if not ((left <= z_neck) and (z_neck <= right)): raise(ValueError("Beam neck outside approximated focal region."))
+
+        dz_neck = np.abs(np.array((left, right))-z_neck).max()
+
+        return z_neck, dz_neck, r_neck, sigma_neck
+
+
+    def focal_run(self):
         pass

@@ -21,6 +21,8 @@ import solensim.backend.optim as optim
 import solensim.backend.track as track
 from solensim.units import *
 
+import time
+import pandas as pd
 import numpy as np
 
 def test_load_mcode_plugin():
@@ -39,6 +41,12 @@ class TrackHandle(track.TrackModule):
         track.TrackModule.__init__(self, astra)
         self.linked_core = None
 
+    # Result storage:
+        self.results = pd.DataFrame()  # run info container???
+        self.data = {}
+        self._run_ticker = 0
+
+    # Interaction with core:
     def bind_to_core(self, core):
         self._linked_core = core
         if core != None:
@@ -47,6 +55,19 @@ class TrackHandle(track.TrackModule):
         return self._linked_core
     linked_core = property(get_link_to_bound_core, bind_to_core)
 
+    # Logging:
+    def msg(self, msg):
+        dt = pd.Timestamp.fromtimestamp(time.time())
+        if self.verbose:  print("%s : %s"%(dt.time(), msg))
+
+    def use_field(self, z, Bz):
+        self.msg("Updating currently used field.")
+        self.astra.write_field(z, Bz)
+
+    def get_field(self):
+        self.msg("Loaded field from solenoid.dat")
+        z, Bz = self.astra.read_field()
+        return z, Bz
 
 class CoreHandle(core.Core):
     """
@@ -58,3 +79,8 @@ class CoreHandle(core.Core):
 
     def register_track_module(self, track_module):
         self.track = track_module
+
+    # Logging:
+    def msg(self, msg):
+        dt = pd.Timestamp.fromtimestamp(time.time())
+        if self.verbose:  print("%s : %s"%(dt.time(), msg))
