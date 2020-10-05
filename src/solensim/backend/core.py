@@ -106,8 +106,11 @@ class Core():
         I, dI = integrate.quad(integrand, -np.inf, np.inf)
         return I
 
+    def get_z(self):
+        return np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
+
     def get_Bz(self, p):
-        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
+        z = self.get_z()
         return self.Model.field[self.FM](z, p)
 
     def get_fwhm(self, p):

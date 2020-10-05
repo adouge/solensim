@@ -26,6 +26,7 @@
 
   - core module:
     - renamed .Model.impuls() to .Model.impuls_SI() to clarify output units
+    - added a method for fetching the z vector used elsewhere in core
 
   - general:
     - Astra interface's helptext no longer greets the user upon running the main file
