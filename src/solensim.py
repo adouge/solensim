@@ -38,11 +38,6 @@ print("========================================")
 
 print("Astra interface initialized as \"astra\"")
 astra = frontend.Astra_Interface()
-print("astra.help():")
-astra.help()
-astra.presets()
-
-print("\n")
 
 core = frontend.Core()
 print("Core handle initialized as \"core\" (WIP).")
