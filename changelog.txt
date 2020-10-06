@@ -1,4 +1,6 @@
 0.4.0, WIP:
+
+0.4.0a1, 06.10.20:
   - Tracking presets:
     - renamed stuff around to better reflect on their purpose; generator presets are now mostly for beam shapes,
       with the intention that they will be modified for specific uses;
@@ -27,7 +29,9 @@
       loads and pre-processes state data, estimates focus location, gives maximum larmor angle,
       and neatly saves everything with a label of choice (or counter).
     - a focal run - sweeps the focal region obtained in overview, fits particle trajectories to model and obtains the focal point of each
-    - on the frontend: plot routine to check fitting success & see a zoom-in of the focal region
+    - on the frontend:
+      - plot routine to check fitting success & see a zoom-in of the focal region
+      - plot routine to visualize felddurchgang
 
   - core module:
     - renamed .Model.impuls() to .Model.impuls_SI() to clarify output units

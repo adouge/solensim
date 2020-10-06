@@ -78,6 +78,33 @@ class Tracker(wrapper.TrackHandle):
         plt.ylabel("Radial position [mm]", fontsize=16)
         plt.legend(loc="upper left", fontsize=16)
 
+    def check_felddurchgang(self, label=None):
+        if label==None:
+            lbl = self._run_ticker
+        else:
+            lbl = label
+        s = self.data[lbl]["s"]
+        z_solenoid = self.results.loc[lbl, "z_solenoid"]
+        zpos = self.data[lbl]["zpos"]
+        if not self.results.loc[lbl, "use_heads"]:
+            heads = self.make_heads(s, zpos)
+            self.data[lbl]["heads"] = heads
+            self.results.loc[lbl, "use_heads"] = True
+        esle: heads = self.data[lbl]["heads"]
+        plt.figure(figsize=(9,9))
+        plt.plot(heads.get("z").values, heads.get("r_avg").values*1/heads["r_avg"].max(), "-k", label="Avg. beam radius")
+        plt.plot(heads.get("z").values, heads.get("pr_avg").values*1/heads["pr_avg"].abs().max(), "-r", label="Avg. radial momentum")
+        plt.plot(heads.get("z").values, heads.get("pphi_avg").values*1/heads["pr_avg"].abs().max(), "-b", label="Avg. rot. momentum ")
+        plt.plot(heads.get("z").values, heads.get("turn_avg").values, "-g", label="Avg. cum. turn")
+        z, Bz = self.astra.read_field()
+        plt.plot(z+1, Bz/np.max(Bz), "--k", label="Axial field component")
+        plt.xlabel("Axial position [m]", fontsize=16)
+        plt.ylabel("Arbitrary units", fontsize=16)
+        plt.axis([heads["z"].min(), heads["z"].max(), -1, np.max((1, heads["pphi_avg"].abs().max()/heads["pr_avg"].abs().max()))])
+        plt.legend(loc="upper right", fontsize=16)
+        plt.grid()
+        plt.show()
+
 class Astra_Interface(astra_interface.Core):
     """
         Direct access to the astra interface
