@@ -100,7 +100,7 @@ class Tracker(wrapper.TrackHandle):
         plt.plot(z+1, Bz/np.max(Bz), "--k", label="Axial field component")
         plt.xlabel("Axial position [m]", fontsize=16)
         plt.ylabel("Arbitrary units", fontsize=16)
-        plt.axis([heads["z"].min(), heads["z"].max(), -1, np.max((1, heads["pphi_avg"].abs().max()/heads["pr_avg"].abs().max()))])
+        plt.axis([heads["z"].min(), heads["z"].max(), -1, np.max((2, heads["pphi_avg"].abs().max()/heads["pr_avg"].abs().max()))])
         plt.legend(loc="upper right", fontsize=16)
         plt.grid()
         plt.show()
