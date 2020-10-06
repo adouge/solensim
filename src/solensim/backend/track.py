@@ -313,11 +313,11 @@ class TrackModule():
                 y=p_f.query("z>@z_solenoid").loc[part, "r"].values,
                 p0=(f_guess, drdz_guess))
             foci.loc[part, "r"] =  p_f.query("zpos==0").loc[part,"r"].values
-            foci.loc[part, "f"] = p[0]
-            foci.loc[part, "df"] = dp[0]
+            foci.loc[part, "z_f"] = p[0]
+            foci.loc[part, "dz_f"] = dp[0]
             foci.loc[part, "drdz"] = p[1]
             foci.loc[part, "ddrdz"] = dp[1]
-        f_prelim = foci.get("f").max()-z_solenoid
+        f_prelim = foci.get("z_f").max()-z_solenoid
         self.results.loc[lbl, "f_prelim"] = f_prelim
         self.data[lbl]["foci"] = foci
         self.msg("Preliminary focal length value: %.2f cm"%(f_prelim*100))

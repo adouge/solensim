@@ -70,10 +70,10 @@ class Tracker(wrapper.TrackHandle):
         foci = self.data[lbl]["foci"]
         parts = self.data[lbl]["parts"]
         for part in parts:
-            plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".k")
-            plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, foci.loc[part, "f"], foci.loc[part, "drdz"])/mm, "--r")
-        plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".k", label="data")
-        plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, foci.loc[part, "f"], foci.loc[part, "drdz"])/mm, "--r", label="linear approx.")
+            plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".r")
+            plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, foci.loc[part, "z_f"], foci.loc[part, "drdz"])/mm, "--b")
+        plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".r", label="data")
+        plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, foci.loc[part, "z_f"], foci.loc[part, "drdz"])/mm, "--b", label="linear approx.")
         plt.xlabel("Axial position [m]", fontsize=16)
         plt.ylabel("Radial position [mm]", fontsize=16)
         plt.legend(loc="upper left", fontsize=16)
@@ -92,16 +92,16 @@ class Tracker(wrapper.TrackHandle):
             self.results.loc[lbl, "use_heads"] = True
         esle: heads = self.data[lbl]["heads"]
         plt.figure(figsize=(9,9))
-        plt.plot(heads.get("z").values, heads.get("r_avg").values*1/heads["r_avg"].max(), "-k", label="Avg. beam radius")
-        plt.plot(heads.get("z").values, heads.get("pr_avg").values*1/heads["pr_avg"].abs().max(), "-r", label="Avg. radial momentum")
-        plt.plot(heads.get("z").values, heads.get("pphi_avg").values*1/heads["pr_avg"].abs().max(), "-b", label="Avg. rot. momentum ")
-        plt.plot(heads.get("z").values, heads.get("turn_avg").values, "-g", label="Avg. cum. turn")
+        plt.plot(heads.get("z").values, heads.get("r_avg").values*1/heads["r_avg"].max(), "-k", label="Avg. beam radius [max(r)]")
+        plt.plot(heads.get("z").values, heads.get("pr_avg").values*1/heads["pr_avg"].abs().max(), "-r", label="Avg. radial momentum [max(pr)]")
+        plt.plot(heads.get("z").values, heads.get("pphi_avg").values*1/heads["pr_avg"].abs().max(), "-b", label="Avg. rot. momentum [max(pr)]")
+        plt.plot(heads.get("z").values, heads.get("turn_avg").values, "-g", label="Avg. cum. turn [rad/pi]")
         z, Bz = self.astra.read_field()
-        plt.plot(z+1, Bz/np.max(Bz), "--k", label="Axial field component")
+        plt.plot(z+1, Bz/np.max(Bz), "--k", label="Axial field component [max(Bz)]")
         plt.xlabel("Axial position [m]", fontsize=16)
         plt.ylabel("Arbitrary units", fontsize=16)
         plt.axis([heads["z"].min(), heads["z"].max(), -1, np.max((2, heads["pphi_avg"].abs().max()/heads["pr_avg"].abs().max()))])
-        plt.legend(loc="upper right", fontsize=16)
+        plt.legend(loc="best", fontsize=14)
         plt.grid()
         plt.show()
 

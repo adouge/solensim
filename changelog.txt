@@ -1,4 +1,8 @@
 0.4.0, WIP:
+  - Track module:
+    - on the frontend:
+      - finalized the felddurchgang plot
+    
 
 0.4.0a1, 06.10.20:
   - Tracking presets:
