@@ -63,6 +63,7 @@ class Tracker(wrapper.TrackHandle):
             lbl = self._run_ticker
         else:
             lbl = label
+        self.msg("Illustrating trajectory fitting at focal region at label %s"%lbl)
         plt.figure(figsize=(9,9))
         p = self.data[lbl]["s_focal"].swaplevel()
         z_solenoid = self.results.loc[lbl, "z_solenoid"]
@@ -83,6 +84,7 @@ class Tracker(wrapper.TrackHandle):
             lbl = self._run_ticker
         else:
             lbl = label
+        self.msg("Illustrating beam state vs. position at label %s"%lbl)
         s = self.data[lbl]["s"]
         z_solenoid = self.results.loc[lbl, "z_solenoid"]
         zpos = self.data[lbl]["zpos"]
