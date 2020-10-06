@@ -57,6 +57,26 @@ class Tracker(wrapper.TrackHandle):
     def help(self):
         print(self._helptext)
 
+    # Various plots
+    def check_ray_fitting(self, label=None):
+        if label==None:
+            lbl = self._run_ticker
+        else:
+            lbl = label
+        plt.figure(figsize=(9,9))
+        p = self.data[lbl]["s_focal"].swaplevel()
+        z_solenoid = self.results.loc[lbl, "z_solenoid"]
+        p = p.query("z>@z_solenoid")
+        foci = self.data[lbl]["foci"]
+        parts = self.data[lbl]["parts"]
+        for part in parts:
+            plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".k")
+            plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, foci.loc[part, "f"], foci.loc[part, "drdz"])/mm, "--r")
+        plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".k", label="data")
+        plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, foci.loc[part, "f"], foci.loc[part, "drdz"])/mm, "--r", label="linear approx.")
+        plt.xlabel("Axial position [m]", fontsize=16)
+        plt.ylabel("Radial position [mm]", fontsize=16)
+        plt.legend(loc="upper left", fontsize=16)
 
 class Astra_Interface(astra_interface.Core):
     """
@@ -115,8 +135,8 @@ class Astra_Interface(astra_interface.Core):
             .read_nml(file) - return contents of file (in workspace) as namelist object
             .write_nml(nml, file) - write nml namelist to file
 
-            .read_field() - return z, Bz from solenoid.dat file, update stored .field
-            .write_field(z, Bz) - write solenoid to solenoid.dat, update stored .field
+            .read_field(file) - return z, Bz from file (defaults to solenoid.dat), update stored .field
+            .write_field(z, Bz, file) - write solenoid to file (defaults to solenoid.dat), update stored .field
 
         Output readin:
             .read_states() - returns dataframe with screen output based on screens & zphase/start/stop specified in &OUTPUT namelist,

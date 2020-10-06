@@ -6,12 +6,15 @@
     - dropped the cross, box, square shapes
     - turned off trajectory mapping, redundant / unhelpful
     - reclassified gen/beam "default" presets as "gauss", since they haven't been even close to "default" so far
-    - reclassified default track preset to "overview"
+    - reclassified default track preset to "overview", disabled field smoothing
     - Decided that using 1-D lines is better than 2-D carpets, in terms of header info accuracy
 
   - frontend:
     - updated ASTRA interface's helptext, default presets
     - ASTRA handle cleans workspace upon initiation
+
+  - ASTRA interface:
+    - added file option to read/write field, defaulting to solenoid.dat
 
   - wrapper:
     - added rudimentary feedback ("logging") via track/core.msg("msg") + verbosity settings
@@ -21,12 +24,15 @@
   - track module:
     - added access to astra's read/write field methods (w/ "logging")
     - implemented an overview routine which, for a given energy / generator preset, runs astra,
-      loads and pre-processes state data, estimates focus location and width, gives maximum larmor angle,
+      loads and pre-processes state data, estimates focus location, gives maximum larmor angle,
       and neatly saves everything with a label of choice (or counter).
+    - a focal run - sweeps the focal region obtained in overview, fits particle trajectories to model and obtains the focal point of each
+    - on the frontend: plot routine to check fitting success & see a zoom-in of the focal region
 
   - core module:
     - renamed .Model.impuls() to .Model.impuls_SI() to clarify output units
     - added a method for fetching the z vector used elsewhere in core
+    - .fit_to_model() can now also take a sigma parameter to be passed to curve_fit()
 
   - general:
     - Astra interface's helptext no longer greets the user upon running the main file

@@ -36,5 +36,5 @@
     s_higher_order = .true.
     s_noscale = .true.
     s_pos = 1
-    s_smooth = 10
+    s_smooth = 0
 /

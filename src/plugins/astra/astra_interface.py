@@ -146,14 +146,14 @@ class Core():
 
 
 # Current workspace access
-    def write_field(self, z, Bz):
+    def write_field(self, z, Bz, file="solenoid.dat"):
         field = {"z":z, "Bz":Bz}
         fielddf = pd.DataFrame.from_dict(field)
         self.field = fielddf
-        fielddf.to_csv(os.path.join(self._workdir, "solenoid.dat"), sep="\t", index=False, header=False)
+        fielddf.to_csv(os.path.join(self._workdir, file), sep="\t", index=False, header=False)
 
-    def read_field(self):
-        fielddf = pd.read_table(os.path.join(self._workdir,"solenoid.dat"), names=["z", "Bz"])
+    def read_field(self, file="solenoid.dat", sep="\t"):
+        fielddf = pd.read_table(os.path.join(self._workdir, file), names=["z", "Bz"], engine="python", sep=sep)
         self.field = fielddf
         z = fielddf["z"].values
         Bz = fielddf["Bz"].values

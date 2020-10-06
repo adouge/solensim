@@ -21,10 +21,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from solensim.units import *
 
-def field_REGAE(handle, astra):
+def field_REGAE(handle, astra, E, scaling):
     print("Describing REGAE magnet (no yoke)\n via two-loop-approximation.")
     g_REGAE = [30, 99.5, 41.8]
-    s_REGAE = 10*1000
+    s_REGAE = scaling*1000
     print("Rin, a, b [cm]:")
     print(g_REGAE)
     print("Scaling factor [A]: %d"%s_REGAE)
@@ -34,7 +34,7 @@ def field_REGAE(handle, astra):
     B = handle.get_Bz(p)
     Bmax = handle.get_Bmax(p)
     fwhm = handle.get_fwhm(p)
-    handle.E = 3.5
+    handle.E = E
     focal = handle.get_f(p)
     print("Maximum field strength: %.3f mT, FWHM %.1f mm"%(Bmax/mm, fwhm/mm))
     print("Focal length for %.2f MeV energy: %.3f m"%(handle.E, focal))

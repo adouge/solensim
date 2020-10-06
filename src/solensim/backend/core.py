@@ -90,8 +90,11 @@ class Core():
         """
         self.interpol_field = interpolate.interp1d(z, Bz, fill_value="extrapolate")
 
-    def fit_to_model(self, model, x, y, p0=None):
-        popt, pcov = opt.curve_fit(model, x, y, p0=p0)
+    def fit_to_model(self, model, x, y, p0=None, sigma=None):
+        if type(sigma)==type(None):
+            s = np.ones(len(y))
+        else: s = sigma
+        popt, pcov = opt.curve_fit(model, x, y, p0=p0, sigma=s)
         dp = np.sqrt(np.diag(pcov))
         return popt, dp
 
