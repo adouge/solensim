@@ -19,7 +19,7 @@
 import solensim.backend.core as core
 import solensim.backend.optim as optim
 import solensim.backend.track as track
-from solensim.units import *
+from solensim.aux import *
 
 import time
 import pandas as pd
@@ -42,9 +42,26 @@ class TrackHandle(track.TrackModule):
         self.linked_core = None
 
     # Result storage:
-        self.results = pd.DataFrame()  # run info container???
+        self.runs = pd.DataFrame()  # run info container
         self.data = {}
         self._run_ticker = 0
+
+    def resolve_label(self, label):
+        if type(label)==type(None):
+            lbl = self._run_ticker
+        else:
+            lbl = label
+        return lbl
+
+    def init_run(self, label=None):
+        if label not in self.runs.index:
+            self._run_ticker += 1
+            newrun=True
+        else:
+            newrun=False
+        lbl = self.resolve_label(label)
+        track.TrackModule.init_run(self, label=lbl, newrun=newrun)
+
 
     # Interaction with core:
     def bind_to_core(self, core):
@@ -58,16 +75,33 @@ class TrackHandle(track.TrackModule):
     # Logging:
     def msg(self, msg):
         dt = pd.Timestamp.fromtimestamp(time.time())
-        if self.verbose:  print("%s : %s"%(dt.time(), msg))
+        if self.verbose:  print("%s %s :  %s"%(dt.time(), self.trace, msg))
 
-    def use_field(self, z, Bz):
+    def use_field(self, z, Bz, label=None):
+        """
+        Requirements:
+            symmetrical field (Bmax at z=0), ~0 at bounds;
+            [z] - m, [Bz] - T
+        """
         self.msg("Updating currently used field.")
+        self.field_z = z
+        self.field_Bz = Bz
+        self.field_width = (z[-1] - z[0])
         self.astra.write_field(z, Bz)
+        self.init_run(label)
 
-    def get_field(self):
-        self.msg("Loaded field from solenoid.dat")
-        z, Bz = self.astra.read_field()
-        return z, Bz
+    def use_dat(self, file, sep="\t", label=None):
+        """
+        Read from file in current dir (temporary)
+        Requirements:
+            symmetrical field (Bmax at z=0), ~0 at bounds;
+            [z] - m, [Bz] - T
+        """
+        self.msg("Using field from %s."%file)
+        fielddf = pd.read_table(file, names=["z", "Bz"], engine="python", sep=sep)
+        z = fielddf["z"].values
+        Bz = fielddf["Bz"].values
+        self.use_field(z, Bz, label=label)
 
 class CoreHandle(core.Core):
     """
@@ -83,4 +117,4 @@ class CoreHandle(core.Core):
     # Logging:
     def msg(self, msg):
         dt = pd.Timestamp.fromtimestamp(time.time())
-        if self.verbose:  print("%s : %s"%(dt.time(), msg))
+        if self.verbose:  print("%s %s : %s"%(dt.time(), self.trace, msg))

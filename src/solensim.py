@@ -23,7 +23,7 @@ import pandas as pd
 
 import solensim.wrapper as wrapper
 import solensim.frontend as frontend
-from solensim.units import *
+from solensim.aux import *
 import scipy.constants as const
 
 # config

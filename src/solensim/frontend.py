@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from os import listdir
 import os.path
 
-from solensim.units import *
+from solensim.aux import *
 import solensim.wrapper as wrapper
 import plugins.astra.astra_interface as astra_interface
 
@@ -30,9 +30,10 @@ class Core(wrapper.CoreHandle):
     """
         Main Interface
     """
-    def __init__(self):
-        wrapper.CoreHandle.__init__(self)
+    def __init__(self, trace="core"):
         self.verbose = True  # verbose by default
+        self.trace = trace
+        wrapper.CoreHandle.__init__(self)
 
     _helptext = """
         This is a helptext.
@@ -46,9 +47,12 @@ class Tracker(wrapper.TrackHandle):
     """
         Dedicated tracking functionality interface
     """
-    def __init__(self, astra):
-        wrapper.TrackHandle.__init__(self, astra)
+    def __init__(self, astra, trace="track"):
         self.verbose = True  # verbose by default
+        self.trace = trace
+        self.E = 3.5  # default energy
+        wrapper.TrackHandle.__init__(self, astra)
+
 
     _helptext = """
         This is a helptext.
@@ -59,40 +63,41 @@ class Tracker(wrapper.TrackHandle):
 
     # Various plots
     def check_ray_fitting(self, label=None):
-        if label==None:
-            lbl = self._run_ticker
-        else:
-            lbl = label
+        lbl = self.resolve_label(label)
+        if lbl not in self.runs.index:
+            raise(ValueError("Unknown label: %s"%lbl))
         self.msg("Illustrating trajectory fitting at focal region at label %s"%lbl)
         plt.figure(figsize=(9,9))
-        p = self.data[lbl]["s_focal"].swaplevel()
-        z_solenoid = self.results.loc[lbl, "z_solenoid"]
+        p = self.data[lbl]["s_f"].swaplevel()
+        z_solenoid = self.runs.loc[lbl, "z_solenoid"]
         p = p.query("z>@z_solenoid")
-        foci = self.data[lbl]["foci"]
+        fits = self.data[lbl]["fits"]
         parts = self.data[lbl]["parts"]
         for part in parts:
             plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".r")
-            plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, foci.loc[part, "z_f"], foci.loc[part, "drdz"])/mm, "--b")
         plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".r", label="data")
-        plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, foci.loc[part, "z_f"], foci.loc[part, "drdz"])/mm, "--b", label="linear approx.")
+        for part in parts:
+            plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g")
+        plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g", label="linear approx.")
         plt.xlabel("Axial position [m]", fontsize=16)
         plt.ylabel("Radial position [mm]", fontsize=16)
         plt.legend(loc="upper left", fontsize=16)
 
     def check_felddurchgang(self, label=None):
-        if label==None:
-            lbl = self._run_ticker
-        else:
-            lbl = label
+        lbl = self.resolve_label(label)
+        if lbl not in self.runs.index:
+            raise(ValueError("Unknown label: %s"%lbl))
         self.msg("Illustrating beam state vs. position at label %s"%lbl)
         s = self.data[lbl]["s"]
-        z_solenoid = self.results.loc[lbl, "z_solenoid"]
+        z_solenoid = self.runs.loc[lbl, "z_solenoid"]
         zpos = self.data[lbl]["zpos"]
-        if not self.results.loc[lbl, "use_heads"]:
+        if "heads" in self.runs.columns and self.runs.loc[lbl, "heads"] == True:
+            heads = self.data[lbl]["heads"]
+        else:
             heads = self.make_heads(s, zpos)
             self.data[lbl]["heads"] = heads
-            self.results.loc[lbl, "use_heads"] = True
-        esle: heads = self.data[lbl]["heads"]
+            self.runs.loc[lbl, "heads"] = True
+
         plt.figure(figsize=(9,9))
         plt.plot(heads.get("z").values, heads.get("r_avg").values*1/heads["r_avg"].max(), "-k", label="Avg. beam radius [max(r)]")
         plt.plot(heads.get("z").values, heads.get("pr_avg").values*1/heads["pr_avg"].abs().max(), "-r", label="Avg. radial momentum [max(pr)]")
@@ -114,15 +119,15 @@ class Astra_Interface(astra_interface.Core):
 
     def __init__(self):
         astra_interface.Core.__init__(self);
-        self.track_preset = "overview"
+        self.track_preset = "default"
         self.gen_preset = "line"
         self.beam_preset = "mono_line"
-        self.verbose = True  # verbose by default
+        self.verbose = False  # not verbose by default
         self.clean()
 
     _helptext = """
         General options, presets:
-            .verbose - True default, set to False to supress ASTRA stdout piping.
+            .verbose - False default, set to True to show ASTRA stdout piping.
             .presets() - list available and loaded presets
             .track_preset = "preset" to set ASTRA runfile preset,
             .beam_preset = "beam" to choose beam,

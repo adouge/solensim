@@ -25,7 +25,7 @@ import subprocess
 import re
 
 import solensim.wrapper as wrapper
-from solensim.units import *
+from solensim.aux import *
 
 
 class Core():
@@ -36,34 +36,18 @@ class Core():
     _plugindir = os.path.abspath("./plugins/astra/")
     _workdir  = os.path.abspath("./plugins/astra/workspace")
     _ssdir = os.path.abspath(".")
-    _beamsdir = os.path.abspath("./plugins/astra/presets/beams")
     _tpresetsdir = os.path.abspath("./plugins/astra/presets/track")
     _genpresetsdir = os.path.abspath("./plugins/astra/presets/generator")
 
     def __init__(self):
         pass
 
-# Presets, beams
-    def beam_presets(self):
-        return listdir(self._beamsdir)
-
+# Presets
     def track_presets(self):
         return listdir(self._tpresetsdir)
 
     def gen_presets(self):
         return listdir(self._genpresetsdir)
-
-    def load_beam_preset(self, beam):
-        toload = os.path.join(self._beamsdir, beam)
-        cp = "cp -f %s/* %s"%(toload, self._workdir)
-        os.system(cp)
-        self._beam_preset = beam
-        self.read_beam()
-
-    def loaded_beam_preset(self):
-        return self._beam_preset
-
-    beam_preset = property(loaded_beam_preset, load_beam_preset)
 
     def load_track_preset(self, preset):
         toload = os.path.join(self._tpresetsdir, preset)
@@ -100,9 +84,6 @@ class Core():
         elif type=="gen":
             target = self._genpresetsdir
             source = os.path.join(self._workdir, "generator.in")
-        elif type=="beam":
-            target = self._beamsdir
-            source = os.path.join(self._workdir, "beam.ini")
         else:
             flag = True
             return flag, new  # return error status
@@ -127,8 +108,6 @@ class Core():
             target = self._tpresetsdir
         elif type=="gen":
             target = self._genpresetsdir
-        elif type=="beam":
-            target = self._beamsdir
         else:
             flag = True
             return flag, existed  # return error status
@@ -146,13 +125,13 @@ class Core():
 
 
 # Current workspace access
-    def write_field(self, z, Bz, file="solenoid.dat"):
+    def write_field(self, z, Bz, file="field.dat"):
         field = {"z":z, "Bz":Bz}
         fielddf = pd.DataFrame.from_dict(field)
         self.field = fielddf
         fielddf.to_csv(os.path.join(self._workdir, file), sep="\t", index=False, header=False)
 
-    def read_field(self, file="solenoid.dat", sep="\t"):
+    def read_field(self, file="field.dat", sep="\t"):
         fielddf = pd.read_table(os.path.join(self._workdir, file), names=["z", "Bz"], engine="python", sep=sep)
         self.field = fielddf
         z = fielddf["z"].values
@@ -189,12 +168,10 @@ class Core():
         os.system("rm %s"%(file))
 
     def clean(self):
-        self.mop("beam.ini")
         self.mop("run.*")
         self.mop("generator.in")
         self.track_preset = self.track_preset
         self.gen_preset = self.gen_preset
-        self.beam_preset = self.beam_preset
 
     def workspace(self):
         files =  listdir(self._workdir)

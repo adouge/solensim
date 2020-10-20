@@ -1,8 +1,33 @@
 0.4.0, WIP:
+  - General:
+    - Updated planning structures (project boards, milestones) to better reflect current perspective
+    - renamed overview track preset to default, assuming potential tweaking by relevant routines; default max Runge-Kutta step set to 0.1 ps
+    - Added trace strings to modules' messages
+    - renamed units.py to aux.py, added replacement ceil() and floor() functions that allow "decimal spacing", adapted to the needs here
+
+  - ASTRA interface:
+    - set default ASTRA verbosity to false
+    - removed the concept of beam presets
+    - .clean() no longer resets the beam
+    - renamed field storage file from solenoid.dat to field.dat
+
   - Track module:
     - on the frontend:
       - finalized the felddurchgang plot
-    
+      - adapted the plots to new module structure
+    - overhauled previous code towards modularity using run data storage & labeling
+      - **to consider:** how to handle external parameters? Number and energy of particles, e.g.?
+        - Works for now, will figure out later, when it will be time to integrate everything.
+          - A shared settings object??
+    - implemented focal trajectory fitting to off-axis "focusing"
+    - improved focal region detection
+
+  - Core module:
+    - did a little decluttering/decomplexifying in the code, added more verbosity
+
+  - Wrapper:
+    - added result storage and (auto)labeling tricks to track wrapper, inted to use it further;
+      concept - one field, one "DB" entry
 
 0.4.0a1, 06.10.20:
   - Tracking presets:
@@ -44,6 +69,7 @@
 
   - general:
     - Astra interface's helptext no longer greets the user upon running the main file
+
 
 0.3.4, 04.10.20:
   - ASTRA plugin:

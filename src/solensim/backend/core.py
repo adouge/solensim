@@ -25,7 +25,7 @@ import scipy.optimize as opt
 import scipy.interpolate as interpolate
 import numpy as np
 
-from solensim.units import *
+from solensim.aux import *
 import solensim.backend.track as track
 
 class Model():
@@ -64,23 +64,21 @@ class Core():
     TODO - main class
     """
     def __init__(self):
-        self.Model = Model(self)
+        self.model = Model(self)
         self.FM = "twoloop"  # default field model
         self.zmax = 1
         self.zgrain = 4  # 0.1 mm precision
-        # Beam:
-        self.E = "None"
-        self.R = 1  # 1 mm beam "radius"
-        self.sample_field(np.zeros(10), np.zeros(10))
 
-# E, P relationship:
-    def get_E(self):
-        return self._E
-    def set_E(self, E):
-        self._E = E
-        if str(E) != "None": self.P = self.Model.impuls_SI(E)
-        else: self.P = 0
-    E = property(get_E, set_E)
+# Field model switching:
+    def get_FM(self):
+        return self._FM
+    def set_FM(self, FM):
+        if FM not in self.model.field.keys():
+            raise(ValueError("Unknown field model: %s"%FM))
+        else:
+            self._FM = FM
+            self.msg("Setting field model to \"%s\"."%FM)
+    FM = property(get_FM, set_FM)
 
     def sample_field(self, z, Bz):
         """
@@ -89,6 +87,7 @@ class Core():
         (the p parameters are then irrelevant)
         """
         self.interpol_field = interpolate.interp1d(z, Bz, fill_value="extrapolate")
+        self.msg("Sampled field for interpolation.")
 
     def fit_to_model(self, model, x, y, p0=None, sigma=None):
         if type(sigma)==type(None):
@@ -103,9 +102,9 @@ class Core():
         Compute nth field integral
         """
         if n == 3:
-            integrand = lambda z: -1/2*self.Model.field[self.FM](z, p)*derivative(self.Model.field[self.FM], z, n=2, args=[p])
+            integrand = lambda z: -1/2*self.model.field[self.FM](z, p)*derivative(self.model.field[self.FM], z, n=2, args=[p])
         else:
-            integrand = lambda z: self.Model.field[self.FM](z, p)**n
+            integrand = lambda z: self.model.field[self.FM](z, p)**n
         I, dI = integrate.quad(integrand, -np.inf, np.inf)
         return I
 
@@ -114,28 +113,29 @@ class Core():
 
     def get_Bz(self, p):
         z = self.get_z()
-        return self.Model.field[self.FM](z, p)
+        return self.model.field[self.FM](z, p)
 
     def get_fwhm(self, p):
         """
         Get z(FWHM), assuming a field symmetrical around 0, small enough to contain FWHM within 1 meter
         """
         Bhalb = self.get_Bmax(p)/2
-        f = lambda z: self.Model.field[self.FM](z,p) - Bhalb
+        f = lambda z: self.model.field[self.FM](z,p) - Bhalb
         return opt.root_scalar(f, bracket=[0,self.zmax], xtol=10**(-self.zgrain)).root*2
 
-    def get_f(self, p):
+    def get_f(self, p, E):
         f2 = self.fint(p, 2)
-        return 1/((const.e/2/self.P)**2*f2)
+        P = self.model.impuls_SI(E)
+        return 1/((const.e/2/P)**2*f2)
 
     def get_Bmax(self, p):
         z = np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
-        return np.max(self.Model.field[self.FM](z,p))
+        return np.max(self.model.field[self.FM](z,p))
 
 # Aberrations and the like:
 # Spherical aberrations:
-    def get_cs(self, p):
+    def get_cs(self, p, R):
         f3 = self.fint(p, 3)
         f4 = self.fint(p, 4)
-        rad = self.R*mm
+        rad = R*mm
         return const.e**2*rad**4/4/self.P**2*f3 + const.e**4*rad**4/12/self.P**4*f4
