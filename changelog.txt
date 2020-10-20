@@ -21,6 +21,7 @@
           - A shared settings object??
     - implemented focal trajectory fitting to off-axis "focusing"
     - improved focal region detection
+    - disabled min/max calculation in headers, takes extra time & is unneeded.
 
   - Core module:
     - did a little decluttering/decomplexifying in the code, added more verbosity

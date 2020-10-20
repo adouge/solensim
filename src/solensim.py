@@ -33,7 +33,7 @@ print("(tried loading config)\n")
 vstring = "0.4.0"
 #################
 
-print("solensim v%s solenoid design & optimization tool"%vstring)
+print("solensim v%s solenoid electromagnet lens design tool"%vstring)
 print("========================================")
 
 print("Astra interface initialized as \"astra\"")

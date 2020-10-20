@@ -1,5 +1,5 @@
-solensim v0.3.4
-Comprehensive solenoid lens design tool.
+solensim v0.4.0
+Solenoid electromagnet lens design tool.
 -------------------------------------------------------------------
 Aims:
  - flexibly and capably calculate solenoid fields with yoke, and analyze their effect on various electron
