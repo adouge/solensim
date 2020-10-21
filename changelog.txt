@@ -1,4 +1,4 @@
-0.4.0, WIP:
+0.4.0, 21.10.20:
   - General:
     - Updated planning structures (project boards, milestones) to better reflect current perspective
     - renamed overview track preset to default, assuming potential tweaking by relevant routines; default max Runge-Kutta step set to 0.1 ps
