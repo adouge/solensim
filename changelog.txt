@@ -1,4 +1,98 @@
-0.3.4, WIP:
+0.4.0, 21.10.20:
+  - General:
+    - Updated planning structures (project boards, milestones) to better reflect current perspective
+    - renamed overview track preset to default, assuming potential tweaking by relevant routines; default max Runge-Kutta step set to 0.1 ps
+    - Added trace strings to modules' messages
+    - renamed units.py to aux.py, added replacement ceil() and floor() functions that allow "decimal spacing", adapted to the needs here
+    - Ditched ASTRA's field smoothing in favor of a "rough" solution - just cut off "background" field at definition region's range.
+
+  - ASTRA interface:
+    - set default ASTRA verbosity to false
+    - removed the concept of beam presets
+    - .clean() no longer resets the beam
+    - renamed field storage file from solenoid.dat to field.dat
+
+  - Track presets:
+    - Generator presets - left only uniform (ex line) and gauss (now flattened, max. 2D). Ring, b/c ne meshayet.
+    - Run configuration - disabled ASTRA's field smoothing
+
+  - Track module:
+    - on the frontend:
+      - finalized the felddurchgang plot
+      - adapted the plots to new module structure
+      - added fixed axes to focal fit check plot, swapped draw order around to have data in foreground
+    - overhauled previous code towards modularity using run data storage & labeling
+      - **to consider:** how to handle external parameters? Number and energy of particles, e.g.?
+        - Works for now, will figure out later, when it will be time to integrate everything.
+          - A shared settings object??
+    - implemented focal trajectory fitting to off-axis "focusing" - seems rarely applicable now, however
+    - improved focal region detection
+    - disabled min/max + std calculation in headers, takes extra time & is unneeded.
+    - implemented Cs calculation via power series \Delta f expansion, to flexible orders;
+      - three weighing options:
+        - against r0
+        - against r_offset (relevant only for off-axis focusing)
+        - against r0^2 (default)
+      - the f produced is above max observed f, so that "reality" criterion is fulfilled.
+    - moved particle trajectory models to a separate class.
+    - added normalization hook to field selection
+
+  - Core module:
+    - did a little decluttering/decomplexifying in the code, added more verbosity
+    - disabled extrapolation in field sampling, default fill value for Bz outside of sampled range is now 0 - leads to higher accuracy
+    - dropped the "fit to model" wrapper for being useless
+    - added a method to calculate normalization/scaling factor for bringing a field to a set f at a set E
+
+  - Wrapper:
+    - added result storage and (auto)labeling tricks to track wrapper, inted to use it further;
+      concept - one field, one "DB" entry
+
+  - Documentation:
+    - totally missing from anything pre-track lol.
+
+0.4.0a1, 06.10.20:
+  - Tracking presets:
+    - renamed stuff around to better reflect on their purpose; generator presets are now mostly for beam shapes,
+      with the intention that they will be modified for specific uses;
+      also made beam presets somewhat more descriptive, I guess.
+    - dropped the cross, box, square shapes
+    - turned off trajectory mapping, redundant / unhelpful
+    - reclassified gen/beam "default" presets as "gauss", since they haven't been even close to "default" so far
+    - reclassified default track preset to "overview", disabled field smoothing
+    - Decided that using 1-D lines is better than 2-D carpets, in terms of header info accuracy
+
+  - frontend:
+    - updated ASTRA interface's helptext, default presets
+    - ASTRA handle cleans workspace upon initiation
+
+  - ASTRA interface:
+    - added file option to read/write field, defaulting to solenoid.dat
+
+  - wrapper:
+    - added rudimentary feedback ("logging") via track/core.msg("msg") + verbosity settings
+    - added DF and auto-numbering label -based expandable result storage to track.
+      Plan to use it to incrementally add data via subroutines.
+
+  - track module:
+    - added access to astra's read/write field methods (w/ "logging")
+    - implemented an overview routine which, for a given energy / generator preset, runs astra,
+      loads and pre-processes state data, estimates focus location, gives maximum larmor angle,
+      and neatly saves everything with a label of choice (or counter).
+    - a focal run - sweeps the focal region obtained in overview, fits particle trajectories to model and obtains the focal point of each
+    - on the frontend:
+      - plot routine to check fitting success & see a zoom-in of the focal region
+      - plot routine to visualize felddurchgang
+
+  - core module:
+    - renamed .Model.impuls() to .Model.impuls_SI() to clarify output units
+    - added a method for fetching the z vector used elsewhere in core
+    - .fit_to_model() can now also take a sigma parameter to be passed to curve_fit()
+
+  - general:
+    - Astra interface's helptext no longer greets the user upon running the main file
+
+
+0.3.4, 04.10.20:
   - ASTRA plugin:
     - rewrote .read_states() to accomodate for any zphase (simple trick) and zstart/zstop
     - added warning to helptext about .clean() possibly overwriting unsaved runfiles

@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from os import listdir
 import os.path
 
-from solensim.units import *
+from solensim.aux import *
 import solensim.wrapper as wrapper
 import plugins.astra.astra_interface as astra_interface
 
@@ -30,7 +30,9 @@ class Core(wrapper.CoreHandle):
     """
         Main Interface
     """
-    def __init__(self):
+    def __init__(self, trace="core"):
+        self.verbose = True  # verbose by default
+        self.trace = trace
         wrapper.CoreHandle.__init__(self)
 
     _helptext = """
@@ -45,8 +47,12 @@ class Tracker(wrapper.TrackHandle):
     """
         Dedicated tracking functionality interface
     """
-    def __init__(self, astra):
+    def __init__(self, astra, trace="track"):
+        self.verbose = True  # verbose by default
+        self.trace = trace
+        self.E = 3.5  # default energy
         wrapper.TrackHandle.__init__(self, astra)
+
 
     _helptext = """
         This is a helptext.
@@ -55,6 +61,63 @@ class Tracker(wrapper.TrackHandle):
     def help(self):
         print(self._helptext)
 
+    # Various plots
+    def check_ray_fitting(self, label=None):
+        lbl = self.resolve_label(label)
+        if lbl not in self.runs.index:
+            raise(ValueError("Unknown label: %s"%lbl))
+        self.msg("Illustrating trajectory fitting at focal region at label %s"%lbl)
+        plt.figure(figsize=(9,9))
+        p = self.data[lbl]["s_f"].swaplevel()
+        z_solenoid = self.runs.loc[lbl, "z_solenoid"]
+        p = p.query("z>@z_solenoid")
+        fits = self.data[lbl]["fits"]
+        parts = self.data[lbl]["parts"]
+        z = np.linspace(p.get("z").min(), p.get("z").max(), num=1000)
+        if "drdz" in fits.columns:
+            for part in parts:
+                plt.plot(z, self.model.axial_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "drdz"])/mm, "--g")
+            plt.plot(z, self.model.axial_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "drdz"])/mm, "--g", label="Axial approx.")
+        else:
+            for part in parts:
+                plt.plot(z, self.model.off_axis_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g")
+            plt.plot(z, self.model.off_axis_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g", label="Approx. with offset")
+        for part in parts:
+            plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, "+r")
+        plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, "+r", label="data")
+        plt.xlabel("Axial position [m]", fontsize=16)
+        plt.ylabel("Radial position [mm]", fontsize=16)
+        plt.axis([self.runs.loc[label, "z_focal_left"], self.runs.loc[label, "z_focal_right"], 0, p.get("r").max()*1.05/mm])
+        plt.legend(loc="upper center", fontsize=16)
+
+    def check_felddurchgang(self, label=None):
+        lbl = self.resolve_label(label)
+        if lbl not in self.runs.index:
+            raise(ValueError("Unknown label: %s"%lbl))
+        self.msg("Illustrating beam state vs. position at label %s"%lbl)
+        s = self.data[lbl]["s"]
+        z_solenoid = self.runs.loc[lbl, "z_solenoid"]
+        zpos = self.data[lbl]["zpos"]
+        if "heads" in self.runs.columns and self.runs.loc[lbl, "heads"] == True:
+            heads = self.data[lbl]["heads"]
+        else:
+            heads = self.make_heads(s, zpos)
+            self.data[lbl]["heads"] = heads
+            self.runs.loc[lbl, "heads"] = True
+
+        plt.figure(figsize=(9,9))
+        plt.plot(heads.get("z").values, heads.get("r").values*1/heads["r"].max(), "-k", label="Avg. beam radius [max(r)]")
+        plt.plot(heads.get("z").values, heads.get("pr").values*1/heads["pr"].abs().max(), "-r", label="Avg. radial momentum [max(pr)]")
+        plt.plot(heads.get("z").values, heads.get("pphi").values*1/heads["pr"].abs().max(), "-b", label="Avg. rot. momentum [max(pr)]")
+        plt.plot(heads.get("z").values, heads.get("turn").values, "-g", label="Avg. cum. turn [rad/pi]")
+        z, Bz = self.astra.read_field()
+        plt.plot(z+z_solenoid, Bz/np.max(Bz), "--k", label="Axial field component [max(Bz)]")
+        plt.xlabel("Axial position [m]", fontsize=16)
+        plt.ylabel("Arbitrary units", fontsize=16)
+        plt.axis([heads["z"].min(), heads["z"].max(), -1, np.max((2, heads["pphi"].abs().max()/heads["pr"].abs().max()))])
+        plt.legend(loc="best", fontsize=14)
+        plt.grid()
+        plt.show()
 
 class Astra_Interface(astra_interface.Core):
     """
@@ -64,13 +127,13 @@ class Astra_Interface(astra_interface.Core):
     def __init__(self):
         astra_interface.Core.__init__(self);
         self.track_preset = "default"
-        self.gen_preset = "default"
-        self.beam_preset = "default"
-        self.verbose = True
+        self.gen_preset = "uniform"
+        self.verbose = False  # not verbose by default
+        self.clean()
 
     _helptext = """
         General options, presets:
-            .verbose - True default, set to False to supress ASTRA stdout piping.
+            .verbose - False default, set to True to show ASTRA stdout piping.
             .presets() - list available and loaded presets
             .track_preset = "preset" to set ASTRA runfile preset,
             .beam_preset = "beam" to choose beam,
@@ -84,7 +147,7 @@ class Astra_Interface(astra_interface.Core):
             .runfile - loaded ASTRA runfile in dict form, see current setup editing
             .genfile - analogously
             .beam - currently loaded beam file as pandas dataframe
-            .field - currently loaded field as pandas dataframe
+            .field - currently loaded field as pandas dataframe, if loaded
 
         Current run setup editing:
             .read_runfile(),
@@ -106,20 +169,20 @@ class Astra_Interface(astra_interface.Core):
         Workspace control:
             .workspace() to view ASTRA workdir
             .clean() to clean everything in workspace and reload presets (Attention: overwrites current runfiles!)
+                - does not delete user-made files
             .mop(filename) to delete particular file; works with asterisk patterns (e.g. *.001)
 
             .read_nml(file) - return contents of file (in workspace) as namelist object
             .write_nml(nml, file) - write nml namelist to file
 
-            .read_field() - return z, Bz from solenoid.dat file, update stored .field
-            .write_field(z, Bz) - write solenoid to solenoid.dat, update stored .field
+            .read_field(file) - return z, Bz from file (defaults to solenoid.dat), update stored .field
+            .write_field(z, Bz, file) - write solenoid to file (defaults to solenoid.dat), update stored .field
 
         Output readin:
-            .read_screens() - returns dataframe with screen output based on screens specified in &OUTPUT namelist,
-                as well as initial and final tracked states;
-                keyed according to screen positions; essentially a collection of .beam dataframes
+            .read_states() - returns dataframe with screen output based on screens & zphase/start/stop specified in &OUTPUT namelist,
+                as well as the initial beam state; keyed according to beam positions
             .read_trajectories() - returns contents of the trajectory tracking output
-            .read_zemit() - returns contents of the Zemit file output
+            .read_zemit() - returns contents of the Zemit file output (WIP)
     """
 
     def help(self):

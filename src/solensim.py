@@ -23,26 +23,21 @@ import pandas as pd
 
 import solensim.wrapper as wrapper
 import solensim.frontend as frontend
-from solensim.units import *
+from solensim.aux import *
 import scipy.constants as const
 
 # config
 wrapper.load_ini()
 print("(tried loading config)\n")
 #################
-vstring = "0.3.4"
+vstring = "0.4.0"
 #################
 
-print("solensim v%s solenoid design & optimization tool"%vstring)
+print("solensim v%s solenoid electromagnet lens design tool"%vstring)
 print("========================================")
 
 print("Astra interface initialized as \"astra\"")
 astra = frontend.Astra_Interface()
-print("astra.help():")
-astra.help()
-astra.presets()
-
-print("\n")
 
 core = frontend.Core()
 print("Core handle initialized as \"core\" (WIP).")

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from solensim.units import *
+from solensim.aux import *
 import scipy.constants as const
 
 def line_rot(track, astra):

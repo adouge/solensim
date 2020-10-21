@@ -1,6 +1,6 @@
 &input
     add = .false.
-    c_sig_z = 2.0
+    c_sig_z = 0.0
     cathode = .false.
     cor_ekin = 0.0
     cor_px = 0.0
@@ -14,16 +14,17 @@
     fname = 'beam.ini'
     ipart = 100
     n_add = 0
-    nemit_x = 1
-    nemit_y = 1
     noise_reduc = .true.
-    probe = .true.
+    probe = .false.
     q_total = 1.602176634e-08
     ref_ekin = 3.0
     ref_zpos = 0.0
-    sig_ekin = 3
-    sig_x = 1.0
-    sig_y = 1.0
-    sig_z = 3.0
+    sig_ekin = 0
+    sig_px = 0.0
+    sig_py = 0.0
+    sig_x = 10
+    sig_y = 0.0
+    sig_z = 0.0
     species = 'electrons'
+    type = 'standard'
 /

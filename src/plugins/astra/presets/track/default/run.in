@@ -1,10 +1,10 @@
 &newrun
     check_ref_part = .true.
     distribution = 'beam.ini'
-    h_max = 0.001
-    h_min = 0.0001
-    head = 'Symmetrical 2m field at z = 1m, track up to a meter afterwards (3 m), log beam state every 0.01 m'
-    max_step = 100000
+    h_max = 0.0001
+    h_min = 0.00
+    head = 'Default solensim ASTRA run template'
+    max_step = 1000000
     qbunch = 0.0
     run = 1
     track_all = .true.
@@ -22,7 +22,7 @@
     high_res = .true.
     phases = .true.
     refs = .false.
-    tracks = .true.
+    tracks = .false.
     zemit = 300
     zphase = 300
     zstart = 0.0
@@ -30,11 +30,11 @@
 /
 
 &solenoid
-    file_bfield = 'solenoid.dat'
+    file_bfield = 'field.dat'
     lbfield = .true.
     maxb = 0.060855
     s_higher_order = .true.
     s_noscale = .true.
     s_pos = 1
-    s_smooth = 10
+    s_smooth = 0
 /
