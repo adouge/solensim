@@ -55,6 +55,7 @@ class TrackModule():
         self.E = 3.5  # default enrgy, placeholder
         self.N = 100
         self.sig_r = 10
+        self.baseline_f = 1.5
 
 # Astra setup
 
@@ -204,9 +205,9 @@ class TrackModule():
         self.run_label = label
         self.msg(message%label)
         self.linked_core.sample_field(self.field_z, self.field_Bz)
-        F2 = self.linked_core.fint("lolkek", 2)
-        f_predict = self.linked_core.get_f("lolkek", self.E)
-        l = self.linked_core.get_fwhm("lolkek")
+        F2 = self.linked_core.fint(2)
+        f_predict = self.linked_core.get_f(self.E)
+        l = self.linked_core.get_fwhm()
         self.runs.loc[label, "E"] = self.E
         self.runs.loc[label, "N"] = self.N
         self.runs.loc[label, "sigma_r"] = self.sig_r
@@ -217,9 +218,6 @@ class TrackModule():
         if f_predict < self.field_width/2:
             self.msg("[WARN] Predicted focus inside field definition boundary!")
             self.runs.loc[label, "warn_focus_in_field"] = True
-        else:
-            self.runs.loc[label, "warn_focus_in_field"] = False
-
         self.msg("F2: %.3f mT^2"%(F2/mm**2))
         self.msg("FWHM: %.2f cm"%(l/cm))
         self.msg("Predicted focal length for %.2f MeV: %.2f cm"%(self.E, f_predict/cm))
@@ -236,13 +234,13 @@ class TrackModule():
         sig_r = self.runs.loc[label, "sigma_r"]
         self.msg(">>> at %s: Performing overview tracking of %d electrons, E=%.2f"%(label, N, E))
         self.runs.loc[label, "field_width"] = self.field_width
-        bounds = [0, self.field_width + 1]
+        bounds = [0, self.field_width/2 + self.runs.loc[label, "f_predict"]+0.5]
         self.setup_tracking(bounds, step=step)
         self.runs.loc[label, "z_solenoid"] = self.z_solenoid
         self.runs.loc[label, "step_overview"] = step
         self.generate_beam(E=E, N=N, sig_r=sig_r, distribution=beam, twodim=beam_2d)
-        self.runs.loc[label, "distr_r"] = beam
-        self.runs.loc[label, "dim_r"] = 2 if beam_2d else 1
+        self.runs.loc[label, "beam_distr"] = beam
+        self.runs.loc[label, "beam_dim"] = 2 if beam_2d else 1
         self.msg("Running ASTRA...")
         self.astra.run()
 
@@ -271,83 +269,6 @@ class TrackModule():
         self.runs.loc[label, "z_focal_right"] = right
         self.msg("Focal region at ~ z: [%.2f, %.2f] cm; z_solenoid %.2f m"%(left/cm, right/cm, self.z_solenoid))
 
-    def get_focal_region_old(self, average=False, method="pr_edge"):
-        """
-            todo
-        """
-        label = self.run_label
-        self.msg("%s: estimating focal region. Use averaging : %s"%(label, average))
-        if not average:
-            # ACTHUNG works only with nice beams; averaging would help to avoid spontaneous "oops I crossed the axis" moments,
-            # but takes more time, and it's efficiency is... questionable.
-            s = self.data[label]["s"]
-            z_solenoid = self.runs.loc[label, "z_solenoid"]
-            if method=="pr_all":
-                paraxial_prefocal = s.query("z>@z_solenoid and pr < 0").get("z").max()
-                offaxis_postfocal =  s.query("z>@z_solenoid and pr > 0").get("z").min()
-                unit = self.runs.loc[label, "step_overview"]*mm
-                left = floor(offaxis_postfocal, unit)
-                right = ceil(paraxial_prefocal, unit)
-
-            elif method=="pr_edge":  # take the extreme cases - outermost and innermost particles
-                paraxial = s.loc[0, "r"].idxmin()
-                offaxis = s.loc[0, "r"].idxmax()
-                p = s.swaplevel()
-                paraxial_prefocal = p.loc[paraxial].query("z>@z_solenoid and pr < 0").get("z").max()
-                offaxis_postfocal =  p.loc[offaxis].query("z>@z_solenoid and pr > 0").get("z").min()
-                unit = self.runs.loc[label, "step_overview"]*mm
-                left = floor(offaxis_postfocal, unit)
-                right = ceil(paraxial_prefocal, unit)
-
-            if left > right:
-                self.msg("[WARN] Paraxial trajectories seem to focus before off-axis ones. Reversing bound order.")
-                self.runs.loc[label, "z_focal_left"] = right
-                self.runs.loc[label, "z_focal_right"] = left
-                self.runs.loc[label, "warn_bad_focal_bound_order"] = True
-                self.msg("Focal region at ~ z: [%.2f, %.2f] cm; z_solenoid %.2f m"%(right/cm, left/cm, self.z_solenoid))
-            else:
-                self.runs.loc[label, "z_focal_left"] = left
-                self.runs.loc[label, "z_focal_right"] = right
-                self.runs.loc[label, "warn_bad_focal_bound_order"] = False
-                self.msg("Focal region at ~ z: [%.2f, %.2f] cm; z_solenoid %.2f m"%(left/cm, right/cm, self.z_solenoid))
-        else:
-            #if "heads" in self.runs.columns and self.runs.loc[lbl, "heads"] == True:
-            #    s = self.data[lbl]["heads"]
-            #else:
-            #    s = self.make_heads(self.data[label]["s"], self.data[label]["zpos"])
-            #    self.data[label]["heads"] = s
-            #    self.runs.loc[label, "heads"] = True
-            pass
-
-    # deprecated method
-    def get_focal_region_from_heads(self, heads, method="pr"):
-        """
-            useless???
-        """
-        if method == "pr":
-            z_solenoid = self.astra.runfile["solenoid"]["s_pos"]
-            left = heads.query("z>@z_solenoid and pr_avg < 0").get("z").max()
-            right =  heads.query("z>@z_solenoid and pr_avg > 0").get("z").min()
-
-        #elif method == "pphi":
-        #    pphi = heads["pphi_avg"].values
-        #    width_info = signal.peak_widths(np.abs(pphi), np.where(pphi==pphi.min())[0])
-        #    lind = np.floor(width_info[2])
-        #    rind = np.floor(width_info[3]) + 1
-        #    left = heads["z"].values[int(lind)]
-        #    right = heads["z"].values[int(rind)]
-
-        #z_neck = heads["r_avg"].idxmax()
-        #if not left <= z_neck <= right:
-        #    if method != "pr":
-        #        self.msg("WARN: Approximate beam neck not in determined focal region, falling back on pr method!")
-        #        return self.get_focal_region_from_heads(heads, method="pr")
-        #    else:
-        #        self.msg("WARN: still not ok, returning potentially wrong results, be advised.")
-
-        return left, right
-
-
 #Focal run:
     def focal_run(self, step=1):
         """
@@ -373,11 +294,12 @@ class TrackModule():
         self.data[label]["zpos_f"] = zpos_f
 
 #Fitting trajectories @ focus:
-    def fit_focal_traj(self, model="axial", iverted_r_sigma=False):  #TODO
+    def fit_focal_traj(self, model="offset", iverted_r_sigma=False):  #TODO
         label = self.run_label
 
         self.msg(">>> at %s: Analyzing focal region data..."%label)
         self.msg("Trajectory model: %s"%model)
+        self.runs.loc[label, "ray_model"] = model
         s_f = self.data[label]["s_f"]
         parts = self.data[label]["parts"]
         z_solenoid = self.runs.loc[label, "z_solenoid"]
@@ -448,6 +370,7 @@ class TrackModule():
             dr = fits.get("r0").values**2
             self.msg("Weighing against squared initial radial position.")
         else: raise ValueError("Incorrect weighing option: %s"%sigma)
+        self.runs.loc[label, "f_expansion_sigma"] = sigma
         f_guess = self.runs.loc[label, "f_max_observed"]
         c2_guess = 1
         #self.msg("f guess: %.2f cm"%(f_guess/cm))

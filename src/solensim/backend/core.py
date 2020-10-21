@@ -66,10 +66,10 @@ class Core():
     def __init__(self):
         self.model = Model(self)
         self.FM = "twoloop"  # default field model
-        self.zmax = 1
-        self.zgrain = 4  # 0.1 mm precision
+        self.bcalc_zmax = 1
+        self.bcalc_zgrain = 4  # 0.1 mm precision
 
-# Field model switching:
+## Field model switching:
     def get_FM(self):
         return self._FM
     def set_FM(self, FM):
@@ -80,6 +80,7 @@ class Core():
             self.msg("Setting field model to \"%s\"."%FM)
     FM = property(get_FM, set_FM)
 
+## Field data handling:
     def sample_field(self, z, Bz, extrapolate=False):
         """
         enter z, Bz to create an interpolator.
@@ -92,15 +93,18 @@ class Core():
         self.msg("Sampled field for interpolation.")
         self.FM = "interpol"
 
-    def fit_to_model(self, model, x, y, p0=None, sigma=None):
-        if type(sigma)==type(None):
-            s = np.ones(len(y))
-        else: s = sigma
-        popt, pcov = opt.curve_fit(model, x, y, p0=p0, sigma=s)
-        dp = np.sqrt(np.diag(pcov))
-        return popt, dp
+    def get_scale_factor(self, f_N, E_N):  # [m], [MeV]
+        """
+            Assuming the to-be-scaled field is already sampled
+        """
+        p_N = self.model.impuls_SI(E_N)
+        F2 = self.fint(2)
+        k = 2*p_N/const.e/np.sqrt(f_N*F2)
+        self.msg("Factor to scale sampled field to %.2f m @ %.2f MeV: k=%.6f"%(f_N, E_N, k))
+        return k
 
-    def fint(self, p, n):
+## Field characterization:
+    def fint(self, n, p="numeric"):
         """
         Compute nth field integral
         """
@@ -112,34 +116,25 @@ class Core():
         return I
 
     def get_z(self):
-        return np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
+        return np.linspace(-self.bcalc_zmax, self.bcalc_zmax, num=2*10**self.bcalc_zgrain+1)
 
-    def get_Bz(self, p):
+    def get_Bz(self, p="numeric"):
         z = self.get_z()
         return self.model.field[self.FM](z, p)
 
-    def get_fwhm(self, p):
+    def get_fwhm(self, p="numeric"):
         """
         Get z(FWHM), assuming a field symmetrical around 0, small enough to contain FWHM within 1 meter
         """
         Bhalb = self.get_Bmax(p)/2
         f = lambda z: self.model.field[self.FM](z,p) - Bhalb
-        return opt.root_scalar(f, bracket=[0,self.zmax], xtol=10**(-self.zgrain)).root*2
+        return opt.root_scalar(f, bracket=[0,self.bcalc_zmax], xtol=10**(-self.bcalc_zgrain)).root*2
 
-    def get_f(self, p, E):
-        f2 = self.fint(p, 2)
+    def get_f(self, E, p="numeric"):
+        f2 = self.fint(2, p)
         P = self.model.impuls_SI(E)
         return 1/((const.e/2/P)**2*f2)
 
     def get_Bmax(self, p):
-        z = np.linspace(-self.zmax, self.zmax, num=2*10**self.zgrain+1)
+        z = np.linspace(-self.bcalc_zmax, self.bcalc_zmax, num=2*10**self.bcalc_zgrain+1)
         return np.max(self.model.field[self.FM](z,p))
-
-# Aberrations and the like:
-# Spherical aberrations:
-    def get_cs(self, p, E, R):
-        P = self.model.impuls_SI(E)
-        f3 = self.fint(p, 3)
-        f4 = self.fint(p, 4)
-        rad = R*mm
-        return const.e**2*rad**4/4/P**2*f3 + const.e**4*rad**4/12/P**4*f4

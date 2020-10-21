@@ -86,21 +86,28 @@ class TrackHandle(track.TrackModule):
             self.msg("Field seems to cut off on itself, no decrement made.")
             return Bz, 0
 
-    def use_field(self, z, Bz, label=None):
+    def use_field(self, z, Bz, label=None, normalize=False):
         """
         Requirements:
             symmetrical field (Bmax at z=0), ~0 at bounds;
             [z] - m, [Bz] - T
         """
-        Bz2, rel_decrement = self.cut_field_edges(Bz)
-        self.msg("Updating currently used field.")
+        self.msg(">>> New input field!")
+        if normalize:
+            self.msg("Normalizing input field...")
+            self.linked_core.sample_field(z, Bz)
+            k = self.linked_core.get_scale_factor(self.baseline_f, self.E)
+            Bz2 = Bz*k
+        else:
+            Bz2 = Bz
+        Bz2, rel_decrement = self.cut_field_edges(Bz2)
         self.field_z = z
         self.field_Bz = Bz2
         self.field_width = (z[-1] - z[0])
         self.astra.write_field(z, Bz2)
         self.init_run(rel_decrement, label=label)
 
-    def use_dat(self, file, sep="\t", label=None):
+    def use_dat(self, file, sep="\t", label=None, normalize=False):
         """
         Read from file in current dir (temporary)
         Requirements:
@@ -111,7 +118,7 @@ class TrackHandle(track.TrackModule):
         fielddf = pd.read_table(file, names=["z", "Bz"], engine="python", sep=sep)
         z = fielddf["z"].values
         Bz = fielddf["Bz"].values
-        self.use_field(z, Bz, label=label)
+        self.use_field(z, Bz, label=label, normalize=normalize)
 
 class CoreHandle(core.Core):
     """

@@ -6,7 +6,6 @@
     - renamed units.py to aux.py, added replacement ceil() and floor() functions that allow "decimal spacing", adapted to the needs here
     - Ditched ASTRA's field smoothing in favor of a "rough" solution - just cut off "background" field at definition region's range.
 
-
   - ASTRA interface:
     - set default ASTRA verbosity to false
     - removed the concept of beam presets
@@ -21,6 +20,7 @@
     - on the frontend:
       - finalized the felddurchgang plot
       - adapted the plots to new module structure
+      - added fixed axes to focal fit check plot, swapped draw order around to have data in foreground
     - overhauled previous code towards modularity using run data storage & labeling
       - **to consider:** how to handle external parameters? Number and energy of particles, e.g.?
         - Works for now, will figure out later, when it will be time to integrate everything.
@@ -35,15 +35,20 @@
         - against r0^2 (default)
       - the f produced is above max observed f, so that "reality" criterion is fulfilled.
     - moved particle trajectory models to a separate class.
-    
+    - added normalization hook to field selection
 
   - Core module:
     - did a little decluttering/decomplexifying in the code, added more verbosity
     - disabled extrapolation in field sampling, default fill value for Bz outside of sampled range is now 0 - leads to higher accuracy
+    - dropped the "fit to model" wrapper for being useless
+    - added a method to calculate normalization/scaling factor for bringing a field to a set f at a set E
 
   - Wrapper:
     - added result storage and (auto)labeling tricks to track wrapper, inted to use it further;
       concept - one field, one "DB" entry
+
+  - Documentation:
+    - totally missing from anything pre-track lol.
 
 0.4.0a1, 06.10.20:
   - Tracking presets:
