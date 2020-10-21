@@ -36,6 +36,7 @@
       - the f produced is above max observed f, so that "reality" criterion is fulfilled.
     - moved particle trajectory models to a separate class.
     - added normalization hook to field selection
+    - overview runs automatically define tracking boundaries; **still need to handle the occasional case where zphase is too large for ASTRA.**
 
   - Core module:
     - did a little decluttering/decomplexifying in the code, added more verbosity
@@ -49,6 +50,7 @@
 
   - Documentation:
     - totally missing from anything pre-track lol.
+    - Merge subversion changelogs before release. Don't do **_this_** again. _Please._
 
 0.4.0a1, 06.10.20:
   - Tracking presets:
