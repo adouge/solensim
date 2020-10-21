@@ -4,12 +4,18 @@
     - renamed overview track preset to default, assuming potential tweaking by relevant routines; default max Runge-Kutta step set to 0.1 ps
     - Added trace strings to modules' messages
     - renamed units.py to aux.py, added replacement ceil() and floor() functions that allow "decimal spacing", adapted to the needs here
+    - Ditched ASTRA's field smoothing in favor of a "rough" solution - just cut off "background" field at definition region's range.
+
 
   - ASTRA interface:
     - set default ASTRA verbosity to false
     - removed the concept of beam presets
     - .clean() no longer resets the beam
     - renamed field storage file from solenoid.dat to field.dat
+
+  - Track presets:
+    - Generator presets - left only uniform (ex line) and gauss (now flattened, max. 2D). Ring, b/c ne meshayet.
+    - Run configuration - disabled ASTRA's field smoothing
 
   - Track module:
     - on the frontend:
@@ -19,12 +25,21 @@
       - **to consider:** how to handle external parameters? Number and energy of particles, e.g.?
         - Works for now, will figure out later, when it will be time to integrate everything.
           - A shared settings object??
-    - implemented focal trajectory fitting to off-axis "focusing"
+    - implemented focal trajectory fitting to off-axis "focusing" - seems rarely applicable now, however
     - improved focal region detection
-    - disabled min/max calculation in headers, takes extra time & is unneeded.
+    - disabled min/max + std calculation in headers, takes extra time & is unneeded.
+    - implemented Cs calculation via power series \Delta f expansion, to flexible orders;
+      - three weighing options:
+        - against r0
+        - against r_offset (relevant only for off-axis focusing)
+        - against r0^2 (default)
+      - the f produced is above max observed f, so that "reality" criterion is fulfilled.
+    - moved particle trajectory models to a separate class.
+    
 
   - Core module:
     - did a little decluttering/decomplexifying in the code, added more verbosity
+    - disabled extrapolation in field sampling, default fill value for Bz outside of sampled range is now 0 - leads to higher accuracy
 
   - Wrapper:
     - added result storage and (auto)labeling tricks to track wrapper, inted to use it further;

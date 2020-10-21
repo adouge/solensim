@@ -1,5 +1,5 @@
 ### solensim
-Comprehensive solenoid lens design tool.
+Solenoid electromagnet lens design tool.
 -------------------------------------------------------------------
 **Aims**:
  - flexibly and capably calculate solenoid fields with yoke, and analyze their effect on various electron

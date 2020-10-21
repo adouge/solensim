@@ -53,14 +53,11 @@ class TrackHandle(track.TrackModule):
             lbl = label
         return lbl
 
-    def init_run(self, label=None):
+    def init_run(self, rel_decrement, label=None):
         if label not in self.runs.index:
             self._run_ticker += 1
-            newrun=True
-        else:
-            newrun=False
         lbl = self.resolve_label(label)
-        track.TrackModule.init_run(self, label=lbl, newrun=newrun)
+        track.TrackModule.init_run(self, label=lbl, rel_decrement=rel_decrement)
 
 
     # Interaction with core:
@@ -77,18 +74,31 @@ class TrackHandle(track.TrackModule):
         dt = pd.Timestamp.fromtimestamp(time.time())
         if self.verbose:  print("%s %s :  %s"%(dt.time(), self.trace, msg))
 
+
+    def cut_field_edges(self, Bz):
+        if Bz[0] != 0 and Bz[-1] != 0:
+            background = np.min(Bz)
+            Bz_new = Bz-background
+            rel_decrement = background/np.max(Bz)
+            self.msg("Non-zero field edge, making decrement: %.2e relative to max(B_z)"%rel_decrement)
+            return Bz_new, rel_decrement
+        else:
+            self.msg("Field seems to cut off on itself, no decrement made.")
+            return Bz, 0
+
     def use_field(self, z, Bz, label=None):
         """
         Requirements:
             symmetrical field (Bmax at z=0), ~0 at bounds;
             [z] - m, [Bz] - T
         """
+        Bz2, rel_decrement = self.cut_field_edges(Bz)
         self.msg("Updating currently used field.")
         self.field_z = z
-        self.field_Bz = Bz
+        self.field_Bz = Bz2
         self.field_width = (z[-1] - z[0])
-        self.astra.write_field(z, Bz)
-        self.init_run(label)
+        self.astra.write_field(z, Bz2)
+        self.init_run(rel_decrement, label=label)
 
     def use_dat(self, file, sep="\t", label=None):
         """

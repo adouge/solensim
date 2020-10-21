@@ -76,9 +76,14 @@ class Tracker(wrapper.TrackHandle):
         for part in parts:
             plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".r")
         plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".r", label="data")
-        for part in parts:
-            plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g")
-        plt.plot(p.loc[part, "z"].values, self.ray_model(p.loc[part, "z"].values, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g", label="linear approx.")
+        if "drdz" in fits.columns:
+            for part in parts:
+                plt.plot(p.loc[part, "z"].values, self.model.axial_trajectory(p.loc[part, "z"].values, fits.loc[part, "z_f"], fits.loc[part, "drdz"])/mm, "--g")
+            plt.plot(p.loc[part, "z"].values, self.model.axial_trajectory(p.loc[part, "z"].values, fits.loc[part, "z_f"], fits.loc[part, "drdz"])/mm, "--g", label="Axial approx.")
+        else:
+            for part in parts:
+                plt.plot(p.loc[part, "z"].values, self.model.off_axis_trajectory(p.loc[part, "z"].values, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g")
+            plt.plot(p.loc[part, "z"].values, self.model.off_axis_trajectory(p.loc[part, "z"].values, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g", label="Approx. with offset")
         plt.xlabel("Axial position [m]", fontsize=16)
         plt.ylabel("Radial position [mm]", fontsize=16)
         plt.legend(loc="upper left", fontsize=16)
@@ -99,15 +104,15 @@ class Tracker(wrapper.TrackHandle):
             self.runs.loc[lbl, "heads"] = True
 
         plt.figure(figsize=(9,9))
-        plt.plot(heads.get("z").values, heads.get("r_avg").values*1/heads["r_avg"].max(), "-k", label="Avg. beam radius [max(r)]")
-        plt.plot(heads.get("z").values, heads.get("pr_avg").values*1/heads["pr_avg"].abs().max(), "-r", label="Avg. radial momentum [max(pr)]")
-        plt.plot(heads.get("z").values, heads.get("pphi_avg").values*1/heads["pr_avg"].abs().max(), "-b", label="Avg. rot. momentum [max(pr)]")
-        plt.plot(heads.get("z").values, heads.get("turn_avg").values, "-g", label="Avg. cum. turn [rad/pi]")
+        plt.plot(heads.get("z").values, heads.get("r").values*1/heads["r"].max(), "-k", label="Avg. beam radius [max(r)]")
+        plt.plot(heads.get("z").values, heads.get("pr").values*1/heads["pr"].abs().max(), "-r", label="Avg. radial momentum [max(pr)]")
+        plt.plot(heads.get("z").values, heads.get("pphi").values*1/heads["pr"].abs().max(), "-b", label="Avg. rot. momentum [max(pr)]")
+        plt.plot(heads.get("z").values, heads.get("turn").values, "-g", label="Avg. cum. turn [rad/pi]")
         z, Bz = self.astra.read_field()
-        plt.plot(z+1, Bz/np.max(Bz), "--k", label="Axial field component [max(Bz)]")
+        plt.plot(z+z_solenoid, Bz/np.max(Bz), "--k", label="Axial field component [max(Bz)]")
         plt.xlabel("Axial position [m]", fontsize=16)
         plt.ylabel("Arbitrary units", fontsize=16)
-        plt.axis([heads["z"].min(), heads["z"].max(), -1, np.max((2, heads["pphi_avg"].abs().max()/heads["pr_avg"].abs().max()))])
+        plt.axis([heads["z"].min(), heads["z"].max(), -1, np.max((2, heads["pphi"].abs().max()/heads["pr"].abs().max()))])
         plt.legend(loc="best", fontsize=14)
         plt.grid()
         plt.show()
@@ -120,8 +125,7 @@ class Astra_Interface(astra_interface.Core):
     def __init__(self):
         astra_interface.Core.__init__(self);
         self.track_preset = "default"
-        self.gen_preset = "line"
-        self.beam_preset = "mono_line"
+        self.gen_preset = "uniform"
         self.verbose = False  # not verbose by default
         self.clean()
 

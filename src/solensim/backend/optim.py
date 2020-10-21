@@ -20,7 +20,7 @@ import scipy.constants as const
 import scipy.optimize as opt
 import numpy as np
 
-from solensim.units import *
+from solensim.aux import *
 import solensim.backend.core as core
 import solensim.backend.track as track
 

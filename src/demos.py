@@ -19,6 +19,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from solensim.aux import *
 
 def field_REGAE(handle, astra, E, scaling):
     print("Describing REGAE magnet (no yoke)\n via two-loop-approximation.")
@@ -27,6 +28,8 @@ def field_REGAE(handle, astra, E, scaling):
     print("Rin, a, b [cm]:")
     print(g_REGAE)
     print("Scaling factor [A]: %d"%s_REGAE)
+
+    handle.zmax = 1
 
     p = (s_REGAE, *g_REGAE)
     z = np.linspace(-handle.zmax, handle.zmax, num = 2*10**handle.zgrain+1)

@@ -80,14 +80,17 @@ class Core():
             self.msg("Setting field model to \"%s\"."%FM)
     FM = property(get_FM, set_FM)
 
-    def sample_field(self, z, Bz):
+    def sample_field(self, z, Bz, extrapolate=False):
         """
         enter z, Bz to create an interpolator.
         Use core.FM = "interpol" to calculate field based on samples
         (the p parameters are then irrelevant)
         """
-        self.interpol_field = interpolate.interp1d(z, Bz, fill_value="extrapolate")
+        if extrapolate: fill = "extrapolate"
+        else: fill = 0
+        self.interpol_field = interpolate.interp1d(z, Bz, fill_value=fill, bounds_error=False)
         self.msg("Sampled field for interpolation.")
+        self.FM = "interpol"
 
     def fit_to_model(self, model, x, y, p0=None, sigma=None):
         if type(sigma)==type(None):
@@ -134,8 +137,9 @@ class Core():
 
 # Aberrations and the like:
 # Spherical aberrations:
-    def get_cs(self, p, R):
+    def get_cs(self, p, E, R):
+        P = self.model.impuls_SI(E)
         f3 = self.fint(p, 3)
         f4 = self.fint(p, 4)
         rad = R*mm
-        return const.e**2*rad**4/4/self.P**2*f3 + const.e**4*rad**4/12/self.P**4*f4
+        return const.e**2*rad**4/4/P**2*f3 + const.e**4*rad**4/12/P**4*f4
