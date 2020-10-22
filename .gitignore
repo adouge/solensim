@@ -55,6 +55,9 @@ tex/bachelor/*
 # untrack the jupyter notebook
 solensim.ipynb
 
+# workspace:
+src/workspace/*
+
 # Astra:
 # don't track astra executables
 src/plugins/astra/workspace/*

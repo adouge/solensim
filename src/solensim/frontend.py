@@ -74,6 +74,9 @@ class Tracker(wrapper.TrackHandle):
         fits = self.data[lbl]["fits"]
         parts = self.data[lbl]["parts"]
         z = np.linspace(p.get("z").min(), p.get("z").max(), num=1000)
+        for part in parts:
+            plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".r")
+        plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, ".r", label="data")
         if "drdz" in fits.columns:
             for part in parts:
                 plt.plot(z, self.model.axial_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "drdz"])/mm, "--g")
@@ -82,12 +85,9 @@ class Tracker(wrapper.TrackHandle):
             for part in parts:
                 plt.plot(z, self.model.off_axis_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g")
             plt.plot(z, self.model.off_axis_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g", label="Approx. with offset")
-        for part in parts:
-            plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, "+r")
-        plt.plot(p.loc[part, "z"].values, p.loc[part, "r"].values/mm, "+r", label="data")
         plt.xlabel("Axial position [m]", fontsize=16)
         plt.ylabel("Radial position [mm]", fontsize=16)
-        plt.axis([self.runs.loc[label, "z_focal_left"], self.runs.loc[label, "z_focal_right"], 0, p.get("r").max()*1.05/mm])
+        plt.axis([self.runs.loc[lbl, "z_focal_left"], self.runs.loc[lbl, "z_focal_right"], 0, p.get("r").max()*1.05/mm])
         plt.legend(loc="upper center", fontsize=16)
 
     def check_felddurchgang(self, label=None):

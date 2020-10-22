@@ -1,3 +1,11 @@
+0.4.1, WIP:
+  - Track module:
+    - fixed overview run bound definition to account for f within field width
+    - reset focal run default step to 0.1 mm - effective maximum sweepable region is thus at 10 cm (max 1000 output files??).
+      - For reasonable focusing (1.5m) and aberration (below 200 m lol), this seems good enough. Fix will come later.
+    - on the frontend:
+      - fixed .check_ray_fitting() plot axes, reversed plotting order again - high amounts of data obscure fits, better to have them in front.
+
 0.4.0, 21.10.20:
   - General:
     - Updated planning structures (project boards, milestones) to better reflect current perspective

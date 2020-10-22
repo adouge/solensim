@@ -234,7 +234,8 @@ class TrackModule():
         sig_r = self.runs.loc[label, "sigma_r"]
         self.msg(">>> at %s: Performing overview tracking of %d electrons, E=%.2f"%(label, N, E))
         self.runs.loc[label, "field_width"] = self.field_width
-        bounds = [0, self.field_width/2 + self.runs.loc[label, "f_predict"]+0.5]
+        right_margin = np.max([self.runs.loc[label, "f_predict"], self.field_width/2])
+        bounds = [0, self.field_width/2 + right_margin+0.5]
         self.setup_tracking(bounds, step=step)
         self.runs.loc[label, "z_solenoid"] = self.z_solenoid
         self.runs.loc[label, "step_overview"] = step
@@ -270,7 +271,7 @@ class TrackModule():
         self.msg("Focal region at ~ z: [%.2f, %.2f] cm; z_solenoid %.2f m"%(left/cm, right/cm, self.z_solenoid))
 
 #Focal run:
-    def focal_run(self, step=1):
+    def focal_run(self, step=0.1):
         """
             TBA
         """
