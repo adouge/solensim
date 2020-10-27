@@ -1,4 +1,4 @@
-solensim v0.4.0
+solensim v0.4.1
 Solenoid electromagnet lens design tool.
 -------------------------------------------------------------------
 Aims:
