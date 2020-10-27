@@ -302,7 +302,7 @@ class TrackModule():
         self.data[label]["zpos_f"] = zpos_f
 
 #Fitting trajectories @ focus:
-    def fit_focal_traj(self, model="offset", iverted_r_sigma=False):  #TODO
+    def fit_focal_traj(self, model="offset"):  #TODO
         label = self.run_label
 
         self.msg(">>> at %s: Analyzing focal region data..."%label)

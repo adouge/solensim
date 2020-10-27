@@ -46,6 +46,19 @@ class TrackHandle(track.TrackModule):
         self.data = {}
         self._run_ticker = 0
 
+    def drop_labels(self, *args):
+        l = len(args)
+        if l==1:
+            labels = args[0]
+            self.msg("Dropping label \"%s\" from result DF."%labels)
+            self.data.pop(labels)
+        else:
+            labels = [*args]
+            self.msg("Dropping %d labels from result DF."%l)
+            for label in labels:
+                self.data.pop(label)
+        self.runs = self.runs.drop(index=labels)
+
     def resolve_label(self, label):
         if type(label)==type(None):
             lbl = self._run_ticker

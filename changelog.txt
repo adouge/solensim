@@ -8,6 +8,8 @@
     - added a runlabel-based "make heads" wrapper
     - reset baseline focal distance to 1 m; since the fields are now assumed to always be 2m wide and the real focus will be somewhat further than 1 m anyway,
       this shouldn't be spamming warn_focus_in_field flags
+    - added a method to drop labels from result storage
+    - removed unused "inverted_r_sigma" toggle from .fit_focal_traj()
 
 
 0.4.0, 21.10.20:
