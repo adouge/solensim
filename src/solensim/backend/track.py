@@ -52,10 +52,10 @@ class TrackModule():
         self.calc_phi_v = np.vectorize(self.calc_phi)
         self.calc_dphi_v = np.vectorize(self.calc_dphi)
 
-        self.E = 3.5  # default enrgy, placeholder
+        self.E = 3.5  # default energy, placeholder
         self.N = 100
         self.sig_r = 10
-        self.baseline_f = 1.5
+        self.baseline_f = 1
 
 # Astra setup
 
@@ -252,6 +252,13 @@ class TrackModule():
         self.msg("Saving results...")
         data = {"s":s, "zpos":zpos, "parts":parts, "pref":pref}
         self.data[label] = data
+
+    def add_heads(self):
+        label = self.run_label
+        s = self.data[label]["s"]
+        zpos = self.data[label]["zpos"]
+        heads = self.make_heads(s, zpos)
+        self.data[label]["heads"] = heads
 
 ## Focal region estimation
     def get_focal_region(self):
