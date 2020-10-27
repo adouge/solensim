@@ -29,7 +29,7 @@
 *.zip
 
 # old versions archive
-old/*
+old
 
 # latex library file backups
 *.bib.bak
@@ -38,19 +38,20 @@ old/*
 
 # procedural octave remains
 octave-workspace
-
 # compiled python code
 *.pyc
-
 # jupyter trash
-aux/.ipynb_checkpoints/*
-.ipynb_checkpoints/*
+aux/.ipynb_checkpoints
+.ipynb_checkpoints
 
 # Acc101 Presentation & Figures
-tex/Acc101_Prezi/*
-
+tex/Acc101_Prezi
 # Bachelorarbeit
-tex/bachelor/*
+tex/bachelor
+src/ba.py
+tex/progress_reports
+tex/figures
+tex/lib
 
 # untrack the jupyter notebook
 solensim.ipynb
@@ -61,5 +62,6 @@ src/workspace/*
 # Astra:
 # don't track astra executables
 src/plugins/astra/workspace/*
+
 # Manual:
 tex/Astra-Manual_V3.2.pdf
