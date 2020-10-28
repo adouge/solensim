@@ -46,8 +46,7 @@ track = frontend.Tracker(astra)
 track.linked_core = core  # bind core and track together
 print("Tracker initialized as \"track\" (WIP).")
 
-### BA section
+### dev section
 
 from importlib import reload
 import demos
-import bachelor
