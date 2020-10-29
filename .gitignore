@@ -47,10 +47,7 @@ aux/.ipynb_checkpoints
 # Acc101 Presentation & Figures
 tex/Acc101_Prezi
 # Bachelorarbeit
-tex/bachelor
 src/ba.py
-tex/progress_reports
-tex/figures
 tex/lib
 
 # untrack the jupyter notebook
