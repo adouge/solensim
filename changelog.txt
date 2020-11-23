@@ -1,4 +1,6 @@
 0.4.1, WIP:
+
+0.4.1a, 23.11.20: (separated due to long development pause - 23.11.20)
   - Track module:
     - fixed overview run bound definition to account for f within field width
     - reset focal run default step to 0.1 mm - effective maximum sweepable region is thus at 10 cm (max 1000 output files??).
