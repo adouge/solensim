@@ -63,7 +63,7 @@ src/plugins/astra/workspace/generator
 src/plugins/astra/workspace/*.dat
 src/plugins/astra/workspace/*.ini
 src/plugins/astra/workspace/*.in
-src/plugins/astra/workspace/*.run.*
+src/plugins/astra/workspace/run.*
 src/plugins/astra/workspace/NORRAN
 
 
