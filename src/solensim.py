@@ -1,3 +1,4 @@
+"""Solensim main file."""
 #########################################################################
 #    Copyright 2020 Anton Douginets, Andrii Yanovets
 #
@@ -26,14 +27,18 @@ import solensim.frontend as frontend
 from solensim.aux import *
 import scipy.constants as const
 
+# for dev purposes
+from importlib import reload
+import demos
+
 # config
 wrapper.load_ini()
 print("(tried loading config)\n")
 #################
-vstring = "0.4.1"
+vstring = "0.4.2"
 #################
 
-print("solensim v%s solenoid electromagnet lens design tool"%vstring)
+print("solensim v%s solenoid electromagnet lens design tool" % vstring)
 print("========================================")
 
 print("Astra interface initialized as \"astra\"")
@@ -45,7 +50,3 @@ print("Core handle initialized as \"core\" (WIP).")
 track = frontend.Tracker(astra)
 track.linked_core = core  # bind core and track together
 print("Tracker initialized as \"track\" (WIP).")
-
-### dev section
-from importlib import reload
-import demos

@@ -1,3 +1,4 @@
+"""solensim optim module."""
 #########################################################################
 #    Copyright 2020 Anton Douginets
 #    This file is part of solensim.
@@ -24,6 +25,10 @@ from solensim.aux import *
 import solensim.backend.core as core
 import solensim.backend.track as track
 
+
 class OptimModule():
+    """Placeholder."""
+
     def __init__(self):
+        """Init placeholder."""
         pass

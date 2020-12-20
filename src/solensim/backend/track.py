@@ -1,3 +1,4 @@
+"""solensim track module."""
 #########################################################################
 #    Copyright 2020 Anton Douginets
 #    This file is part of solensim.
@@ -25,27 +26,38 @@ import pandas as pd
 from solensim.aux import *
 
 # debug
-#import pysnooper
+# import pysnooper
+
 
 class Model():
+    """Model subblock."""
+
     def __init__(self):
+        """Init model subblock."""
         pass
 
     def off_axis_trajectory(self, z, f, r_min, dxdz, dydz, cos0):
+        """Model off-axis particle."""
         return np.sqrt(r_min**2 + 2*r_min*(z-f)*(cos0*dxdz + np.sqrt(1-cos0**2)*dydz) + (z-f)**2*(dxdz**2 + dydz**2))
 
     def axial_trajectory(self, z, f, drdz):
+        """Model on-axis particle."""
         return np.abs(drdz*(z-f))
 
     def f_expansion(self, r, f, *args):
+        """Model polynomial f expansion."""
         f_real = f
         order = len(args)
         for i in np.arange(order):
             f_real -= r**(2*(order-i))*args[-(i+1)]
         return f_real
 
+
 class TrackModule():
+    """Backend track block."""
+
     def __init__(self, astra_interface):
+        """Init track block."""
         self.astra = astra_interface  # use Astra Frontend, same as the one provided in main script
         self.model = Model()
 
@@ -61,11 +73,12 @@ class TrackModule():
 
     def setup_tracking(self, bounds, step=10):
         """
-            Configure ASTRA to track within bounds=[left, right] with step = step [mm].
-            Defaults: 0, 3m; step 1 cm
-            Intended to follow track.use_field() and precede track.generate_beam(), followed by track.astra.run()
-        """
+        Configure tracking.
 
+        Track within bounds=[left, right] with step = step [mm].
+        Defaults: 0, 3m; step 1 cm
+        Intended to follow track.use_field() and precede track.generate_beam(), followed by track.astra.run()
+        """
         self.msg("Setting up tracking...")
         self.astra.clean()
         unit = step*mm
@@ -78,11 +91,12 @@ class TrackModule():
         zphase = np.ceil((right-left)/unit)
         self.astra.runfile["output"]["zphase"] = zphase
         self.astra.runfile["output"]["zemit"] = zphase
-        self.msg("Tracking in: [%.2f, %.2f] m, %.2f mm step."%(left, right, step))
+        self.msg("Tracking in: [%.2f, %.2f] m, %.2f mm step." % (left, right, step))
         self.astra.update_runfile()
 
     def generate_beam(self, E, N, sig_r, distribution="gauss", twodim=True):
-        self.msg("Generating %.2f MeV, N=%d %s beam; sigma: %.1f mm, 2D - %s"%(E, N, distribution, sig_r, twodim))
+        """Generate beam."""
+        self.msg("Generating %.2f MeV, N=%d %s beam; sigma: %.1f mm, 2D - %s" % (E, N, distribution, sig_r, twodim))
         kinE_MeV = E - const.m_e/const.e*const.c**2/MeV
         self.astra.gen_preset = distribution
         self.astra.genfile["input"]["ref_ekin"] = kinE_MeV
@@ -96,16 +110,12 @@ class TrackModule():
 
 # Astra output processing
     def calc_phi(self, x, y):
-        """
-         Get true angle in [0, 2pi] from cosine and y-coordinate, in uniits of pi (!)
-        """
+        """Get true angle in [0, 2pi] from cosine and y-coordinate, in uniits of pi (!)."""
         phi = np.arctan2(y, x)/np.pi
         return 2 + phi if phi < 0 else phi
 
     def calc_dphi(self, phi2, phi1):
-        """
-        Get phase shift, accounting for cyclicity of phi; assume phis in units of pi, and only rotate in one direction
-        """
+        """Get phase shift, accounting for cyclicity of phi; assume phis in units of pi, and only rotate in one direction."""
         if np.sign(phi2-1) < np.sign(phi1-1):
             return phi2 - phi1 + 2
         else:
@@ -113,44 +123,46 @@ class TrackModule():
 
     def process_states(self, s):
         """
-        Process ASTRA beam state output
-            s, zpos, parts, pref = process_states(s)
+        Process ASTRA beam state output.
+
+        s, zpos, parts, pref = process_states(s)
         returns:
             s - new dataframe (state-sorted)
             zpos - state z-coordinate list,
             parts - particle index list,
             pref - reference particle states
         Does:
-            - add polar coordinates (r, phi) and respective impulses (pr, pphi);
-            - calculates phase change relative to start (turn) and previous state (dphi)
-            -updates particle z, pz, t with ref particle values
-                --> transform into system static relative to field/"lab"; eliminates need for reference particle
-            - drops charge, flag, type columns, but leaves them in pref for redundancy
+        - add polar coordinates (r, phi) and respective impulses (pr, pphi);
+        - calculates phase change relative to start (turn) and previous state (dphi)
+        -updates particle z, pz, t with ref particle values
+            --> transform into system static relative to field/"lab"; eliminates need for reference particle
+        - drops charge, flag, type columns, but leaves them in pref for redundancy
         """
-
         pref = s.query("particle==0")
         N = len(s.index.levels[1])
         s = s.query("particle>0").copy()
 
-        pref_broadcast = pd.concat([pref]*(N-1)).sort_index() # replicate each ref row N-1 times, since the ref particle is out
+        pref_broadcast = pd.concat([pref] * (N - 1)).sort_index()  # replicate each ref row N-1 times, since the ref particle is out
         s.loc[:, "z"] = s.loc[:, "z"].values + pref_broadcast.get("z").values
         s.loc[:, "pz"] = s.loc[:, "pz"].values + pref_broadcast.get("pz").values
         s.loc[:, "t"] = s.loc[:, "t"].values + pref_broadcast.get("t").values
 
         s.loc[:, "r"] = np.sqrt(s["x"].values**2 + s["y"].values**2)
-        s.loc[:, "onaxis"] = s["r"].values==0
+        s.loc[:, "onaxis"] = s["r"].values == 0
 
         phi = self.calc_phi_v(s.get("x").values, s.get("y").values)
         s.loc[:, "phi"] = phi
-        s.loc[:, "pr"] = np.cos(phi*np.pi)*s.loc[:, "px"].values + np.sin(phi*np.pi)*s.loc[:, "py"].values
-        s.loc[:, "pphi"] = - np.sin(phi*np.pi)*s["px"].values + np.cos(phi*np.pi)*s["py"].values
+        s.loc[:, "pr"] = np.cos(phi * np.pi) * s.loc[:, "px"].values + np.sin(
+            phi * np.pi) * s.loc[:, "py"].values
+        s.loc[:, "pphi"] = - np.sin(phi * np.pi) * s["px"].values + np.cos(
+            phi * np.pi) * s["py"].values
 
         zpos = s.index.levels[0]
         z0 = zpos[0]
         s.loc[z0, "turn"] = 0
         s.loc[z0, "dphi"] = 0
         beam_start = s.loc[z0].copy()
-        beam_start_broadcast = pd.concat([beam_start]*(len(zpos)-1))
+        beam_start_broadcast = pd.concat([beam_start] * (len(zpos) - 1))
         zs = zpos[1:]
         z0s = zpos[:-1]
         s.loc[zs, "turn"] = self.calc_dphi_v(s.loc[zs, "phi"].values, beam_start_broadcast.get("phi").values)
@@ -160,60 +172,56 @@ class TrackModule():
         todrop = ["type", "flag", "q"]
         s = s.drop(columns=todrop)
 
-
         return s, zpos, parts, pref
 
     def make_heads(self, s, zpos):
-        """
-            makes some "statistics" on each state
-        """
+        """make some "statistics" on each state."""
         headers = {}
         for z in zpos:
             header = {
-                "z" : z,
-                "r" : s.loc[z, "r"].mean(),
-#                "r_std" : s.loc[z, "r"].std(),
-                "pr" : s.loc[z, "pr"].mean(),
-#                "pr_std" : s.loc[z, "pr"].std(),
-                "pphi" : s.loc[z, "pphi"].mean(),
-#                "pphi_std" : s.loc[z, "pphi"].std(),
-                "dphi" : s.loc[z, "dphi"].mean(),
-#                "dphi_std" : s.loc[z, "dphi"].std(),
-                "turn" : s.loc[z, "turn"].mean(),
-#                "turn_std" : s.loc[z, "turn"].std(),
-
-#                "r_min" : s.loc[z, "r"].min(),
-#                "r_max" : s.loc[z, "r"].max(),
-#                "pr_min" : s.loc[z, "pr"].min(),
-#                "pr_max" : s.loc[z, "pr"].max(),
-#                "pphi_min" : s.loc[z, "pphi"].min(),
-#                "pphi_max" : s.loc[z, "pphi"].max(),
-#                "dphi_min" : s.loc[z, "dphi"].min(),
-#                "dphi_max" : s.loc[z, "dphi"].max(),
-#                "turn_min" : s.loc[z, "turn"].min(),
-#                "turn_max" : s.loc[z, "turn"].max()
+                "z": z,
+                "r": s.loc[z, "r"].mean(),
+                # "r_std" : s.loc[z, "r"].std(),
+                "pr": s.loc[z, "pr"].mean(),
+                # "pr_std" : s.loc[z, "pr"].std(),
+                "pphi": s.loc[z, "pphi"].mean(),
+                # "pphi_std" : s.loc[z, "pphi"].std(),
+                "dphi": s.loc[z, "dphi"].mean(),
+                # "dphi_std" : s.loc[z, "dphi"].std(),
+                "turn": s.loc[z, "turn"].mean(),
+                # "turn_std" : s.loc[z, "turn"].std(),
+                # "r_min" : s.loc[z, "r"].min(),
+                # "r_max" : s.loc[z, "r"].max(),
+                # "pr_min" : s.loc[z, "pr"].min(),
+                # "pr_max" : s.loc[z, "pr"].max(),
+                # "pphi_min" : s.loc[z, "pphi"].min(),
+                # "pphi_max" : s.loc[z, "pphi"].max(),
+                # "dphi_min" : s.loc[z, "dphi"].min(),
+                # "dphi_max" : s.loc[z, "dphi"].max(),
+                # "turn_min" : s.loc[z, "turn"].min(),
+                # "turn_max" : s.loc[z, "turn"].max()
             }
             headers[z] = header
         heads = pd.DataFrame.from_dict(headers).transpose()
         return heads
 
-
-### the "Algorithm" components
-## Init:
+# the "Algorithm" components
+# Init:
     def init_run(self, label, rel_decrement=0):
+        """Initialize new run."""
         message = ">>> Initiating new run at label: %s"
         self.run_label = label
-        self.msg(message%label)
+        self.msg(message % label)
         self.linked_core.sample_field(self.field_z, self.field_Bz)
         F2 = self.linked_core.fint(2)
         f_predict = self.linked_core.get_f(self.E)
-        l = self.linked_core.get_fwhm()
+        fwhm = self.linked_core.get_fwhm()
         self.runs.loc[label, "E"] = self.E
         self.runs.loc[label, "N"] = self.N
         self.runs.loc[label, "sigma_r"] = self.sig_r
         self.runs.loc[label, "rel_decrement"] = rel_decrement
         self.runs.loc[label, "F2"] = F2
-        self.runs.loc[label, "FWHM"] = l
+        self.runs.loc[label, "FWHM"] = fwhm
         self.runs.loc[label, "f_predict"] = f_predict
         if f_predict < self.field_width/2:
             self.msg("[WARN] Predicted focus inside field definition boundary!")

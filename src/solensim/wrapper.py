@@ -1,3 +1,4 @@
+"""solensim wrapper module."""
 #########################################################################
 #    Copyright 2020 Anton Douginets
 #    This file is part of solensim.
@@ -25,19 +26,24 @@ import time
 import pandas as pd
 import numpy as np
 
+
 def test_load_mcode_plugin():
+    """Test."""
     import plugins.mcode.wrapper as mwrapper
     o = mwrapper.OWrapper()
     return o
 
+
 def load_ini():
+    """Load program configuration."""  # TODO: config loading
     wip()
 
+
 class TrackHandle(track.TrackModule):
-    """
-    Interlayer to tracking functionality
-    """
+    """Interlayer to tracking functionality."""
+
     def __init__(self, astra):
+        """Init interlayer."""
         track.TrackModule.__init__(self, astra)
         self.linked_core = None
 
@@ -47,53 +53,61 @@ class TrackHandle(track.TrackModule):
         self._run_ticker = 0
 
     def drop_labels(self, *args):
-        l = len(args)
-        if l==1:
+        """Delete sotred results at labels specified."""
+        L = len(args)
+        if L == 1:
             labels = args[0]
-            self.msg("Dropping label \"%s\" from result DF."%labels)
+            self.msg("Dropping label \"%s\" from result DF." % labels)
             self.data.pop(labels)
         else:
             labels = [*args]
-            self.msg("Dropping %d labels from result DF."%l)
+            self.msg("Dropping %d labels from result DF." % L)
             for label in labels:
                 self.data.pop(label)
         self.runs = self.runs.drop(index=labels)
 
     def resolve_label(self, label):
-        if type(label)==type(None):
+        """Check if label exists and assign a run counter if needed."""
+        if type(label) == type(None):
             lbl = self._run_ticker
         else:
             lbl = label
         return lbl
 
     def init_run(self, rel_decrement, label=None):
+        """Initialize new result entry."""
         if label not in self.runs.index:
             self._run_ticker += 1
         lbl = self.resolve_label(label)
         track.TrackModule.init_run(self, label=lbl, rel_decrement=rel_decrement)
 
-
-    # Interaction with core:
+# Interaction with core:
     def bind_to_core(self, core):
+        """Connect with an instance of calc module."""
         self._linked_core = core
-        if core != None:
+        if core is not None:
             core.register_track_module(self)
+
     def get_link_to_bound_core(self):
+        """Get connected calc module instance."""
         return self._linked_core
+
     linked_core = property(get_link_to_bound_core, bind_to_core)
 
     # Logging:
     def msg(self, msg):
+        """Log msg with caller signature and timestamp."""
         dt = pd.Timestamp.fromtimestamp(time.time())
-        if self.verbose:  print("%s %s :  %s"%(dt.time(), self.trace, msg))
-
+        if self.verbose:
+            print("%s %s :  %s" % (dt.time(), self.trace, msg))
 
     def cut_field_edges(self, Bz):
+        """Cut field edges."""  # TODO: docstring
         if Bz[0] != 0 and Bz[-1] != 0:
             background = np.min(Bz)
             Bz_new = Bz-background
             rel_decrement = background/np.max(Bz)
-            self.msg("Non-zero field edge, making decrement: %.2e relative to max(B_z)"%rel_decrement)
+            self.msg("Non-zero field edge, making decrement: %.2e relative to max(B_z)" % rel_decrement)
             return Bz_new, rel_decrement
         else:
             self.msg("Field seems to cut off on itself, no decrement made.")
@@ -101,6 +115,8 @@ class TrackHandle(track.TrackModule):
 
     def use_field(self, z, Bz, label=None, normalize=False):
         """
+        Select field for furhter handling.
+
         Requirements:
             symmetrical field (Bmax at z=0), ~0 at bounds;
             [z] - m, [Bz] - T
@@ -122,29 +138,34 @@ class TrackHandle(track.TrackModule):
 
     def use_dat(self, file, sep="\t", label=None, normalize=False):
         """
-        Read from file in current dir (temporary)
+        Read from file in current dir (temporary).
+
         Requirements:
             symmetrical field (Bmax at z=0), ~0 at bounds;
             [z] - m, [Bz] - T
         """
-        self.msg("Using field from %s."%file)
+        self.msg("Using field from %s." % file)
         fielddf = pd.read_table(file, names=["z", "Bz"], engine="python", sep=sep)
         z = fielddf["z"].values
         Bz = fielddf["Bz"].values
         self.use_field(z, Bz, label=label, normalize=normalize)
 
+
 class CoreHandle(core.Core):
-    """
-    Pre-optim core interlayer
-    """
+    """Pre-optim core interlayer."""
+
     def __init__(self):
+        """Init the interlayer."""
         core.Core.__init__(self)
         self.track = None
 
     def register_track_module(self, track_module):
+        """Connect to an instance of track module."""
         self.track = track_module
 
     # Logging:
     def msg(self, msg):
+        """Log msg with caller signature and timestamp."""
         dt = pd.Timestamp.fromtimestamp(time.time())
-        if self.verbose:  print("%s %s : %s"%(dt.time(), self.trace, msg))
+        if self.verbose:
+            print("%s %s : %s" % (dt.time(), self.trace, msg))
