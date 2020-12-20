@@ -57,8 +57,19 @@ solensim.ipynb
 src/workspace/*
 
 # Astra:
-# don't track astra executables
-src/plugins/astra/workspace/*
+# don't track astra executables & workfiles
+src/plugins/astra/workspace/Astra
+src/plugins/astra/workspace/generator
+src/plugins/astra/workspace/*.dat
+src/plugins/astra/workspace/*.ini
+src/plugins/astra/workspace/*.in
+src/plugins/astra/workspace/*.run.*
+src/plugins/astra/workspace/NORRAN
+
+
+
+
+
 
 # Manual:
 tex/Astra-Manual_V3.2.pdf
