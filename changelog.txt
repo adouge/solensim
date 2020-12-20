@@ -1,6 +1,6 @@
-0.4.1, WIP:
+0.4.2, WIP:
 
-0.4.1a, 23.11.20: (separated due to long development pause - 23.11.20)
+0.4.1, 23.11.20: (separated due to long development pause - 23.11.20)
   - Track module:
     - fixed overview run bound definition to account for f within field width
     - reset focal run default step to 0.1 mm - effective maximum sweepable region is thus at 10 cm (max 1000 output files??).
@@ -17,7 +17,7 @@
 0.4.0, 21.10.20:
   - General:
     - Updated planning structures (project boards, milestones) to better reflect current perspective
-    - renamed overview track preset to default, assuming potential tweaking by relevant routines; default max Runge-Kutta step set to 0.1 ps
+    - renamed overview track preset to default, assuming potential tweaking by relevant routines; default max Runge-Kutta step set to 0.1 picosecond
     - Added trace strings to modules' messages
     - renamed units.py to aux.py, added replacement ceil() and floor() functions that allow "decimal spacing", adapted to the needs here
     - Ditched ASTRA's field smoothing in favor of a "rough" solution - just cut off "background" field at definition region's range.
@@ -29,12 +29,12 @@
     - renamed field storage file from solenoid.dat to field.dat
 
   - Track presets:
-    - Generator presets - left only uniform (ex line) and gauss (now flattened, max. 2D). Ring, b/c ne meshayet.
+    - Generator presets - left only uniform (ex line) and Gaussian (now flattened, max. 2D). Ring, b/c it doesn't bother.
     - Run configuration - disabled ASTRA's field smoothing
 
   - Track module:
     - on the frontend:
-      - finalized the felddurchgang plot
+      - finalised the felddurchgang plot
       - adapted the plots to new module structure
       - added fixed axes to focal fit check plot, swapped draw order around to have data in foreground
     - overhauled previous code towards modularity using run data storage & labeling
@@ -61,7 +61,7 @@
     - added a method to calculate normalization/scaling factor for bringing a field to a set f at a set E
 
   - Wrapper:
-    - added result storage and (auto)labeling tricks to track wrapper, inted to use it further;
+    - added result storage and (auto)labeling tricks to track wrapper, instead to use it further;
       concept - one field, one "DB" entry
 
   - Documentation:
@@ -80,7 +80,7 @@
     - Decided that using 1-D lines is better than 2-D carpets, in terms of header info accuracy
 
   - frontend:
-    - updated ASTRA interface's helptext, default presets
+    - updated ASTRA interface's help text, default presets
     - ASTRA handle cleans workspace upon initiation
 
   - ASTRA interface:
@@ -92,9 +92,9 @@
       Plan to use it to incrementally add data via subroutines.
 
   - track module:
-    - added access to astra's read/write field methods (w/ "logging")
-    - implemented an overview routine which, for a given energy / generator preset, runs astra,
-      loads and pre-processes state data, estimates focus location, gives maximum larmor angle,
+    - added access to ASTRA's read/write field methods (w/ "logging")
+    - implemented an overview routine which, for a given energy / generator preset, runs ASTRA,
+      loads and pre-processes state data, estimates focus location, gives maximum Larmor angle,
       and neatly saves everything with a label of choice (or counter).
     - a focal run - sweeps the focal region obtained in overview, fits particle trajectories to model and obtains the focal point of each
     - on the frontend:
@@ -107,13 +107,13 @@
     - .fit_to_model() can now also take a sigma parameter to be passed to curve_fit()
 
   - general:
-    - Astra interface's helptext no longer greets the user upon running the main file
+    - ASTRA interface's help text no longer greets the user upon running the main file
 
 
 0.3.4, 04.10.20:
   - ASTRA plugin:
-    - rewrote .read_states() to accomodate for any zphase (simple trick) and zstart/zstop
-    - added warning to helptext about .clean() possibly overwriting unsaved runfiles
+    - rewrote .read_states() to accommodate for any zphase (simple trick) and zstart/zstop
+    - added warning to help text about .clean() possibly overwriting unsaved run files
 
   - Tracking presets:
     - default now takes beam states every 0.01 m, assuming field 2 m wide @ z = 1m (particles immediately fly into the field);
@@ -149,10 +149,10 @@
     - renamed .get_field() to .read_field()
     - introduced .field field - .read_field() now also stores the field aside from returning z, Bz,
         and write_field analogously writes it to astra.field
-    - expanded helptext to describe the handle's data fields
+    - expanded help text to describe the handle's data fields
     - fixed read_zemit and trajectories not working (kek blunder)
     - temporarily disabled read_zemit, because no clue what the numbers mean, yet
-    - .read_screens rewritten as .read_states - not dependent on runfile, flexible (regex & dataframes), and with initial beam state as well
+    - .read_screens rewritten as .read_states - not dependent on run file, flexible (regex & dataframes), and with initial beam state as well
     - added .read_last to only grab the first and last beam states only
     - .workspace() now sorts its output
     - won't say final (again), but looks like it (kek)
@@ -160,11 +160,11 @@
   - Tracking presets:
     - ring preset: change default radius from 3mm to 1 mm; - 3 MeV Ekin, 10% sigma, uniform E distribution
     - added line preset: uniform line from -10 to 10 mm (sigmas); monochromatic
-    - default beam + gen: gaussian bundle, 1x1x3mm (x,y,z); 3 MeV Ekin 1 % sigma; nemit_x,y 1
-    - default runfile: disabled ref output; track from 0 to 4 m, state image every 10 cm
+    - default beam + gen: Gaussian bundle, 1x1x3mm (x,y,z); 3 MeV Ekin 1 % sigma; nemit_x,y 1
+    - default run file: disabled ref output; track from 0 to 4 m, state image every 10 cm
 
   - Track module:
-    - can do state trafo to polar
+    - can do state transform to polar
     - correct phi and delta phi calculations
 
   - Demos:
@@ -174,7 +174,7 @@
 
 0.3.2, 12.09.20:
   - ASTRA plugin:
-    - wrote a helptext documenting the ASTRA plugin
+    - wrote a help text documenting the ASTRA plugin
     - changing track preset no longer tries to load the corresponding beam
     - changed interface formatting a bit
     - added ability to write beam.ini from beam dataframe
@@ -186,7 +186,7 @@
 
   - Tracking presets:
     - added cross (5mm), square box (5mm), non-monochromatic (10% sigma) 3 mm 3 MeV ring
-    - turned off field scaling in default runfile
+    - turned off field scaling in default run file
 
   - General:
     - main script is "production-ready", for what it can do now;
@@ -207,13 +207,13 @@
   - remove old code (I still have it, just to declutter)
   - added a placeholder .ini file for the future
   - Worked up an ASTRA plugin/interface, see associated v0.3 issues
-  - Reogranized the docs a bit
+  - Reorganized the docs a bit
   - Realized the grave need for documentation.
 
 0.2.1, 25.08.20:
   - restructure code for future feature expansion
   - lay "structure" for MATLAB, Astra plugins
-  - update build script to accomodate new changes
+  - update build script to accommodate new changes
   - remove circular dependency of wrapper/frontend (FE calls method of W which calls methods added in FE)
 
 0.2.0, Foundation: start of change logging
