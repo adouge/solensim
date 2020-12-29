@@ -80,6 +80,9 @@ class TrackHandle(track.TrackModule):
             self._run_ticker += 1
         lbl = self.resolve_label(label)
         track.TrackModule.init_run(self, label=lbl, rel_decrement=rel_decrement)
+        self.data[label] = {}
+        self.data[label]["field_z"] = self.field_z
+        self.data[label]["field_Bz"] = self.field_Bz
 
 # Interaction with core:
     def bind_to_core(self, core):
@@ -108,7 +111,7 @@ class TrackHandle(track.TrackModule):
             Bz_new = Bz-background
             rel_decrement = background/np.max(Bz)
             self.msg("Non-zero field edge, making decrement: %.2e relative to max(B_z)" % rel_decrement)
-            return Bz_new, rel_decrement
+            return Bz_new, rel_decrement  # FIXME: cutoff
         else:
             self.msg("Field seems to cut off on itself, no decrement made.")
             return Bz, 0

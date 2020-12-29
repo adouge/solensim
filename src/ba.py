@@ -1,12 +1,133 @@
 """BA scripts."""
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from solensim.aux import *
 import scipy.constants as const
 from scipy.optimize import curve_fit
+import pysnooper
 
-def larmor_raw(track, core, compute=False):
+def second_moment(a,b):
+    n = len(a)
+    return np.sum(a*b)/n - np.sum(a)*np.sum(b)/n**2
+
+#@pysnooper.snoop()
+def make_emits(track, core, label):
+    m_e = const.m_e*const.c**2/const.e
+    s = track.data[label]["s"].copy()
+    zpos = track.data[label]["zpos"]
+    emittances = pd.DataFrame(columns=["z", "eps_x", "eps_y", "eps_z", "eps_z_rel"])
+    indices = ["x", "y", "z", "z_rel"]
+    for z in zpos:
+        b = s.loc[z].copy()
+        #zref = track.data[label]["pref"].loc[(z, 0), "z"]
+        #zref = np.mean(b["z"])
+        #pzref = np.mean(b["pz"])
+        for index in indices:
+            i = b[index].values
+            pi = b["p"+index].values
+            m1 = second_moment(i, i)
+            m2 = second_moment(pi, pi)
+            m3 = second_moment(i, pi)
+            eps2 = m1*m2 - m3**2
+            if eps2 < 0:
+                eps = 0
+            else:
+                eps = np.sqrt(eps2)#/m_e
+            emittances.loc[z, "eps_"+index] = eps
+            emittances.loc[z, index+"_ms"] = m1#np.sqrt(m1)
+            emittances.loc[z, "p"+index+"_ms"] = m2#np.sqrt(m2)
+            emittances.loc[z, "cov2_"+index] = m3**2
+        emittances.loc[z, "z"] = z
+        track.data[label]["eps"] = emittances
+
+def plot_z_emits(track, core, labels):
+    plt.figure(figsize=(9,9))
+    color = {
+        0: "r",
+        1: "g",
+        2: "b",
+        3: "k"
+    }
+    center = 0
+    shift = 0
+    counter = 0
+    for label in labels:
+        eps = track.data[label]["eps"]
+        maxe = (eps["eps_z_rel"].max())
+        z_sol = track.runs.loc[label, "z_solenoid"]
+        if z_sol == center:
+            shift += 0.5
+        center = z_sol
+        z = track.data[label]["field_z"] + z_sol
+        Bz = track.data[label]["field_Bz"]
+
+        Bz = np.diff(Bz)/np.diff(z)
+        z = z[1:] - np.diff(z)
+
+        Bz *= maxe/np.max(Bz)/2
+        plt.plot((eps["z"]+shift)*100, eps["eps_z_rel"].values, "-%s"%color[counter], label=label)
+        plt.plot((z+shift)*100, -Bz, "--%s"%color[counter])
+        counter += 1
+    plt.xlabel("Arbitrary z position [cm]", fontsize=20)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.ylabel("RMS z-Emittance [pi*keV*mm]", fontsize=20)
+    plt.legend(loc="upper right", fontsize=20)
+    plt.axis([100,200,-0.0003,0.0006])
+    plt.grid()
+    plt.show()
+
+
+def plot_all_emits(track, core, label):
+    plt.figure(figsize=(9,9))
+    color = {
+        0: "r",
+        1: "g",
+        2: "b",
+        3: "k"
+    }
+    eps = track.data[label]["eps"]
+    maxe = (eps["eps_z"].max())
+    z_sol = track.runs.loc[label, "z_solenoid"]
+    z = track.data[label]["field_z"] + z_sol
+    Bz = track.data[label]["field_Bz"]
+    Bz *= maxe/np.max(Bz)/2
+    for i in ["x", "y", "z"]:
+        plt.plot((eps["z"])*100, eps["eps_z"].values, "-%s"%color[counter], label=label)
+
+    plt.plot((z)*100, -Bz, "--k")
+    plt.xlabel("Arbitrary z position [cm]", fontsize=20)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.ylabel("Norm. RMS Emittance [keV*mm]", fontsize=20)
+    plt.legend(loc="upper right", fontsize=20)
+    plt.show()
+
+
+
+
+def focusing(track, core, label, compute=False):
+    if compute:
+        track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
+        track.overview_run()
+        track.get_focal_region()
+        try:
+            track.focal_run()
+        except:
+            try:
+                track.focal_run(step=0.15)
+            except:
+                track.focal_run(step=0.2)
+        track.fit_focal_traj()
+        track.fit_cs_expansion()
+        track.check_felddurchgang(label=lbl, title="Smoothed, cut off wide field with soft edge")
+        track.check_ray_fitting(label=lbl)
+
+
+
+def larmor(track, core, compute=False):
     """kek."""
     labels_soft = [
         "thin_soft",
@@ -93,7 +214,7 @@ def larmor_raw(track, core, compute=False):
         y = s.loc[idx, "turn"].values
         x = s.loc[0, "r"].values
         bounds = [[0,0],[np.inf,phi0]]
-        popt, pcov = curve_fit(parabola, xdata=x, ydata=y, p0=[0, phi0], bounds=bounds, sigma=x**3)
+        popt, pcov = curve_fit(parabola, xdata=x, ydata=y, p0=[0, phi0], bounds=bounds, sigma=x**4)
         As[label] = popt[0]
         Bs[label] = popt[1]
         #pots[label] = popt[2]
@@ -116,16 +237,13 @@ def larmor_raw(track, core, compute=False):
         ax.set_xlabel("Initial radial position [mm]", fontsize=28)
         ax.plot(0,0,"-k",label="Expansion fit")
         ax.legend(loc="upper left", fontsize=24)
-
+        ax.grid()
+        #ax.plot([0,30], [0,0], "--k")
     #plt.axis([0,31,-0.025,1.025])
-    ax1.set_ylabel("Deviation from PhiL @r=0 [%]", fontsize=28)
+    ax1.set_ylabel("Deviation from min. observed PhiL [%]", fontsize=28)
     ax1.set_title("Soft edge", fontsize=24)
     ax2.set_title("Sharp edge", fontsize=24)
     plt.show()
-    print(As)
-    print(Bs)
-    print(phis)
-    print(pots)
 
     plt.figure(figsize=(16, 5))
     plt.title(

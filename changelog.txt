@@ -1,4 +1,15 @@
 0.4.2, WIP:
+  - General:
+    - tried out linting the code; boy is it a mess. Addressed some formatting issues; the code needs an audit & rewrite.
+    - started tracking sample fields
+    - added the six sample fields
+    - started tracking BA stuff again (scripts), for safety and future incorporation
+    - moved non-solensim-specific doc sources to private .bib file (not tracked)
+  - Core module:
+    - added a frontend method to plot a field.
+  - Track module:
+    - change default normalisation f to 1.25 m.
+    - use_field() now initialises also the data container, storing the field used.
 
 0.4.1, 23.11.20: (separated due to long development pause - 23.11.20)
   - Track module:

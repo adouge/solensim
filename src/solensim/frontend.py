@@ -17,6 +17,7 @@
 #########################################################################
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from os import listdir
 import os.path
@@ -41,6 +42,62 @@ class Core(wrapper.CoreHandle):
 
     def help(self):
         print(self._helptext)
+
+    def show_dat(self, file, sep="\t", label="On-axis field", normalize=False, target=[1, 3.5]):
+        field_df = pd.read_table(
+            file,
+            names=["z", "Bz"],
+            engine="python",
+            sep=sep)
+        z = field_df["z"].values
+        Bz = field_df["Bz"].values
+        self.show_field(z, Bz, label=label, normalize=normalize, target=target)
+
+    def show_field(self, z, Bz, label="On-axis field", normalize=False, target=[1.25, 3.5]):
+        plt.figure(figsize=(9, 6))
+        self.sample_field(z, Bz)
+        self.E = target[1]
+        if normalize:
+            k = self.get_scale_factor(*target)
+            print("B_0 [mT]: %.3f" % (k/mm))
+            Bz2 = Bz * k
+            lbl = label# + ", normalized"
+            self.sample_field(z, Bz2)
+        else:
+            lbl = label
+        fwhm = self.get_fwhm()/mm
+        F2 = self.fint(2)/mm**2
+        F1 = self.fint(1)/mm
+        focal = self.get_f(self.E)
+        zmax = np.max(z)
+        self.bcalc_zmax = zmax
+        zplot = self.get_z()
+        Bzplot = self.get_Bz()/mm
+        plt.plot(zplot*100, Bzplot, "-k")
+        bzmax = np.max(Bzplot)
+        plt.axis([-zmax*100, zmax*100, 0, 1.1*bzmax])
+        disp1 = "f: %.2f m @%.1f MeV" % (focal, self.E)
+        disp2 = "FWHM: %.0f mm" % fwhm
+        disp4 = "F2: %.1f m*mT2" % F2
+        disp3 = "F1: %.2f m*mT  " % F1
+        disp_left = "%s\n%s" % (disp1, disp2)
+        disp_right = "%s\n%s" % (disp3, disp4)
+        plt.text(
+            -0.95*zmax*100, 1.075*bzmax, disp_left,
+            horizontalalignment="left",
+            verticalalignment="top",
+            fontsize=20)
+        plt.text(
+            0.95*zmax*100, 1.075*bzmax, disp_right,
+            horizontalalignment="right",
+            verticalalignment="top",
+            fontsize=20)
+        plt.xlabel("On-axis position [cm]", fontsize=24)
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.ylabel("On-axis field [mT]", fontsize=24)
+        plt.title(lbl, fontsize=24)
+        plt.show()
 
 
 class Tracker(wrapper.TrackHandle):
@@ -67,7 +124,7 @@ class Tracker(wrapper.TrackHandle):
         if lbl not in self.runs.index:
             raise(ValueError("Unknown label: %s"%lbl))
         self.msg("Illustrating trajectory fitting at focal region at label %s"%lbl)
-        plt.figure(figsize=(9,9))
+        plt.figure(figsize=(18,12))
         p = self.data[lbl]["s_f"].swaplevel()
         z_solenoid = self.runs.loc[lbl, "z_solenoid"]
         p = p.query("z>@z_solenoid")
@@ -85,12 +142,15 @@ class Tracker(wrapper.TrackHandle):
             for part in parts:
                 plt.plot(z, self.model.off_axis_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g")
             plt.plot(z, self.model.off_axis_trajectory(z, fits.loc[part, "z_f"], fits.loc[part, "r_min"], fits.loc[part, "dxdz"], fits.loc[part, "dydz"], fits.loc[part, "cos0"])/mm, "--g", label="Approx. with offset")
-        plt.xlabel("Axial position [m]", fontsize=16)
-        plt.ylabel("Radial position [mm]", fontsize=16)
+        plt.xlabel("Axial position [m]", fontsize=32)
+        plt.xticks(fontsize=24)
+        plt.yticks(fontsize=24)
+        plt.ylabel("Radial position [mm]", fontsize=32)
         plt.axis([self.runs.loc[lbl, "z_focal_left"], self.runs.loc[lbl, "z_focal_right"], 0, p.get("r").max()*1.05/mm])
-        plt.legend(loc="upper center", fontsize=16)
+        plt.legend(loc="upper center", fontsize=32)
+        plt.title("Focal region \"zoom-in\"", fontsize=24)
 
-    def check_felddurchgang(self, label=None):
+    def check_felddurchgang(self, label=None, title=""):
         lbl = self.resolve_label(label)
         if lbl not in self.runs.index:
             raise(ValueError("Unknown label: %s"%lbl))
@@ -105,17 +165,20 @@ class Tracker(wrapper.TrackHandle):
             self.data[lbl]["heads"] = heads
             self.runs.loc[lbl, "heads"] = True
 
-        plt.figure(figsize=(9,9))
-        plt.plot(heads.get("z").values, heads.get("r").values*1/heads["r"].max(), "-k", label="Avg. beam radius [max(r)]")
+        plt.figure(figsize=(18,12))
+        plt.title(title, fontsize=24)
+        plt.plot(heads.get("z").values, heads.get("r").values*1/heads["r"].max(), "-k", label="Avg. radial position [max(r)]")
         plt.plot(heads.get("z").values, heads.get("pr").values*1/heads["pr"].abs().max(), "-r", label="Avg. radial momentum [max(pr)]")
         plt.plot(heads.get("z").values, heads.get("pphi").values*1/heads["pr"].abs().max(), "-b", label="Avg. rot. momentum [max(pr)]")
-        plt.plot(heads.get("z").values, heads.get("turn").values, "-g", label="Avg. cum. turn [rad/pi]")
+        plt.plot(heads.get("z").values, heads.get("turn").values, "-g", label="Avg. Larmor angle [rad/pi]")
         z, Bz = self.astra.read_field()
-        plt.plot(z+z_solenoid, Bz/np.max(Bz), "--k", label="Axial field component [max(Bz)]")
-        plt.xlabel("Axial position [m]", fontsize=16)
-        plt.ylabel("Arbitrary units", fontsize=16)
+        plt.plot(z+z_solenoid, Bz/np.max(Bz), "--k", label="On-axis field [max(Bz)]")
+        plt.xlabel("Axial position [m]", fontsize=32)
+        plt.ylabel("Arbitrary units", fontsize=32)
+        plt.xticks(fontsize=24)
+        plt.yticks(fontsize=24)
         plt.axis([heads["z"].min(), heads["z"].max(), -1, np.max((2, heads["pphi"].abs().max()/heads["pr"].abs().max()))])
-        plt.legend(loc="best", fontsize=14)
+        plt.legend(loc="best", fontsize=24)
         plt.grid()
         plt.show()
 

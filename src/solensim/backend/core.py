@@ -19,15 +19,14 @@
 
 import scipy.constants as const
 from numpy.lib.scimath import sqrt as csqrt
-from numpy.lib.scimath import power as cpow
 import scipy.integrate as integrate
 from scipy.misc import derivative
 import scipy.optimize as opt
 import scipy.interpolate as interpolate
 import numpy as np
 
-from solensim.aux import *
-import solensim.backend.track as track
+from solensim.aux import mm, MeV
+# import solensim.backend.track as track
 
 
 class Model():
@@ -37,6 +36,7 @@ class Model():
         """Init the model subblock."""
         self.field = {
             "twoloop": self.twoloop,
+            "biswas": self.biswas,
             "interpol": self.data_interpol
         }
         self.linked_core = linked_core
@@ -58,6 +58,10 @@ class Model():
     def data_interpol(self, z, p="Unused"):
         """Get field from stored interpolation."""
         return self.linked_core.interpol_field(z)
+
+    def biswas(self, z, p):
+        Bmax, a, n = p
+        return Bmax/(1 + (z/a)**n)
 
 # Beam-related
     def impuls_SI(self, E):

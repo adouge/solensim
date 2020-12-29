@@ -1,6 +1,8 @@
 &input
     add = .false.
     c_sig_z = 0.0
+    c_sig_x = 3
+    c_sig_y = 3
     cathode = .false.
     cor_ekin = 0.0
     cor_px = 0.0
@@ -18,13 +20,13 @@
     probe = .false.
     q_total = 1.602176634e-08
     ref_ekin = 3.0
-    ref_zpos = 0.0
     sig_ekin = 0
+    ref_zpos = 0.0
     sig_px = 0.0
     sig_py = 0.0
-    sig_x = 10
+    sig_x = 0
     sig_y = 0.0
-    sig_z = 0.0
+    sig_z = 1.0
     species = 'electrons'
     type = 'standard'
 /

@@ -18,12 +18,11 @@
 #########################################################################
 
 import scipy.constants as const
-import scipy.signal as signal
 import scipy.optimize as opt
 import numpy as np
 import pandas as pd
 
-from solensim.aux import *
+from solensim.aux import ceil, mm, cm, MeV, floor
 
 # debug
 # import pysnooper
@@ -65,13 +64,13 @@ class TrackModule():
         self.calc_dphi_v = np.vectorize(self.calc_dphi)
 
         self.E = 3.5  # default energy, placeholder
-        self.N = 100
+        self.N = 250
         self.sig_r = 10
-        self.baseline_f = 1
+        self.baseline_f = 1.25
 
 # Astra setup
 
-    def setup_tracking(self, bounds, step=10):
+    def setup_tracking(self, bounds=[0, 3], step=10):
         """
         Configure tracking.
 
@@ -82,7 +81,7 @@ class TrackModule():
         self.msg("Setting up tracking...")
         self.astra.clean()
         unit = step*mm
-        self.z_solenoid = ceil(self.field_width/2, unit)
+        self.z_solenoid = ceil(self.field_width/2, unit) + 0.25  # INFO: add a safety margin of 25 cm on the left
         self.astra.runfile["solenoid"]["s_pos"] = self.z_solenoid
         left = floor(bounds[0], unit)
         right = ceil(bounds[1], unit)
@@ -143,6 +142,7 @@ class TrackModule():
         s = s.query("particle>0").copy()
 
         pref_broadcast = pd.concat([pref] * (N - 1)).sort_index()  # replicate each ref row N-1 times, since the ref particle is out
+        s.loc[:, ["z_rel", "pz_rel"]] = s.loc[:, ["z", "pz"]].values
         s.loc[:, "z"] = s.loc[:, "z"].values + pref_broadcast.get("z").values
         s.loc[:, "pz"] = s.loc[:, "pz"].values + pref_broadcast.get("pz").values
         s.loc[:, "t"] = s.loc[:, "t"].values + pref_broadcast.get("t").values
@@ -227,7 +227,7 @@ class TrackModule():
             self.msg("[WARN] Predicted focus inside field definition boundary!")
             self.runs.loc[label, "warn_focus_in_field"] = True
         self.msg("F2: %.3f mT^2"%(F2/mm**2))
-        self.msg("FWHM: %.2f cm"%(l/cm))
+        self.msg("FWHM: %.2f cm" % (fwhm/cm))
         self.msg("Predicted focal length for %.2f MeV: %.2f cm"%(self.E, f_predict/cm))
 
 
@@ -242,8 +242,8 @@ class TrackModule():
         sig_r = self.runs.loc[label, "sigma_r"]
         self.msg(">>> at %s: Performing overview tracking of %d electrons, E=%.2f"%(label, N, E))
         self.runs.loc[label, "field_width"] = self.field_width
-        right_margin = np.max([self.runs.loc[label, "f_predict"], self.field_width/2])
-        bounds = [0, self.field_width/2 + right_margin+0.5]
+        right_margin = np.max([self.runs.loc[label, "f_predict"], self.field_width/2+0.25])
+        bounds = [0, self.field_width/2+0.25 + right_margin+0.5]
         self.setup_tracking(bounds, step=step)
         self.runs.loc[label, "z_solenoid"] = self.z_solenoid
         self.runs.loc[label, "step_overview"] = step
@@ -259,7 +259,8 @@ class TrackModule():
 
         self.msg("Saving results...")
         data = {"s":s, "zpos":zpos, "parts":parts, "pref":pref}
-        self.data[label] = data
+        for key in data.keys():
+            self.data[label][key] = data[key]
 
     def add_heads(self):
         label = self.run_label
