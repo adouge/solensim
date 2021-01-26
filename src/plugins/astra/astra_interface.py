@@ -209,6 +209,10 @@ class Core():
 # Column headers:
     _beam_labels = ["x", "y", "z", "px", "py", "pz", "t", "q", "type", "flag"]
     _zemit_labels = ["z", "t", "E", "zrms", "dErms", "epszrms", "z*dEbar/dz"]
+    _tremit_labels = {
+        "X": ["z", "t", "x_bar", "x_rms", "slope_x_rms", "eps_x_nrms", "x*slope_x_bar"],
+        "Y": ["z", "t", "y_bar", "y_rms", "slope_y_rms", "eps_y_nrms", "y*slope_y_bar"]
+    }
     _tracking_labels = ["n", "flag", "z", "x", "y", "Fz", "Fx", "Fy"]
 # Beam:
     def get_beam(self):
@@ -262,6 +266,15 @@ class Core():
         path = os.path.join(self._workdir, "run.Zemit.001")
         zemit = pd.read_table(path, names=self._zemit_labels, skipinitialspace=True, sep=" +", engine="python")
         return zemit
+
+    def read_tremit(self):
+        coords = ["X", "Y"]
+        tremits = {}
+        for coord in coords:
+            path = os.path.join(self._workdir, "run.%semit.001" % coord)
+            emit = pd.read_table(path, names=self._tremit_labels[coord], skipinitialspace=True, sep=" +", engine="python")
+            tremits[coord] = emit.copy()
+        return tremits
 
     def read_trajectories(self):
         path = os.path.join(self._workdir, "run.track.001")

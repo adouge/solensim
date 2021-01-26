@@ -76,7 +76,7 @@ class Core(wrapper.CoreHandle):
         plt.plot(zplot*100, Bzplot, "-k")
         bzmax = np.max(Bzplot)
         plt.axis([-zmax*100, zmax*100, 0, 1.1*bzmax])
-        disp1 = "f: %.2f m @%.1f MeV" % (focal, self.E)
+        disp1 = "f: %.2f m @ %.1f MeV" % (focal, self.E)
         disp2 = "FWHM: %.0f mm" % fwhm
         disp4 = "F2: %.1f m*mT2" % F2
         disp3 = "F1: %.2f m*mT  " % F1

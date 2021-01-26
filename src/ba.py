@@ -1,12 +1,67 @@
 """BA scripts."""
 
 import numpy as np
+import numpy.linalg as lina
 import pandas as pd
 import matplotlib.pyplot as plt
 from solensim.aux import *
 import scipy.constants as const
 from scipy.optimize import curve_fit
-import pysnooper
+#import pysnooper
+
+def generate_field(p, zmax, title, core, f=1.25, E=3.5):
+    core.FM = "biswas"
+    core.bcalc_zmax = zmax
+    z = core.get_z()
+    Bz = core.get_Bz(p)
+    core.sample_field(z, Bz)
+    Bz *= core.get_scale_factor(f, E)
+    maxB = np.max(Bz)*1000
+    maxZ = zmax*100
+    core.sample_field(z, Bz)
+    FWHM = core.get_fwhm()*1000
+    F1 = core.fint(1)*10**3
+    F2 = core.fint(2)*10**6
+    plt.figure(figsize=(8, 5))
+    plt.title(title, fontsize=24)
+    plt.plot(z*100, Bz*1000, "-k")
+    plt.axis([-maxZ, maxZ, 0, 1.1*maxB])
+    plt.xlabel("On-axis position [cm]", fontsize=22)
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
+    plt.ylabel("On-axis field [mT]", fontsize=22)
+    lefttext = "f: %.2f @ %.1f MeV\nFWHM: %.0f mm" % (f, E, FWHM)
+    righttext = "F1: %.2f m*mT  \nF2: %.1f m*mT2" % (F1, F2)
+    plt.text(-0.95*maxZ, maxB*1.05, lefttext, fontsize=20, verticalalignment="top", horizontalalignment="left")
+    plt.text(0.95*maxZ, maxB*1.05, righttext, fontsize=20, verticalalignment="top", horizontalalignment="right")
+    plt.show()
+    field = pd.DataFrame(np.array([z, Bz]).transpose(), columns=["z", "Bz"])
+    return field
+
+def show_field(z, Bz, title, core, f=1.25, E=3.5):
+    core.sample_field(z, Bz)
+    Bz2 = Bz*core.get_scale_factor(f, E)
+    maxB = np.max(Bz2)*1000
+    maxZ = np.max(z)*100
+    core.sample_field(z, Bz2)
+    FWHM = core.get_fwhm()*1000
+    F1 = core.fint(1)*10**3
+    F2 = core.fint(2)*10**6
+    plt.figure(figsize=(8, 5))
+    plt.title(title, fontsize=24)
+    plt.plot(z*100, Bz2*1000, "-k")
+    plt.axis([-maxZ, maxZ, 0, 1.1*maxB])
+    plt.xlabel("On-axis position [cm]", fontsize=22)
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
+    plt.ylabel("On-axis field [mT]", fontsize=22)
+    lefttext = "f: %.2f @ %.1f MeV\nFWHM: %.0f mm" % (f, E, FWHM)
+    righttext = "F1: %.2f m*mT  \nF2: %.1f m*mT2" % (F1, F2)
+    plt.text(-0.95*maxZ, maxB*1.05, lefttext, fontsize=20, verticalalignment="top", horizontalalignment="left")
+    plt.text(0.95*maxZ, maxB*1.05, righttext, fontsize=20, verticalalignment="top", horizontalalignment="right")
+    plt.show()
+    field = pd.DataFrame(np.array([z, Bz2]).transpose(), columns=["z", "Bz"])
+    return field
 
 def second_moment(a,b):
     n = len(a)
@@ -17,28 +72,29 @@ def make_emits(track, core, label):
     m_e = const.m_e*const.c**2/const.e
     s = track.data[label]["s"].copy()
     zpos = track.data[label]["zpos"]
-    emittances = pd.DataFrame(columns=["z", "eps_x", "eps_y", "eps_z", "eps_z_rel"])
-    indices = ["x", "y", "z", "z_rel"]
+    emittances = pd.DataFrame(columns=["z", "eps_x", "eps_y"])
+    indices = ["x", "y"]
     for z in zpos:
         b = s.loc[z].copy()
         #zref = track.data[label]["pref"].loc[(z, 0), "z"]
         #zref = np.mean(b["z"])
         #pzref = np.mean(b["pz"])
         for index in indices:
-            i = b[index].values
-            pi = b["p"+index].values
-            m1 = second_moment(i, i)
-            m2 = second_moment(pi, pi)
-            m3 = second_moment(i, pi)
-            eps2 = m1*m2 - m3**2
-            if eps2 < 0:
-                eps = 0
-            else:
-                eps = np.sqrt(eps2)#/m_e
+            i = b[index].values.astype(np.float64)
+            i -= i.mean()
+            pi = b["p"+index].values.astype(np.float64)
+#            m1 = second_moment(i, i)
+#            m2 = second_moment(pi, pi)
+#            m3 = second_moment(i, pi)
+#            eps2 = m1*m2 - m3**2
+            cov = np.cov(i, pi)
+#            eps2 = cov[0,0]*cov[1,1]-cov[0,1]*cov[1,0]
+            eps2 = lina.det(cov)
+            eps = np.sqrt(eps2)/m_e
             emittances.loc[z, "eps_"+index] = eps
-            emittances.loc[z, index+"_ms"] = m1#np.sqrt(m1)
-            emittances.loc[z, "p"+index+"_ms"] = m2#np.sqrt(m2)
-            emittances.loc[z, "cov2_"+index] = m3**2
+#            emittances.loc[z, index+"_ms"] = m1#np.sqrt(m1)
+#            emittances.loc[z, "p"+index+"_ms"] = m2#np.sqrt(m2)
+#            emittances.loc[z, "cov2_"+index] = m3**2
         emittances.loc[z, "z"] = z
         track.data[label]["eps"] = emittances
 
@@ -63,11 +119,11 @@ def plot_z_emits(track, core, labels):
         z = track.data[label]["field_z"] + z_sol
         Bz = track.data[label]["field_Bz"]
 
-        Bz = np.diff(Bz)/np.diff(z)
-        z = z[1:] - np.diff(z)
+        #Bz = np.diff(Bz)/np.diff(z)
+        #z = z[1:] - np.diff(z)
 
         Bz *= maxe/np.max(Bz)/2
-        plt.plot((eps["z"]+shift)*100, eps["eps_z_rel"].values, "-%s"%color[counter], label=label)
+        plt.plot((eps["z"]+shift)*100, eps["eps_x"].values, "-%s"%color[counter], label=label)
         plt.plot((z+shift)*100, -Bz, "--%s"%color[counter])
         counter += 1
     plt.xlabel("Arbitrary z position [cm]", fontsize=20)
@@ -135,9 +191,9 @@ def larmor(track, core, compute=False):
         "wide_soft"
     ]
     labels_hard = [
-        "thin_sharp",
-        "mid_sharp",
-        "wide_sharp"
+        "thin_hard",
+        "mid_hard",
+        "wide_hard"
     ]
 
     indices = {}
@@ -155,9 +211,9 @@ def larmor(track, core, compute=False):
         "thin/soft",
         "mid/soft",
         "wide/soft",
-        "thin/sharp",
-        "mid/sharp",
-        "wide/sharp"
+        "thin/hard",
+        "mid/hard",
+        "wide/hard"
     ]
     disp_label = {}
 
@@ -181,8 +237,10 @@ def larmor(track, core, compute=False):
 
     F1s = []
     phis = []
-    As = {}
-    Bs = {}
+    As = []
+    A = {}
+    B = {}
+    Bs = []
     pots = {}
     for label in [*labels_soft, *labels_hard]:
         if compute:
@@ -199,8 +257,10 @@ def larmor(track, core, compute=False):
             F1 = track.runs.loc[label, "F1"]
             F1s.append(F1)
 
-        limit = track.runs.loc[label, "z_focal_left"]
+        limit = track.runs.loc[label, "z_solenoid"] + 1
         s = track.data[label]["s"].query("zpos<=@limit")
+        parts = s.loc[0].query("r<=0.01").copy().index
+        s = s.loc[:, parts, :]
         idx = s.index[-1][0]
         phi0 = s.loc[idx, "turn"].min()
         phis.append(phi0)
@@ -213,13 +273,17 @@ def larmor(track, core, compute=False):
             axis = ax1
         y = s.loc[idx, "turn"].values
         x = s.loc[0, "r"].values
-        bounds = [[0,0],[np.inf,phi0]]
-        popt, pcov = curve_fit(parabola, xdata=x, ydata=y, p0=[0, phi0], bounds=bounds, sigma=x**4)
-        As[label] = popt[0]
-        Bs[label] = popt[1]
+        bounds = [[0,0], [1,phi0]]
+        popt, pcov = curve_fit(parabola, xdata=x, ydata=y, p0=[0, phi0], bounds=bounds, sigma=x**2)
+        print(label, popt)
+        As.append(popt[0])
+        A[label] = popt[0]
+        Bs.append(popt[1])
+        B[label] = popt[1]
         #pots[label] = popt[2]
         #phis[indices[label]] = popt[1]
-        rs = np.linspace(0, 30, 100)
+        maxr = 10
+        rs = np.linspace(0, maxr, 100)
         axis.plot(
             s.loc[0, "r"]*1000,
             (s.loc[idx, "turn"] - phi0)/phi0*100,
@@ -232,6 +296,10 @@ def larmor(track, core, compute=False):
             "-k"
         )
 
+    Bs = np.array(Bs)
+    As = np.array(As)
+    plt.axis([0, maxr, 0, np.max((parabola(maxr/1e3, As, Bs)-Bs)/Bs*100)])
+    ax1.set_xlim([0, maxr])
     for ax in (ax1, ax2):
         ax.tick_params(axis='both', which='major', labelsize=24)
         ax.set_xlabel("Initial radial position [mm]", fontsize=28)
@@ -242,7 +310,7 @@ def larmor(track, core, compute=False):
     #plt.axis([0,31,-0.025,1.025])
     ax1.set_ylabel("Deviation from min. observed PhiL [%]", fontsize=28)
     ax1.set_title("Soft edge", fontsize=24)
-    ax2.set_title("Sharp edge", fontsize=24)
+    ax2.set_title("Hard edge", fontsize=24)
     plt.show()
 
     plt.figure(figsize=(16, 5))
@@ -250,18 +318,23 @@ def larmor(track, core, compute=False):
     "Residuals from the 2nd order expansion",
     fontsize = 32
     )
+    diffs = []
     for label in [*labels_soft, *labels_hard]:
         limit = track.runs.loc[label, "z_focal_left"]
         s = track.data[label]["s"].query("zpos<=@limit")
         idx = s.index[-1][0]
         y = s.loc[idx, "turn"].values
         x = s.loc[0, "r"].values
+        diff = (y - parabola(x, A[label], B[label]))/y*100
         plt.plot(
             x/mm,
-            (y - parabola(x, As[label], Bs[label]))/y*100,
+            diff,
             fmt[label], label=disp_label[label],
             markersize=8
         )
+        diffs.append(diff)
+    diffs = np.array(diffs)
+    plt.axis([0,3,0, 1.1*diffs.max()])
     plt.legend(loc="upper left", fontsize=24)
     plt.xlabel("Initial radial position [mm]", fontsize=28)
     plt.xticks(fontsize=24)

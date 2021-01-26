@@ -65,8 +65,8 @@ class TrackModule():
 
         self.E = 3.5  # default energy, placeholder
         self.N = 250
-        self.sig_r = 10
-        self.baseline_f = 1.25
+        self.sig_r = 5
+        self.baseline_f = 1.5
 
 # Astra setup
 
@@ -142,7 +142,8 @@ class TrackModule():
         s = s.query("particle>0").copy()
 
         pref_broadcast = pd.concat([pref] * (N - 1)).sort_index()  # replicate each ref row N-1 times, since the ref particle is out
-        s.loc[:, ["z_rel", "pz_rel"]] = s.loc[:, ["z", "pz"]].values
+        s.loc[:, "z_rel"] = s.loc[:, "z"].values
+        s.loc[:, "pz_rel"] = s.loc[:, "pz"].values
         s.loc[:, "z"] = s.loc[:, "z"].values + pref_broadcast.get("z").values
         s.loc[:, "pz"] = s.loc[:, "pz"].values + pref_broadcast.get("pz").values
         s.loc[:, "t"] = s.loc[:, "t"].values + pref_broadcast.get("t").values

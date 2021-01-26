@@ -125,14 +125,12 @@ class TrackHandle(track.TrackModule):
             [z] - m, [Bz] - T
         """
         self.msg(">>> New input field!")
+        Bz2, rel_decrement = self.cut_field_edges(Bz)
         if normalize:
             self.msg("Normalizing input field...")
             self.linked_core.sample_field(z, Bz)
             k = self.linked_core.get_scale_factor(self.baseline_f, self.E)
-            Bz2 = Bz*k
-        else:
-            Bz2 = Bz
-        Bz2, rel_decrement = self.cut_field_edges(Bz2)
+            Bz2 *= k
         self.field_z = z
         self.field_Bz = Bz2
         self.field_width = (z[-1] - z[0])

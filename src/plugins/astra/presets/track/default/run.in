@@ -4,7 +4,7 @@
     h_max = 0.001
     h_min = 0.00
     head = 'Default solensim ASTRA run template'
-    max_step = 2000000
+    max_step = 20000000
     qbunch = 0.0
     run = 1
     track_all = .true.
