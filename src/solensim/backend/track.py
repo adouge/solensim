@@ -64,8 +64,8 @@ class TrackModule():
         self.calc_dphi_v = np.vectorize(self.calc_dphi)
 
         self.E = 3.5  # default energy, placeholder
-        self.N = 250
-        self.sig_r = 5
+        self.N = 500
+        self.sig_r = 3
         self.baseline_f = 1.5
 
 # Astra setup

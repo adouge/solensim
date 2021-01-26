@@ -247,7 +247,7 @@ def larmor(track, core, compute=False):
             track.use_dat(
                 "plugins/astra/workspace/fields/"+label+".dat",
                 normalize=True, label=label)
-            track.overview_run()
+            track.overview_run(beam_2d=False, beam="gauss")
             track.get_focal_region()
             core.sample_field(track.data[label]["field_z"], track.data[label]["field_Bz"])
             F1 = core.fint(1)
@@ -262,7 +262,8 @@ def larmor(track, core, compute=False):
         parts = s.loc[0].query("r<=0.01").copy().index
         s = s.loc[:, parts, :]
         idx = s.index[-1][0]
-        phi0 = s.loc[idx, "turn"].min()
+        closest = s.loc[0, "r"].idxmin()
+        phi0 = s.loc[(idx, closest), "turn"]
         phis.append(phi0)
         def parabola(r, A, B, pot=2):
             phi = A*r**pot + B
@@ -273,8 +274,9 @@ def larmor(track, core, compute=False):
             axis = ax1
         y = s.loc[idx, "turn"].values
         x = s.loc[0, "r"].values
-        bounds = [[0,0], [1,phi0]]
-        popt, pcov = curve_fit(parabola, xdata=x, ydata=y, p0=[0, phi0], bounds=bounds, sigma=x**2)
+        maxc2 = (y.max() - phi0)/x.max()**2
+        bounds = [[0.75*maxc2,0.75*phi0], [1.25*maxc2,1.25*phi0]]
+        popt, pcov = curve_fit(parabola, xdata=x, ydata=y, p0=[maxc2, phi0], bounds=bounds, sigma=x**4)
         print(label, popt)
         As.append(popt[0])
         A[label] = popt[0]
@@ -282,7 +284,7 @@ def larmor(track, core, compute=False):
         B[label] = popt[1]
         #pots[label] = popt[2]
         #phis[indices[label]] = popt[1]
-        maxr = 10
+        maxr = 9
         rs = np.linspace(0, maxr, 100)
         axis.plot(
             s.loc[0, "r"]*1000,
@@ -334,12 +336,13 @@ def larmor(track, core, compute=False):
         )
         diffs.append(diff)
     diffs = np.array(diffs)
-    plt.axis([0,3,0, 1.1*diffs.max()])
-    plt.legend(loc="upper left", fontsize=24)
+    plt.axis([0,3,-0.003, 0.003])
+    #plt.legend(loc="upper left", fontsize=24)
     plt.xlabel("Initial radial position [mm]", fontsize=28)
     plt.xticks(fontsize=24)
     plt.ylabel("data - model [%]", fontsize=28)
     plt.yticks(fontsize=24)
+    plt.grid()
     plt.show()
 
     plt.figure(figsize=(16, 9))
