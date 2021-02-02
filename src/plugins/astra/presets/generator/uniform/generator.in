@@ -1,6 +1,8 @@
 &input
     add = .false.
     c_sig_z = 0.0
+    c_sig_x = 1.0
+    c_sig_y = 1.0
     cathode = .false.
     cor_ekin = 0.0
     cor_px = 0.0
