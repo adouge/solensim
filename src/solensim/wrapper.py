@@ -128,7 +128,7 @@ class TrackHandle(track.TrackModule):
         Bz2, rel_decrement = self.cut_field_edges(Bz)
         if normalize:
             self.msg("Normalizing input field...")
-            self.linked_core.sample_field(z, Bz)
+            self.linked_core.sample_field(z, Bz2)
             k = self.linked_core.get_scale_factor(self.baseline_f, self.E)
             Bz2 *= k
         self.field_z = z
