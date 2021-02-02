@@ -99,9 +99,10 @@ class TrackModule():
         kinE_MeV = E - const.m_e/const.e*const.c**2/MeV
         self.astra.gen_preset = distribution
         self.astra.genfile["input"]["ref_ekin"] = kinE_MeV
-        self.astra.genfile["input"]["sig_x"] = sig_r
+        mod = "sig_%s" if distribution=="gauss" else "L%s"
+        self.astra.genfile["input"][mod % "x"] = sig_r
         if twodim:
-            self.astra.genfile["input"]["sig_y"] = sig_r
+            self.astra.genfile["input"][mod % "y"] = sig_r
         self.astra.genfile["input"]["ipart"] = N
         self.astra.genfile["input"]["q_total"] = N*const.e*10**(-9)  # nC charge units
         self.astra.update_genfile()
