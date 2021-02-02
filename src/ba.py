@@ -242,12 +242,25 @@ def larmor(track, core, compute=False):
     B = {}
     Bs = []
     pots = {}
+
+    def straighten_out(phi):
+        if phi < 0:
+            phi2 = phi + 1
+        else:
+            phi2 = phi - 1
+        return phi2
+    straighten_out_v = np.vectorize(straighten_out)
+
     for label in [*labels_soft, *labels_hard]:
         if compute:
+            track.sig_r = 20 / np.sqrt(2)
+            track.N = 250
+            track.baseline_f = 1.5
+
             track.use_dat(
                 "plugins/astra/workspace/fields/"+label+".dat",
                 normalize=True, label=label)
-            track.overview_run(beam_2d=False, beam="gauss")
+            track.overview_run(beam_2d=True, beam="uniform")
             track.get_focal_region()
             core.sample_field(track.data[label]["field_z"], track.data[label]["field_Bz"])
             F1 = core.fint(1)
@@ -257,13 +270,12 @@ def larmor(track, core, compute=False):
             F1 = track.runs.loc[label, "F1"]
             F1s.append(F1)
 
-        limit = track.runs.loc[label, "z_solenoid"] + 1
+        limit = track.runs.loc[label, "z_focal_left"] - 0.15
         s = track.data[label]["s"].query("zpos<=@limit")
-        parts = s.loc[0].query("r<=0.01").copy().index
-        s = s.loc[:, parts, :]
+        s = track.data[label]["s"].copy()
         idx = s.index[-1][0]
         closest = s.loc[0, "r"].idxmin()
-        phi0 = s.loc[(idx, closest), "turn"]
+        phi0 = straighten_out(s.loc[(idx, closest), "turn"])
         phis.append(phi0)
         def parabola(r, A, B, pot=2):
             phi = A*r**pot + B
@@ -272,7 +284,8 @@ def larmor(track, core, compute=False):
             axis = ax2
         else:
             axis = ax1
-        y = s.loc[idx, "turn"].values
+
+        y = straighten_out_v(s.loc[idx, "turn"].values)
         x = s.loc[0, "r"].values
         maxc2 = (y.max() - phi0)/x.max()**2
         bounds = [[0.75*maxc2,0.75*phi0], [1.25*maxc2,1.25*phi0]]
@@ -284,11 +297,11 @@ def larmor(track, core, compute=False):
         B[label] = popt[1]
         #pots[label] = popt[2]
         #phis[indices[label]] = popt[1]
-        maxr = 9
+        maxr = 10
         rs = np.linspace(0, maxr, 100)
         axis.plot(
             s.loc[0, "r"]*1000,
-            (s.loc[idx, "turn"] - phi0)/phi0*100,
+            (straighten_out_v(s.loc[idx, "turn"]) - phi0)/phi0*100,
             fmt[label], markersize=8,
             label=disp_label[label]
         )
@@ -315,17 +328,17 @@ def larmor(track, core, compute=False):
     ax2.set_title("Hard edge", fontsize=24)
     plt.show()
 
-    plt.figure(figsize=(16, 5))
+    plt.figure(figsize=(15, 5))
     plt.title(
-    "Residuals from the 2nd order expansion",
-    fontsize = 32
+        "Residuals from the 2nd order expansion",
+        fontsize = 32
     )
     diffs = []
     for label in [*labels_soft, *labels_hard]:
         limit = track.runs.loc[label, "z_focal_left"]
-        s = track.data[label]["s"].query("zpos<=@limit")
+        s = track.data[label]["s"].copy()#.query("zpos<=@limit")
         idx = s.index[-1][0]
-        y = s.loc[idx, "turn"].values
+        y = straighten_out_v(s.loc[idx, "turn"].values)
         x = s.loc[0, "r"].values
         diff = (y - parabola(x, A[label], B[label]))/y*100
         plt.plot(
@@ -336,11 +349,11 @@ def larmor(track, core, compute=False):
         )
         diffs.append(diff)
     diffs = np.array(diffs)
-    plt.axis([0,3,-0.003, 0.003])
+    plt.axis([0,10,-0.001, 0.003])
     #plt.legend(loc="upper left", fontsize=24)
     plt.xlabel("Initial radial position [mm]", fontsize=28)
     plt.xticks(fontsize=24)
-    plt.ylabel("data - model [%]", fontsize=28)
+    plt.ylabel("data - model [0.001%]", fontsize=28)
     plt.yticks(fontsize=24)
     plt.grid()
     plt.show()
@@ -355,9 +368,9 @@ def larmor(track, core, compute=False):
     def slope(x, A):
         return A*x
 
-    A0 = const.e/2/core.model.impuls_SI(track.E)/np.pi
+    A0 = const.e/2/(3.4625e6*const.e/const.c)/np.pi
     print("Guess for slope: %.2f"%A0)
-    A, dA = curve_fit(slope, xdata=F1s, ydata=phis, p0=[A0])
+    A, dA = curve_fit(slope, xdata=F1s, ydata=np.array(Bs), p0=[A0])
     plt.plot(
         F1s/mm, slope(F1s, A)/mm,
         "-k", label="Slope fit: %.6f\npredicted: %.6f" % (A, A0),
@@ -372,6 +385,7 @@ def larmor(track, core, compute=False):
         "-k",
         linewidth=2)
     plt.xlabel("F1 [mT*m]", fontsize=28)
+    plt.axis([4.5, 14.5, 60, 200])
     plt.xticks(fontsize=24)
     plt.ylabel("Minimum recorded PhiL [mrad/pi]", fontsize=28)
     plt.yticks(fontsize=24)
@@ -379,4 +393,14 @@ def larmor(track, core, compute=False):
     plt.show()
     print("dA: %.2f"%dA)
 
-#def larmor_dphi_
+    plt.figure(figsize=(16, 3))
+    plt.ylabel("Data - fit [\u03bcrad]", fontsize=28)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=20)
+    plt.axis([4.5, 14.5, -3, 1])
+    #plt.xlabel("F1 [mT*m]", fontsize=28)
+    for label in [*labels_soft, *labels_hard]:
+        plt.plot(F1s[indices[label]]/mm, -(slope(F1s[indices[label]], A) - Bs[indices[label]])/mm/mm, fmt[label], markersize=12)
+    plt.plot([4.5, 14.5], [0, 0], "-k")
+    plt.grid()
+    plt.show()
