@@ -286,7 +286,7 @@ class TrackModule():
         left =  p.loc[offaxis].query("z>@z_solenoid and pr > 0").get("z").idxmin() - step*mm
         self.runs.loc[label, "z_focal_left"] = left
         self.runs.loc[label, "z_focal_right"] = right
-        self.msg("Focal region at ~ z: [%.2f, %.2f] cm; z_solenoid %.2f m"%(left/cm, right/cm, self.z_solenoid))
+        self.msg("Focal region at ~ z: [%.2f, %.2f] cm; z_solenoid %.2f m"%(left/cm, right/cm, z_solenoid))
 
 #Focal run:
     def focal_run(self, step=0.1):
@@ -349,13 +349,13 @@ class TrackModule():
             for part in parts:
                 r_min_idx = p_f.loc[part, "r"].idxmin()
                 f_guess = p_f.loc[(part, r_min_idx), "z"]
-                drdz_guess = np.mean(p_f.loc[part, "r"].diff()/p_f.loc[part, "z"].diff())
+                drdz_guess = np.mean(np.abs(p_f.loc[part, "r"].diff()/p_f.loc[part, "z"].diff()))
 
                 p, pcov = opt.curve_fit(self.model.axial_trajectory,
                     xdata=p_f.query("z>@z_solenoid").loc[part, "z"].values,
                     ydata=p_f.query("z>@z_solenoid").loc[part, "r"].values,
-                    p0=[f_guess, drdz_guess])
-                    #bounds=([z_solenoid, 0, -np.inf, -np.inf, -1], [np.inf, self.sig_r*mm, np.inf, np.inf, 1]))
+                    p0=[f_guess, drdz_guess],
+                    bounds=([z_solenoid+self.baseline_f*0.9, 0.25*drdz_guess], [z_solenoid+self.baseline_f*1.1, 1.75*drdz_guess]))
                 dp = np.sqrt(np.diag(pcov))
                 fits.loc[part, "r0"] =  p_f.query("zpos==0").loc[part,"r"].values
                 columns = ["z_f", "drdz", "dz_f", "ddrdz"]
@@ -370,35 +370,25 @@ class TrackModule():
         self.msg("Maximum focal length value observed: %.2f cm"%(f_max_observed*100))
 
 #Assessing aberration:
-    def fit_cs_expansion(self, order=1, sigma="radius2", sigma_abs=False):
+    def fit_cs_expansion(self, order=1, sigma_order=2, sigma_abs=False):
         label = self.run_label
         self.msg(">>> at %s: Fitting foci to cs expansion model."%label)
         fits = self.data[label]["fits"].sort_values("r0")
         z_solenoid = self.runs.loc[label, "z_solenoid"]
         f = fits.get("z_f").values - z_solenoid
         r = fits.get("r0").values
-        if not sigma:
-            dr = np.ones(len(r))
-        elif sigma=="offset":
-            dr = fits.get("r_min").values
-            self.msg("Weighing against axis offset.")
-        elif sigma=="radius":
-            dr = fits.get("r0").values
-            self.msg("Weighing against initial radial position.")
-        elif sigma=="radius2":
-            dr = fits.get("r0").values**2
-            self.msg("Weighing against squared initial radial position.")
-        else: raise ValueError("Incorrect weighing option: %s"%sigma)
-        self.runs.loc[label, "f_expansion_sigma"] = sigma
+        dr = fits.get("r0").values**sigma_order
+        self.runs.loc[label, "f_expansion_sigma"] = sigma_order
         f_guess = self.runs.loc[label, "f_max_observed"]
-        c2_guess = 1
+        idxmax = fits["r0"].idxmax()
+        c2_guess = (f_guess - (fits.loc[idxmax, "z_f"] - z_solenoid))/fits.loc[idxmax, "r0"]**2
         #self.msg("f guess: %.2f cm"%(f_guess/cm))
         #self.msg("c1 guess: %.2e m"%c1_guess)
         self.msg("Expansion order: %d"%order)
         p0_1 = np.array((f_guess, c2_guess))
         p0 = np.concatenate((p0_1, np.zeros(order-1)))
-        bounds_lower = np.concatenate(((f_guess*0.9, 0), np.zeros(order-1)))
-        bounds_upper = np.concatenate(((f_guess*1.1, np.inf), np.ones(order-1)*np.inf))
+        bounds_lower = np.concatenate(((f_guess*0.9, 0.9*c2_guess), np.zeros(order-1)))
+        bounds_upper = np.concatenate(((f_guess*1.1, 1.1*c2_guess), np.ones(order-1)*np.inf))
         c, ccov = opt.curve_fit(self.model.f_expansion,
         xdata=r,
         ydata=f,
@@ -413,6 +403,7 @@ class TrackModule():
         quality = "Effective" if order==1 else "Minimal"
         self.msg("%s cs: %.3e m"%(quality, cs))
         self.runs.loc[label, "cs"] = cs
+        self.runs.loc[label, "c2"] = c[1]
         self.runs.loc[label, "f"] = c[0]
         self.runs.loc[label, "df"] = dc[0]
         self.runs.loc[label, "f_expansion_order"] = order
