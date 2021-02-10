@@ -9,6 +9,48 @@ import scipy.constants as const
 from scipy.optimize import curve_fit
 #import pysnooper
 
+labels_soft = [
+    "thin_soft",
+    "mid_soft",
+    "wide_soft"
+]
+labels_hard = [
+    "thin_hard",
+    "mid_hard",
+    "wide_hard"
+]
+
+labels = [*labels_hard, *labels_soft]
+
+indices = {}
+
+fmts = [
+    "or",
+    "ob",
+    "og",
+    "dr",
+    "db",
+    "dg"
+]
+fmt = {}
+disp_labels = [
+    "thin/soft",
+    "mid/soft",
+    "wide/soft",
+    "thin/hard",
+    "mid/hard",
+    "wide/hard"
+]
+disp_label = {}
+
+for i in range(3):
+    fmt[labels_soft[i]] = fmts[i]
+    fmt[labels_hard[i]] = fmts[i+3]
+    disp_label[labels_soft[i]] = disp_labels[i]
+    disp_label[labels_hard[i]] = disp_labels[i+3]
+    indices[labels_soft[i]] = i
+    indices[labels_hard[i]] = i+3
+
 def generate_field(p, zmax, title, core, f=1.25, E=3.5):
     core.FM = "biswas"
     core.bcalc_zmax = zmax
@@ -98,133 +140,293 @@ def make_emits(track, core, label):
         emittances.loc[z, "z"] = z
         track.data[label]["eps"] = emittances
 
-def plot_z_emits(track, core, labels):
-    plt.figure(figsize=(9,9))
-    color = {
-        0: "r",
-        1: "g",
-        2: "b",
-        3: "k"
-    }
-    center = 0
-    shift = 0
-    counter = 0
+def focusing(track, core, label=None, compute=False, expand=False, sigma=2, order=1):
+    if label is not None:
+        if type(label) == list:
+            labels = label
+        else:
+            labels = [label]
+    else:
+        pass
+
+    if compute:
+        track.sig_r = 20/np.sqrt(2)
+        track.N = 250
+        for lbl in labels:
+            track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
+            track.overview_run(beam="uniform")
+            track.field_width=track.runs.loc[lbl, "field_width"]
+            track.get_focal_region()
+            try:
+                track.focal_run()
+            except:
+                track.focal_run(step=0.2)
+            track.fit_focal_traj(model="axial")
+            z = track.data[lbl]["field_z"]
+            Bz = track.data[lbl]["field_Bz"]
+            core.sample_field(z, Bz)
+            track.runs.loc[lbl, ["F1","F3","F4"]] = [core.fint(1), core.fint(3), core.fint(4)]
+        track.runs["Delta_f"] = track.runs["f_max_observed"] - track.runs["f_min_observed"]
+
+# DF vs. F1
+    plt.figure(figsize=(16, 6))
+    plt.title(
+    "Min/max difference for observed foci vs. F1",
+    fontsize=32)
+
     for label in labels:
-        eps = track.data[label]["eps"]
-        maxe = (eps["eps_z_rel"].max())
-        z_sol = track.runs.loc[label, "z_solenoid"]
-        if z_sol == center:
-            shift += 0.5
-        center = z_sol
-        z = track.data[label]["field_z"] + z_sol
-        Bz = track.data[label]["field_Bz"]
+        plt.plot(
+            track.runs.loc[label, "F1"]/mm, track.runs.loc[label, "Delta_f"]*1e2,
+            fmt[label], markersize=24,
+            label=disp_label[label])
+    plt.xlabel("F1 [mT*m]", fontsize=28)
+    plt.axis([4.5, 14.5, 0, 12])
+    plt.xticks(fontsize=24)
+    plt.ylabel("Focal region size [cm]", fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.legend(loc="upper right", fontsize=24)
+    plt.show()
 
-        #Bz = np.diff(Bz)/np.diff(z)
-        #z = z[1:] - np.diff(z)
+# True F vs. F1
+    plt.figure(figsize=(16, 9))
+    plt.title(
+    "Max. observed focus vs. F1",
+    fontsize=32)
 
-        Bz *= maxe/np.max(Bz)/2
-        plt.plot((eps["z"]+shift)*100, eps["eps_x"].values, "-%s"%color[counter], label=label)
-        plt.plot((z+shift)*100, -Bz, "--%s"%color[counter])
-        counter += 1
-    plt.xlabel("Arbitrary z position [cm]", fontsize=20)
-    plt.xticks(fontsize=16)
-    plt.yticks(fontsize=16)
-    plt.ylabel("RMS z-Emittance [pi*keV*mm]", fontsize=20)
-    plt.legend(loc="upper right", fontsize=20)
-    plt.axis([100,200,-0.0003,0.0006])
+    def slope(x, A):
+        return A*x + 1.5
+
+    A, dA = curve_fit(slope, xdata=track.runs["F1"], ydata=track.runs["f_max_observed"], p0=[0])
+    for label in labels:
+        plt.plot(
+            track.runs.loc[label, "F1"]/mm, track.runs.loc[label, "f_max_observed"],
+            fmt[label], markersize=24,
+            label=disp_label[label])
+    plt.plot(
+        track.runs["F1"]/mm, slope(track.runs["F1"], A),
+        "-k", label="Slope fit",
+        linewidth=2)
+    plt.text(10, 1.501, "Slope: %.6fe-3 [mT^-1]" % A, verticalalignment="bottom", fontsize=24)
+    plt.xlabel("F1 [mT*m]", fontsize=28)
+    plt.axis([4.5, 14.5, 1.50, 1.55])
+    plt.xticks(fontsize=24)
+    plt.ylabel("Maximum observed focal length [m]", fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.legend(loc="upper left", fontsize=24)
+    plt.show()
+# Df expansion
+    fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
+    fig.suptitle(
+        "Focal length vs. initial radial position",
+        fontsize=32)
+    if expand or compute:
+        for label in labels:
+            track.run_label = label
+            track.fit_cs_expansion(order=order, sigma_order=sigma)
+    lim = []
+    r = np.linspace(0,10, num=100)
+    for label in labels:
+        fits = track.data[label]["fits"]
+        c = track.data[label]["exp_coeff"]
+        f_real = track.runs.loc[label, "f"]
+        if label in labels_soft:
+            axis = ax1
+        else:
+            axis = ax2
+        zsol = track.runs.loc[label, "z_solenoid"]
+        axis.plot(fits["r0"]*1e3, ((fits["z_f"]-zsol)/f_real-1)*100, fmt[label], markersize=8, label=disp_label[label])
+        y = (track.model.f_expansion(r/1e3, f_real, *c)/f_real-1)*100
+        axis.plot(r, y, "-k")
+        lim.append(np.min(y))
+
+    for ax in (ax1, ax2):
+        ax.tick_params(axis='both', which='major', labelsize=24)
+        ax.set_xlabel("Initial radial position [mm]", fontsize=28)
+        ax.plot(0,0,"-k",label="Expansion fit")
+        ax.legend(loc="lower left", fontsize=24)
+        ax.grid()
+        ax.set_xlim([0, 10])
+        #ax.plot([0,30], [0,0], "--k")
+    #plt.axis([0,31,-0.025,1.025])
+    ax1.set_ylabel("Deviation from max. observed f [%]", fontsize=28)
+    ax1.set_ylim([np.min(lim), 0.1])
+    ax1.set_title("Soft edge", fontsize=24)
+    ax2.set_title("Hard edge", fontsize=24)
+    plt.show()
+
+    plt.figure(figsize=(16, 5))
+    suffix = {
+        1: "st",
+        2: "nd",
+        3: "rd"
+    }
+    plt.title(
+        "Residuals from the %d%s order expansion, %s weighing" % (order, suffix[order], ("no" if sigma == 0 else "r%d" % sigma)),
+        fontsize=32
+    )
+    diffs = []
+    for label in labels:
+        fits = track.data[label]["fits"]
+        c = track.data[label]["exp_coeff"]
+        f_real = track.runs.loc[label, "f"]
+        modeled = track.model.f_expansion(fits["r0"], f_real, *c)
+        y = fits["z_f"] - track.runs.loc[label, "z_solenoid"]
+        diff = (y - modeled)/y*100
+        plt.plot(
+            fits["r0"]*1e3,
+            diff*1e3,
+            fmt[label], label=disp_label[label],
+            markersize=8
+        )
+        diffs.append(diff)
+    diffs = np.array(diffs)
+    plt.axis([0,10,-15, 15])
+    #plt.legend(loc="upper left", fontsize=24)
+    plt.xlabel("Initial radial position [mm]", fontsize=28)
+    plt.xticks(fontsize=24)
+    plt.ylabel("data - model [0.001%]", fontsize=28)
+    plt.yticks(fontsize=24)
     plt.grid()
     plt.show()
 
+    print("TABLE:")
+    print("Field & $C_2\\unit{~[m^{-1}}$")
+    for label in labels:
+        print("%s & $%.2f$" % (disp_label[label], track.data[label]["exp_coeff"][0]))
 
-def plot_all_emits(track, core, label):
-    plt.figure(figsize=(9,9))
-    color = {
-        0: "r",
-        1: "g",
-        2: "b",
-        3: "k"
-    }
-    eps = track.data[label]["eps"]
-    maxe = (eps["eps_z"].max())
-    z_sol = track.runs.loc[label, "z_solenoid"]
-    z = track.data[label]["field_z"] + z_sol
-    Bz = track.data[label]["field_Bz"]
-    Bz *= maxe/np.max(Bz)/2
-    for i in ["x", "y", "z"]:
-        plt.plot((eps["z"])*100, eps["eps_z"].values, "-%s"%color[counter], label=label)
+def aberration(track, core, label=None, compute=False, expand=False, sigma=2, order=1):
+    if label is not None:
+        if type(label) == list:
+            labels = label
+        else:
+            labels = [label]
+    else:
+        pass
 
-    plt.plot((z)*100, -Bz, "--k")
-    plt.xlabel("Arbitrary z position [cm]", fontsize=20)
-    plt.xticks(fontsize=16)
-    plt.yticks(fontsize=16)
-    plt.ylabel("Norm. RMS Emittance [keV*mm]", fontsize=20)
-    plt.legend(loc="upper right", fontsize=20)
-    plt.show()
-
-
-
-
-def focusing(track, core, label, compute=False):
     if compute:
-        track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
-        track.overview_run()
-        track.get_focal_region()
-        try:
-            track.focal_run()
-        except:
+        track.sig_r = 1
+        track.N = 1000
+        for lbl in labels:
+            track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
+            track.overview_run()
+            track.field_width=track.runs.loc[lbl, "field_width"]
+            track.get_focal_region()
             try:
-                track.focal_run(step=0.15)
+                track.focal_run()
             except:
                 track.focal_run(step=0.2)
-        track.fit_focal_traj()
-        track.fit_cs_expansion()
-        track.check_felddurchgang(label=lbl, title="Smoothed, cut off wide field with soft edge")
-        track.check_ray_fitting(label=lbl)
+            track.fit_focal_traj(model="axial")
+            z = track.data[lbl]["field_z"]
+            Bz = track.data[lbl]["field_Bz"]
+            core.sample_field(z, Bz)
+            track.runs.loc[lbl, ["F1","F3","F4"]] = [core.fint(1), core.fint(3), core.fint(4)]
+        track.runs["Delta_f"] = track.runs["f_max_observed"] - track.runs["f_min_observed"]
 
+    if expand or compute:
+        for label in labels:
+            track.run_label = label
+            track.fit_cs_expansion(order=order, sigma_order=sigma)
 
+# C2 vs. F1
+    plt.figure(figsize=(16, 6))
+    plt.title(
+    "First order expansion coefficient vs. F3",
+    fontsize=32)
+
+    for label in labels:
+        plt.plot(
+            track.runs.loc[label, "F4"]/mm, track.runs.loc[label, "c2"],
+            fmt[label], markersize=24,
+            label=disp_label[label])
+    plt.xlabel("F1 [mT*m]", fontsize=28)
+    #plt.axis([4.5, 14.5, 0, 12])
+    plt.xticks(fontsize=24)
+    plt.ylabel("C2 [m^-1]", fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.legend(loc="upper right", fontsize=24)
+    plt.show()
+
+# Df expansion
+    fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
+    fig.suptitle(
+        "Focal length expansion in the paraxial region by field",
+        fontsize=32)
+
+    lim = []
+    r = np.linspace(0,3, num=100)
+    for label in labels:
+        fits = track.data[label]["fits"]
+        c = track.data[label]["exp_coeff"]
+        f_real = track.runs.loc[label, "f"]
+        if label in labels_soft:
+            axis = ax1
+        else:
+            axis = ax2
+        zsol = track.runs.loc[label, "z_solenoid"]
+        axis.plot(fits["r0"]*1e3, ((fits["z_f"]-zsol)/f_real-1)*100, fmt[label], markersize=8, label=disp_label[label])
+        y = (track.model.f_expansion(r/1e3, f_real, *c)/f_real-1)*100
+        axis.plot(r, y, "-k")
+        lim.append(np.min(y))
+
+    for ax in (ax1, ax2):
+        ax.tick_params(axis='both', which='major', labelsize=24)
+        ax.set_xlabel("Initial radial position [mm]", fontsize=28)
+        ax.plot(0,0,"-k",label="Expansion fit")
+        ax.legend(loc="lower left", fontsize=24)
+        ax.grid()
+        ax.set_xlim([0, 3])
+        #ax.plot([0,30], [0,0], "--k")
+    #plt.axis([0,31,-0.025,1.025])
+    ax1.set_ylabel("Deviation from max. observed f [%]", fontsize=28)
+    ax1.set_ylim([np.min(lim), 0.1])
+    ax1.set_title("Soft edge", fontsize=24)
+    ax2.set_title("Hard edge", fontsize=24)
+    plt.show()
+
+    plt.figure(figsize=(16, 5))
+    suffix = {
+        1: "st",
+        2: "nd",
+        3: "rd"
+    }
+    plt.title(
+        "Residuals from the 1st order expansion, no weighing",
+        fontsize=32
+    )
+    diffs = []
+    for label in labels:
+        fits = track.data[label]["fits"]
+        c = track.data[label]["exp_coeff"]
+        f_real = track.runs.loc[label, "f"]
+        modeled = track.model.f_expansion(fits["r0"], f_real, *c)
+        y = fits["z_f"] - track.runs.loc[label, "z_solenoid"]
+        diff = (y - modeled)/y*100
+        plt.plot(
+            fits["r0"]*1e3,
+            diff*1e3,
+            fmt[label], label=disp_label[label],
+            markersize=8
+        )
+        diffs.append(diff)
+    diffs = np.array(diffs)
+    plt.axis([0,3,-15, 15])
+    #plt.legend(loc="upper left", fontsize=24)
+    plt.xlabel("Initial radial position [mm]", fontsize=28)
+    plt.xticks(fontsize=24)
+    plt.ylabel("data - model [0.001%]", fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.grid()
+    plt.show()
+
+    print("TABLE:")
+    print("Field & $C_2\\unit{~[m^{-1}}$")
+    for label in labels:
+        print("%s & $%.2f$" % (disp_label[label], track.data[label]["exp_coeff"][0]))
+
+    
 
 def larmor(track, core, compute=False):
     """kek."""
-    labels_soft = [
-        "thin_soft",
-        "mid_soft",
-        "wide_soft"
-    ]
-    labels_hard = [
-        "thin_hard",
-        "mid_hard",
-        "wide_hard"
-    ]
-
-    indices = {}
-
-    fmts = [
-        "or",
-        "ob",
-        "og",
-        "dr",
-        "db",
-        "dg"
-    ]
-    fmt = {}
-    disp_labels = [
-        "thin/soft",
-        "mid/soft",
-        "wide/soft",
-        "thin/hard",
-        "mid/hard",
-        "wide/hard"
-    ]
-    disp_label = {}
-
-    for i in range(3):
-        fmt[labels_soft[i]] = fmts[i]
-        fmt[labels_hard[i]] = fmts[i+3]
-        disp_label[labels_soft[i]] = disp_labels[i]
-        disp_label[labels_hard[i]] = disp_labels[i+3]
-        indices[labels_soft[i]] = i
-        indices[labels_hard[i]] = i+3
-
 
     zmax = {}
     s = {}
