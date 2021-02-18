@@ -19,6 +19,7 @@
 
 &output
     emits = .true.
+    tr_emits = .true.
     high_res = .true.
     phases = .true.
     refs = .false.

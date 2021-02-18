@@ -45,11 +45,11 @@ class Model():
 
     def f_expansion(self, r, f, *args):
         """Model polynomial f expansion."""
-        f_real = f
+        f_real = 1
         order = len(args)
         for i in np.arange(order):
             f_real -= r**(2*(order-i))*args[-(i+1)]
-        return f_real
+        return f_real*f
 
 
 class TrackModule():
@@ -381,7 +381,7 @@ class TrackModule():
         self.runs.loc[label, "f_expansion_sigma"] = sigma_order
         f_guess = self.runs.loc[label, "f_max_observed"]
         idxmax = fits["r0"].idxmax()
-        c2_guess = (f_guess - (fits.loc[idxmax, "z_f"] - z_solenoid))/fits.loc[idxmax, "r0"]**2
+        c2_guess = (f_guess - (fits.loc[idxmax, "z_f"] - z_solenoid))/fits.loc[idxmax, "r0"]**2/f_guess
         #self.msg("f guess: %.2f cm"%(f_guess/cm))
         #self.msg("c1 guess: %.2e m"%c1_guess)
         self.msg("Expansion order: %d"%order)

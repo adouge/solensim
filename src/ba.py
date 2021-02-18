@@ -4,9 +4,13 @@ import numpy as np
 import numpy.linalg as lina
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as tick
 from solensim.aux import *
 import scipy.constants as const
 from scipy.optimize import curve_fit
+import scipy.integrate as integrate
+import scipy.interpolate as interpolate
+
 #import pysnooper
 
 labels_soft = [
@@ -114,8 +118,29 @@ def make_emits(track, core, label):
     m_e = const.m_e*const.c**2/const.e
     s = track.data[label]["s"].copy()
     zpos = track.data[label]["zpos"]
+    zmax = zpos[-1]
+    tr = s.query("@zmax - 0.5 <= zpos")
+    pz = tr.loc[zmax, "pz"].mean()
     emittances = pd.DataFrame(columns=["z", "eps_x", "eps_y"])
-    indices = ["x", "y"]
+    indices = ["x", "y", "r"]
+    for idx in indices:
+        tr = tr.swaplevel()
+        for part in tr.index.levels[0][1:]:
+            tr.loc[(part, zmax), "%sprime" % idx] = np.mean(np.diff(tr.loc[part, idx])/np.diff(tr.loc[part, "z"]))
+        tr = tr.swaplevel()
+        i = np.array([*tr.loc[zmax, idx].values, *(-tr.loc[zmax, idx].values)])
+        iprime = np.array([*tr.loc[zmax, "%sprime" % idx].values, *(-tr.loc[zmax, "%sprime" % idx].values)])
+        cov = np.cov(i, iprime)
+        print(cov)
+        eps = pz/m_e*np.sqrt(lina.det(cov))
+        track.runs.loc[label, "eps_%s_tr" % idx] = eps
+    i = tr.loc[zmax, ["x", "y"]].values.transpose()
+    iprime = tr.loc[zmax, ["xprime", "yprime"]].values.transpose()
+    cov = np.cov(i, iprime)
+    print(cov)
+    eps = pz/m_e*np.sqrt(lina.det(cov))
+    track.runs.loc[label, "eps_4d_tr"] = eps
+    track.runs.loc[label, "eps_xy_tr"] = np.mean(track.runs.loc[label, ["eps_x_tr", "eps_y_tr"]])
     for z in zpos:
         b = s.loc[z].copy()
         #zref = track.data[label]["pref"].loc[(z, 0), "z"]
@@ -137,8 +162,252 @@ def make_emits(track, core, label):
 #            emittances.loc[z, index+"_ms"] = m1#np.sqrt(m1)
 #            emittances.loc[z, "p"+index+"_ms"] = m2#np.sqrt(m2)
 #            emittances.loc[z, "cov2_"+index] = m3**2
+        cov2 = np.cov(b.loc[:, ["x", "y"]].values.astype(np.float64).transpose(), b.loc[:, ["px", "py"]].values.astype(np.float64).transpose())
+        emittances.loc[z, "eps_4d"] = np.sqrt(lina.det(cov2))/m_e**2
         emittances.loc[z, "z"] = z
-        track.data[label]["eps"] = emittances
+    track.data[label]["eps"] = emittances
+
+def emittances(track, core, label=None, compute=False):
+    if label is not None:
+        if type(label) == list:
+            labels = label
+        else:
+            labels = [label]
+    else:
+        pass
+
+    if compute:
+        track.sig_r = 0.72
+        track.N = 250
+        for lbl in labels:
+            track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
+            track.overview_run()
+            track.field_width=track.runs.loc[lbl, "field_width"]
+            z = track.data[lbl]["field_z"]
+            Bz = track.data[lbl]["field_Bz"]
+            core.sample_field(z, Bz)
+            track.runs.loc[lbl, "F1"] = core.fint(1)
+            dz = z[:-1] - np.mean(np.diff(z))
+            dBz = np.diff(Bz)/np.diff(z)
+            ddz = dz[:-1] - np.mean(np.diff(dz))
+            func = interpolate.interp1d(
+                dz,
+                dBz**2,
+                fill_value=0,
+                bounds_error=False
+            )
+            track.runs.loc[lbl, "F3"] = integrate.quad(func, -np.inf, np.inf)[0]
+            track.data[lbl]["eps_astra"] = track.astra.read_tremit()
+            make_emits(track, core, lbl)
+
+    epsas = {}
+    for lbl in labels:
+        ea = track.data[lbl]["eps_astra"]
+        ea["X"]["eps_y"] = ea["Y"]["eps_y_nrms"].copy()*1e-6
+        ea = ea["X"].copy()
+        ea["eps_x"] = ea["eps_x_nrms"]*1e-6
+        ea["eps_4d"] = ea["eps_x"]*ea["eps_y"]
+        ea["eps_xy"] = 0.5*(ea["eps_x"] + ea["eps_y"])
+        track.data[lbl]["eps"]["eps_xy"] = 0.5*(track.data[lbl]["eps"]["eps_x"] + track.data[lbl]["eps"]["eps_y"])
+
+        epsas[lbl] = ea.copy()
+
+    fig, (a1, a2) = plt.subplots(1,2, figsize=(16, 6), sharey=True)
+    fig.suptitle("Norm. RMS transverse emittance, own calculation vs. ASTRA", fontsize=32)
+    for i in (0,1):
+        lbl = ["wide_soft", "wide_hard"][i]
+        eps = track.data[lbl]["eps"]
+        epsa = epsas[lbl]
+        z_sol = track.runs.loc[lbl, "z_solenoid"]
+        (a1, a2)[i].plot((eps["z"]-z_sol)*1e2,eps["eps_xy"]*1e6, "--k", label="Own calculation")
+        (a1, a2)[i].plot((epsa["z"]-z_sol)*1e2, epsa["eps_xy"]*1e6, "-k", label="ASTRA")
+        (a1, a2)[i].set_xlabel("z [cm]", fontsize=24)
+        (a1, a2)[i].tick_params(labelsize=24)
+        (a1, a2)[i].set_xlim([-50,50])
+        #(a1, a2)[i].set_title(["Wide field, soft edge", "Wide field, hard edge"][i], fontsize=28)
+    a1.set_ylabel("[pi*mm*mrad]", fontsize=24)
+    a1.set_ylim([-0.1,8])
+    a1.text(-48, 7, "Not accounting for correlation", fontsize=24)
+    a1.set_yticks([0, 2, 4, 8])
+    a1.tick_params(size=10, axis="y")
+    #a2.legend(fontsize=28, loc="upper right")
+    plt.show()
+
+    fig, (a1, a2) = plt.subplots(1,2, figsize=(16, 6), sharey=True)
+    #fig.suptitle("Accounting for correlation", fontsize=32)
+    for i in (0,1):
+        lbl = ["wide_soft", "wide_hard"][i]
+        eps = track.data[lbl]["eps"]
+        epsa = epsas[lbl]
+        z_sol = track.runs.loc[lbl, "z_solenoid"]
+        (a1, a2)[i].plot((eps["z"]-z_sol)*1e2, eps["eps_4d"]**0.5*1e9, "--k", label="Own calculation")
+        (a1, a2)[i].plot((epsa["z"]-z_sol)*1e2, epsa["eps_xy"]*1e9, "-k", label="ASTRA")
+        (a1, a2)[i].set_xlabel("z [cm]", fontsize=24)
+        (a1, a2)[i].tick_params(labelsize=24)
+        (a1, a2)[i].set_xlim([-50,50])
+        (a1, a2)[i].set_title(["Wide field, soft edge", "Wide field, hard edge"][i], fontsize=28)
+    a1.set_ylabel("[pi*mm*mrad]*1e-3", fontsize=24)
+    a1.set_ylim([0,0.6])
+    a1.text(-48, 0.5, "Accounting for correlation", fontsize=24)
+    a2.legend(fontsize=24, loc="lower right")
+    plt.show()
+
+    plt.figure(figsize=(16,6))
+    plt.title("Norm. RMS x,y emittance by field [pi*mrad*mm]*1e-3", fontsize=32)
+    plt.xlabel("Own calculation", fontsize=28)
+    plt.ylabel("ASTRA", fontsize=28)
+
+    own = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5*1e9 for lbl in labels]
+    astra = [epsas[lbl].loc[epsas[lbl].index[-1], "eps_xy"]*1e9 for lbl in labels]
+    slope = lambda x, A: A*x
+    A, dA = curve_fit(slope, xdata=own, ydata=astra, p0=[1])
+    print(A, dA)
+    for label in labels:
+        eps = track.data[label]["eps"]
+        epsa = epsas[label]
+        plt.plot(eps.loc[eps.index[-1], "eps_4d"]**0.5*1e9, epsa.loc[epsa.index[-1], "eps_xy"]*1e9, fmt[label], label=disp_label[label], markersize=24)
+    x = np.linspace(0, 2.25)
+    plt.plot(x, slope(x, A), "-k", label="Slope fit", linewidth=2)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=24)
+    plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.4, 0))
+    plt.axis([0,2.2,-0.1,2.2])
+    plt.text(0.1, 1.9, "Slope: 1-%.2e" % (1-A), fontsize=28)
+    plt.show()
+
+    for lbl in labels:
+        z = track.data[lbl]["field_z"]
+        Bz = track.data[lbl]["field_Bz"]
+        dz = z[:-1] - np.mean(np.diff(z))
+        ddz = dz[:-1] - np.mean(np.diff(dz))
+        dBz = np.diff(Bz)/np.diff(z)
+        ddBz = np.diff(dBz)/np.diff(dz)
+        func = interpolate.interp1d(
+            dz,
+            dBz**2,
+            fill_value=0,
+            bounds_error=False
+        )
+        func2 = interpolate.interp1d(
+            ddz,
+            ddBz**2,
+            fill_value=0,
+            bounds_error=False
+        )
+        track.runs.loc[lbl, ["F3", "F4"]] = [
+            integrate.quad(func, -np.inf, np.inf)[0],
+            integrate.quad(func2, -np.inf, np.inf)[0]
+        ]
+    c1s =  np.array([1/2*track.runs.loc[lbl, "F3"]/track.runs.loc[lbl, "F2"] for lbl in labels])
+    c2s = np.array([5/64*track.runs.loc[lbl, "F4"]/track.runs.loc[lbl, "F2"] for lbl in labels])
+    r = (track.astra.beam["x"]**2 + track.astra.beam["y"]**2)**0.5
+    sig = np.std([*r, *(-r)])
+    print("Sigma: ", sig)
+    epsapprox = np.sqrt(6)/2*sig**4*c1s/1.5
+    pz = 3.4625e6
+    m_e = const.m_e*const.c**2/const.e
+    epstheory = pz/m_e*np.sqrt(6)/2*sig**4/1.5*np.sqrt(c1s**2 + 20*sig**2*c1s*c2s + 120*sig**4*c2s**2)
+    print("epstheory:    ", epstheory)
+    test = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_r"] for lbl in labels]
+    test = np.array(test)
+    print(np.array(test)/epstheory/2)
+    #print(c1s)
+    #print(c2s)
+    #print(epsapprox*1e9)
+    #print(epstheory*1e9)
+
+    print([track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels])
+
+    plt.figure(figsize=(16,6))
+    plt.title("Norm. RMS trace space emittance [pi*mrad*mm]*1e-3\nTransverse", fontsize=32)
+    plt.xlabel("Own calculation", fontsize=28)
+    plt.ylabel("Theoretical prediction", fontsize=28)
+
+    own = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels]
+    own2 = [track.runs.loc[lbl, "eps_xy_tr"] for lbl in labels]
+    print("=====================================")
+    print(own)
+    print(own2)
+    print(epstheory)
+    print("=====================================")
+    print(np.array(own)/test)
+    slope = lambda x, A: A*x
+    A, dA = curve_fit(slope, xdata=own2, ydata=epstheory)
+    print(A, dA)
+    for label in labels:
+        eps = track.data[label]["eps"]
+        epsa = epsas[label]
+        plt.plot(track.runs.loc[label, "eps_xy_tr"]*1e9, epstheory[indices[label]]*1e9, fmt[label], label=disp_label[label], markersize=24)
+    x = np.linspace(0, 2.25)
+    plt.plot(x, slope(x, A), "-k", label="Slope fit", linewidth=2)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=24)
+    plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.425, 0))
+    plt.axis([0,2.2,-0.1,4.75])
+    plt.text(0.1, 4.25, "Slope: %.2e" % A, fontsize=24)
+    plt.show()
+
+    plt.figure(figsize=(16,6))
+    plt.title("Radial", fontsize=32)
+    plt.xlabel("Own calculation", fontsize=28)
+    plt.ylabel("Theoretical prediction", fontsize=28)
+
+    own = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_r"]*1e9 for lbl in labels]
+    print("TraceSPace")
+    print([track.runs.loc[lbl, "eps_r_tr"]/track.runs.loc[lbl, "eps_xy_tr"] for lbl in labels])
+    slope = lambda x, A: A*x
+    A, dA = curve_fit(slope, xdata=np.array([track.runs.loc[label, "eps_r_tr"] for label in labels])*1e9, ydata=epstheory*1e9*2, p0=[1])
+    print(A, dA)
+    for label in labels:
+        eps = track.data[label]["eps"]
+        epsa = epsas[label]
+        plt.plot(track.runs.loc[label, "eps_r_tr"]*1e9, epstheory[indices[label]]*1e9*2, fmt[label], label=disp_label[label], markersize=24)
+    x = np.linspace(0, 5)
+    plt.plot(x, slope(x, A), "-k", label="Slope fit", linewidth=2)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=24)
+    #plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.4, 0))
+    plt.axis([0,4.5,-0.1,9.25])
+    plt.text(0.1, 8.25, "Slope: %.2e" % A, fontsize=24)
+    plt.show()
+
+
+    plt.figure(figsize=(15,4))
+    plt.title("Tracking results vs. theoretical predictions", fontsize=30)
+    diffs = []
+    diff0 = (epstheory[indices["thin_soft"]] - eps.loc[eps.index[-1], "eps_4d"]**0.5*A)/epstheory[indices[label]]*100
+    for label in labels:
+        diff = (-epstheory[indices[label]] + track.runs.loc[label, "eps_xy_tr"])/epstheory[indices[label]]*100
+        eps = track.data[label]["eps"]
+        plt.plot(
+            indices[label] if label in labels_soft else indices[label] - 3,
+            diff,
+            fmt[label],
+            markersize=20,
+            label=({"mid_hard": "Hard edge", "mid_soft": "Soft edge"}[label] if label in ["mid_hard", "mid_soft"] else None)
+        )
+        diffs.append(diff)
+    #plt.plot([-0.5, 4], [0, 0], "-k")
+    diffs = np.array(diffs)
+    plt.axis([-1,3, -50, -56])
+    plt.legend(loc="lower left", fontsize=22, bbox_to_anchor=(1.5/2.75, 0.4))
+    plt.xlabel("Field width", fontsize=24)
+    plt.xticks(fontsize=22, labels=["Thin", "Mid", "Wide"], ticks=[0, 1, 2])
+    plt.ylabel("Deviation [%]", fontsize=24)
+    plt.yticks(fontsize=22)#, ticks=[60,65,70,75])
+    plt.grid()
+    plt.show()
+
+    for lbl in labels:
+        own1 = track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_xy"]
+        own2 = track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5
+        astra = epsas[lbl].loc[epsas[lbl].index[-1], "eps_xy"]
+        print("Diff: %s: %.3e%% XY, %.3e%% sqrt(4D)" % (lbl, (own1-astra)/astra*100, (own2-astra)/astra*100))
+
+    for lbl in labels:
+        print("%s: %.3e rad, %.3e transverse" % (lbl, track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_r"]*1e9, track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5*1e9))
+
+    print(sig*1e3)
 
 def focusing(track, core, label=None, compute=False, expand=False, sigma=2, order=1):
     if label is not None:
@@ -319,32 +588,33 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
             z = track.data[lbl]["field_z"]
             Bz = track.data[lbl]["field_Bz"]
             core.sample_field(z, Bz)
-            track.runs.loc[lbl, ["F1","F3","F4"]] = [core.fint(1), core.fint(3), core.fint(4)]
+            track.runs.loc[lbl, "F1"] = core.fint(1)
+            dz = z[:-1] - np.mean(np.diff(z))
+            ddz = dz[:-1] - np.mean(np.diff(dz))
+            dBz = np.diff(Bz)/np.diff(z)
+            ddBz = np.diff(dBz)/np.diff(dz)
+            func = interpolate.interp1d(
+                dz,
+                dBz**2,
+                fill_value=0,
+                bounds_error=False
+            )
+            func2 = interpolate.interp1d(
+                ddz,
+                ddBz**2,
+                fill_value=0,
+                bounds_error=False
+            )
+            track.runs.loc[lbl, ["F3", "F4"]] = [
+                integrate.quad(func, -np.inf, np.inf)[0],
+                integrate.quad(func2, -np.inf, np.inf)[0]
+            ]
         track.runs["Delta_f"] = track.runs["f_max_observed"] - track.runs["f_min_observed"]
 
     if expand or compute:
         for label in labels:
             track.run_label = label
             track.fit_cs_expansion(order=order, sigma_order=sigma)
-
-# C2 vs. F1
-    plt.figure(figsize=(16, 6))
-    plt.title(
-    "First order expansion coefficient vs. F3",
-    fontsize=32)
-
-    for label in labels:
-        plt.plot(
-            track.runs.loc[label, "F4"]/mm, track.runs.loc[label, "c2"],
-            fmt[label], markersize=24,
-            label=disp_label[label])
-    plt.xlabel("F1 [mT*m]", fontsize=28)
-    #plt.axis([4.5, 14.5, 0, 12])
-    plt.xticks(fontsize=24)
-    plt.ylabel("C2 [m^-1]", fontsize=28)
-    plt.yticks(fontsize=24)
-    plt.legend(loc="upper right", fontsize=24)
-    plt.show()
 
 # Df expansion
     fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
@@ -378,7 +648,7 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
         #ax.plot([0,30], [0,0], "--k")
     #plt.axis([0,31,-0.025,1.025])
     ax1.set_ylabel("Deviation from max. observed f [%]", fontsize=28)
-    ax1.set_ylim([np.min(lim), 0.1])
+    ax1.set_ylim([np.min(lim), 0.05])
     ax1.set_title("Soft edge", fontsize=24)
     ax2.set_title("Hard edge", fontsize=24)
     plt.show()
@@ -409,13 +679,85 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
         )
         diffs.append(diff)
     diffs = np.array(diffs)
-    plt.axis([0,3,-15, 15])
+    plt.axis([0,3,-12, 12])
     #plt.legend(loc="upper left", fontsize=24)
     plt.xlabel("Initial radial position [mm]", fontsize=28)
     plt.xticks(fontsize=24)
     plt.ylabel("data - model [0.001%]", fontsize=28)
-    plt.yticks(fontsize=24)
+    plt.yticks(fontsize=24, ticks=[-8, -4, 0, 4, 8])
     plt.grid()
+    plt.show()
+
+# C2 vs. F1
+    def cs_model(F3, F4):
+        pz = (3.4625e6*const.e/const.c)
+        R = 2e-3
+        c_s = const.e**2 / 4 / pz**2 * R**4 * (F3 + const.e**2 / 3 / pz**2 * F4)
+        return c_s*1.5
+
+    plt.figure(figsize=(16, 6))
+    plt.title(
+    "First order expansion coefficient vs. F1",
+    fontsize=32)
+
+    for label in labels:
+        plt.plot(
+            track.runs.loc[label, "F1"]/mm, track.runs.loc[label, "c2"],
+            fmt[label], markersize=24,
+            label=disp_label[label])
+    plt.xlabel("F1 [mT*m]", fontsize=28)
+    #plt.axis([4.5, 14.5, 0, 12])
+    plt.xticks(fontsize=24)
+    plt.ylabel("C2 [m^-2]", fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.legend(loc="upper right", fontsize=24)
+    plt.show()
+
+# C2 vs. F1
+    def cs_model(F3, F2):
+        c2 = 1 / 2 * F3 / F2
+        return c2
+
+    def cs_model2(F3, F4, F2):
+        c2 = 1 / 2 * F3 / F2
+        c4 = 5 / 64 * F4 / F2
+        return c4
+
+    cs_theory = [cs_model(*track.runs.loc[lbl, ["F3", "F2"]].values) for lbl in labels]
+
+    def model(x, A):#, B):
+        return A*x# + B
+
+    #(A, B), (dA, dB) = curve_fit(model, ydata=cs_theory, xdata=[track.runs.loc[lbl, "c2"] for lbl in labels])
+    A, dA = curve_fit(model, ydata=cs_theory, xdata=[track.runs.loc[lbl, "c2"] for lbl in labels])
+
+    plt.figure(figsize=(16, 6))
+    plt.title(
+    "C2, theoretical vs. tracking results",
+    fontsize=32)
+
+    for label in labels:
+        plt.plot(
+            track.runs.loc[label, "c2"],
+            cs_theory[indices[label]],
+            fmt[label], markersize=24,
+            label=disp_label[label])
+    x = np.linspace(track.runs["c2"].min(), track.runs["c2"].max())
+    plt.plot(
+        x,
+        model(x, A),
+        "-k",
+        label="Slope fit",
+        linewidth=2
+    )
+    print([A, dA])
+    plt.text(0, 700, "Slope: 1 + %.2e +- %.2e" % (A-1, dA), fontsize=24, verticalalignment="top")
+    plt.xlabel("Measured C2 [m^-2]", fontsize=28)
+    plt.axis([-25, 800, -25, 800])
+    plt.xticks(fontsize=24)
+    plt.ylabel("Theoretical C2 [m^-2]", fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.legend(loc="center left", bbox_to_anchor=(0.5,0.5), fontsize=24)
     plt.show()
 
     print("TABLE:")
@@ -423,7 +765,33 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
     for label in labels:
         print("%s & $%.2f$" % (disp_label[label], track.data[label]["exp_coeff"][0]))
 
-    
+    plt.figure(figsize=(16, 4))
+    plt.title(
+        "Theoretical predictions vs. tracking results",
+        fontsize=32
+    )
+    diffs = []
+    for label in labels:
+        diff = (cs_theory[indices[label]] - track.runs.loc[label, "c2"])/cs_theory[indices[label]]*100
+        plt.plot(
+            indices[label] if label in labels_soft else indices[label] - 3,
+            diff,
+            fmt[label],
+            markersize=20,
+            label=({"mid_hard": "Hard edge", "mid_soft": "Soft edge"}[label] if label in ["mid_hard", "mid_soft"] else None)
+        )
+        diffs.append(diff)
+    plt.plot([-0.5, 4], [0, 0], "-k")
+    diffs = np.array(diffs)
+    plt.axis([-0.5,2.5, -8, 8])
+    plt.legend(loc="lower left", fontsize=24, bbox_to_anchor=(1.5/2.75, 0.5))
+    plt.xlabel("Field width", fontsize=28)
+    plt.xticks(fontsize=24, labels=["Thin", "Mid", "Wide"], ticks=[0, 1, 2])
+    plt.ylabel("Model - Tracking [%]", fontsize=28)
+    plt.yticks(fontsize=24, ticks=[-6, -4, -2,0,2,4,6])
+    plt.grid()
+    plt.show()
+
 
 def larmor(track, core, compute=False):
     """kek."""
@@ -606,3 +974,6 @@ def larmor(track, core, compute=False):
     plt.plot([4.5, 14.5], [0, 0], "-k")
     plt.grid()
     plt.show()
+
+    for lbl in labels:
+        print("%s: %.2f" % (lbl, 1e3*phis[indices[lbl]]))

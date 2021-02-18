@@ -129,10 +129,10 @@ class Core():
 # Field characterization:
     def fint(self, n, p="numeric"):
         """Compute nth field integral."""
-        if n == 3:
-            integrand = lambda z: -1/2*self.model.field[self.FM](z, p)*derivative(self.model.field[self.FM], z, n=2, args=[p])
-        else:
+        if n in [1, 2]:
             integrand = lambda z: self.model.field[self.FM](z, p)**n
+        elif n in [3, 4]:
+            integrand = lambda z: derivative(self.model.field[self.FM], z, n=n-2, args=[p])**2
         I, dI = integrate.quad(integrand, -np.inf, np.inf)
         return I
 
