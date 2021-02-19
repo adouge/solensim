@@ -320,9 +320,9 @@ def emittances(track, core, label=None, compute=False):
     #print([track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels])
 
     plt.figure(figsize=(16,6))
-    plt.title("Norm. RMS trace space emittance [pi*mrad*mm]*1e-3\nTransverse", fontsize=32)
-    plt.xlabel("Own calculation", fontsize=28)
-    plt.ylabel("Theoretical prediction", fontsize=28)
+    plt.title("Norm. RMS trace space emittance [pi*mrad*mm]*1e-3", fontsize=32)
+    plt.ylabel("Own calculation", fontsize=28)
+    plt.xlabel("Theoretical prediction", fontsize=28)
 
     own = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels]
     own2 = [track.runs.loc[lbl, "eps_xy_tr"] for lbl in labels]
@@ -343,7 +343,7 @@ def emittances(track, core, label=None, compute=False):
     plt.plot(x, slope(x, A), "-k", label="Slope fit", linewidth=2)
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
-    plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.425, 0))
+    plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.6, 0))
     plt.axis([0,7.5,-0.1,7.5])
     plt.text(0.1, 4.25, "Slope: %.2e" % A, fontsize=24)
     plt.show()
