@@ -32,9 +32,9 @@ fmts = [
     "or",
     "ob",
     "og",
-    "dr",
-    "db",
-    "dg"
+    "sr",
+    "sb",
+    "sg"
 ]
 fmt = {}
 disp_labels = [
@@ -177,8 +177,8 @@ def emittances(track, core, label=None, compute=False):
         pass
 
     if compute:
-        track.sig_r = 0.72
-        track.N = 250
+        track.sig_r = 1
+        track.N = 10000
         for lbl in labels:
             track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
             track.overview_run()
@@ -301,22 +301,23 @@ def emittances(track, core, label=None, compute=False):
     c1s =  np.array([1/2*track.runs.loc[lbl, "F3"]/track.runs.loc[lbl, "F2"] for lbl in labels])
     c2s = np.array([5/64*track.runs.loc[lbl, "F4"]/track.runs.loc[lbl, "F2"] for lbl in labels])
     r = (track.astra.beam["x"]**2 + track.astra.beam["y"]**2)**0.5
-    sig = np.std([*r, *(-r)])
+    sig = np.mean((track.astra.beam["x"].std(), track.astra.beam["y"].std()))
+    #sig = 1e-3
     print("Sigma: ", sig)
-    epsapprox = np.sqrt(6)/2*sig**4*c1s/1.5
+    epsapprox = np.sqrt(6)*sig**4*c1s/1.5
     pz = 3.4625e6
     m_e = const.m_e*const.c**2/const.e
-    epstheory = pz/m_e*np.sqrt(6)/2*sig**4/1.5*np.sqrt(c1s**2 + 20*sig**2*c1s*c2s + 120*sig**4*c2s**2)
-    print("epstheory:    ", epstheory)
-    test = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_r"] for lbl in labels]
-    test = np.array(test)
-    print(np.array(test)/epstheory/2)
+    epstheory = pz/m_e*np.sqrt(6)*sig**4/1.5*np.sqrt(c1s**2 + 20*sig**2*c1s*c2s + 120*sig**4*c2s**2)
+    #print("epstheory:    ", epstheory)
+    #test = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_r"] for lbl in labels]
+    #test = np.array(test)
+    #print(np.array(test)/epstheory/2)
     #print(c1s)
     #print(c2s)
     #print(epsapprox*1e9)
     #print(epstheory*1e9)
 
-    print([track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels])
+    #print([track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels])
 
     plt.figure(figsize=(16,6))
     plt.title("Norm. RMS trace space emittance [pi*mrad*mm]*1e-3\nTransverse", fontsize=32)
@@ -325,52 +326,27 @@ def emittances(track, core, label=None, compute=False):
 
     own = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels]
     own2 = [track.runs.loc[lbl, "eps_xy_tr"] for lbl in labels]
-    print("=====================================")
-    print(own)
-    print(own2)
-    print(epstheory)
-    print("=====================================")
-    print(np.array(own)/test)
+    #print("=====================================")
+    #print(own)
+    #print(own2)
+    #print(epstheory)
+    #print("=====================================")
+    #print(np.array(own)/test)
     slope = lambda x, A: A*x
-    A, dA = curve_fit(slope, xdata=own2, ydata=epstheory)
+    A, dA = curve_fit(slope, ydata=own2, xdata=epstheory)
     print(A, dA)
     for label in labels:
         eps = track.data[label]["eps"]
         epsa = epsas[label]
-        plt.plot(track.runs.loc[label, "eps_xy_tr"]*1e9, epstheory[indices[label]]*1e9, fmt[label], label=disp_label[label], markersize=24)
-    x = np.linspace(0, 2.25)
+        plt.plot(epstheory[indices[label]]*1e9, track.runs.loc[label, "eps_xy_tr"]*1e9, fmt[label], label=disp_label[label], markersize=24)
+    x = np.linspace(0, 8)
     plt.plot(x, slope(x, A), "-k", label="Slope fit", linewidth=2)
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
     plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.425, 0))
-    plt.axis([0,2.2,-0.1,4.75])
+    plt.axis([0,7.5,-0.1,7.5])
     plt.text(0.1, 4.25, "Slope: %.2e" % A, fontsize=24)
     plt.show()
-
-    plt.figure(figsize=(16,6))
-    plt.title("Radial", fontsize=32)
-    plt.xlabel("Own calculation", fontsize=28)
-    plt.ylabel("Theoretical prediction", fontsize=28)
-
-    own = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_r"]*1e9 for lbl in labels]
-    print("TraceSPace")
-    print([track.runs.loc[lbl, "eps_r_tr"]/track.runs.loc[lbl, "eps_xy_tr"] for lbl in labels])
-    slope = lambda x, A: A*x
-    A, dA = curve_fit(slope, xdata=np.array([track.runs.loc[label, "eps_r_tr"] for label in labels])*1e9, ydata=epstheory*1e9*2, p0=[1])
-    print(A, dA)
-    for label in labels:
-        eps = track.data[label]["eps"]
-        epsa = epsas[label]
-        plt.plot(track.runs.loc[label, "eps_r_tr"]*1e9, epstheory[indices[label]]*1e9*2, fmt[label], label=disp_label[label], markersize=24)
-    x = np.linspace(0, 5)
-    plt.plot(x, slope(x, A), "-k", label="Slope fit", linewidth=2)
-    plt.xticks(fontsize=24)
-    plt.yticks(fontsize=24)
-    #plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.4, 0))
-    plt.axis([0,4.5,-0.1,9.25])
-    plt.text(0.1, 8.25, "Slope: %.2e" % A, fontsize=24)
-    plt.show()
-
 
     plt.figure(figsize=(15,4))
     plt.title("Tracking results vs. theoretical predictions", fontsize=30)
@@ -389,10 +365,10 @@ def emittances(track, core, label=None, compute=False):
         diffs.append(diff)
     #plt.plot([-0.5, 4], [0, 0], "-k")
     diffs = np.array(diffs)
-    plt.axis([-1,3, -50, -56])
+    #plt.axis([-1,3, -50, -56])
     plt.legend(loc="lower left", fontsize=22, bbox_to_anchor=(1.5/2.75, 0.4))
     plt.xlabel("Field width", fontsize=24)
-    plt.xticks(fontsize=22, labels=["Thin", "Mid", "Wide"], ticks=[0, 1, 2])
+    plt.xticks(fontsize=22)#, labels=["Thin", "Mid", "Wide"], ticks=[0, 1, 2])
     plt.ylabel("Deviation [%]", fontsize=24)
     plt.yticks(fontsize=22)#, ticks=[60,65,70,75])
     plt.grid()
