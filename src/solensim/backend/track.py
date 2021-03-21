@@ -190,7 +190,7 @@ class TrackModule():
                 # "pphi_std" : s.loc[z, "pphi"].std(),
                 "dphi": s.loc[z, "dphi"].mean(),
                 # "dphi_std" : s.loc[z, "dphi"].std(),
-                "turn": s.loc[z, "turn"].mean(),
+                "turn": np.abs(s.loc[z, "turn"]).mean(),
                 # "turn_std" : s.loc[z, "turn"].std(),
                 # "r_min" : s.loc[z, "r"].min(),
                 # "r_max" : s.loc[z, "r"].max(),

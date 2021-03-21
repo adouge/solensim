@@ -11,6 +11,9 @@ from scipy.optimize import curve_fit
 import scipy.integrate as integrate
 import scipy.interpolate as interpolate
 
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+
 #import pysnooper
 
 labels_soft = [
@@ -424,7 +427,7 @@ def focusing(track, core, label=None, compute=False, expand=False, sigma=2, orde
             track.runs.loc[label, "F1"]/mm, track.runs.loc[label, "Delta_f"]*1e2,
             fmt[label], markersize=24,
             label=disp_label[label])
-    plt.xlabel("F1 [mT*m]", fontsize=28)
+    plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
     plt.axis([4.5, 14.5, 0, 12])
     plt.xticks(fontsize=24)
     plt.ylabel("Focal region size [cm]", fontsize=28)
@@ -452,7 +455,7 @@ def focusing(track, core, label=None, compute=False, expand=False, sigma=2, orde
         "-k", label="Slope fit",
         linewidth=2)
     plt.text(10, 1.501, "Slope: %.6fe-3 [mT^-1]" % A, verticalalignment="bottom", fontsize=24)
-    plt.xlabel("F1 [mT*m]", fontsize=28)
+    plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
     plt.axis([4.5, 14.5, 1.50, 1.55])
     plt.xticks(fontsize=24)
     plt.ylabel("Maximum observed focal length [m]", fontsize=28)
@@ -681,7 +684,7 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
             track.runs.loc[label, "F1"]/mm, track.runs.loc[label, "c2"],
             fmt[label], markersize=24,
             label=disp_label[label])
-    plt.xlabel("F1 [mT*m]", fontsize=28)
+    plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
     #plt.axis([4.5, 14.5, 0, 12])
     plt.xticks(fontsize=24)
     plt.ylabel("C2 [m^-2]", fontsize=28)
@@ -930,21 +933,21 @@ def larmor(track, core, compute=False):
         F1s/mm, slope(F1s, A)/mm,
         "-k",
         linewidth=2)
-    plt.xlabel("F1 [mT*m]", fontsize=28)
+    plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
     plt.axis([4.5, 14.5, 60, 200])
     plt.xticks(fontsize=24)
-    plt.ylabel("Minimum recorded PhiL [mrad/pi]", fontsize=28)
+    plt.ylabel("Minimum recorded $\phi_L$ [$\pi\cdot$mrad]", fontsize=28)
     plt.yticks(fontsize=24)
     plt.legend(loc="upper left", fontsize=24)
     plt.show()
     print("dA: %.2f"%dA)
 
     plt.figure(figsize=(16, 3))
-    plt.ylabel("Data - fit [\u03bcrad]", fontsize=28)
+    plt.ylabel("Data - fit [$\mu$rad]", fontsize=28)
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=20)
     plt.axis([4.5, 14.5, -3, 1])
-    #plt.xlabel("F1 [mT*m]", fontsize=28)
+    #plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
     for label in [*labels_soft, *labels_hard]:
         plt.plot(F1s[indices[label]]/mm, -(slope(F1s[indices[label]], A) - Bs[indices[label]])/mm/mm, fmt[label], markersize=12)
     plt.plot([4.5, 14.5], [0, 0], "-k")
