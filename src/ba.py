@@ -877,39 +877,9 @@ def larmor(track, core, compute=False):
     ax2.set_title("Hard edge", fontsize=24)
     plt.show()
 
-    plt.figure(figsize=(15, 5))
-    plt.title(
-        "Residuals from the 2nd order expansion",
-        fontsize = 32
-    )
-    diffs = []
-    for label in [*labels_soft, *labels_hard]:
-        limit = track.runs.loc[label, "z_focal_left"]
-        s = track.data[label]["s"].copy()#.query("zpos<=@limit")
-        idx = s.index[-1][0]
-        y = straighten_out_v(s.loc[idx, "turn"].values)
-        x = s.loc[0, "r"].values
-        diff = (y - parabola(x, A[label], B[label]))/y*100
-        plt.plot(
-            x/mm,
-            diff,
-            fmt[label], label=disp_label[label],
-            markersize=8
-        )
-        diffs.append(diff)
-    diffs = np.array(diffs)
-    plt.axis([0,10,-0.001, 0.003])
-    #plt.legend(loc="upper left", fontsize=24)
-    plt.xlabel("Initial radial position [mm]", fontsize=28)
-    plt.xticks(fontsize=24)
-    plt.ylabel("data - model [0.001%]", fontsize=28)
-    plt.yticks(fontsize=24)
-    plt.grid()
-    plt.show()
-
     plt.figure(figsize=(16, 9))
     plt.title(
-    "Larmor angle for paraxial particles vs. F1",
+    "Larmor angle for paraxial particles vs. $F_1$",
     fontsize=32)
     F1s = np.array(F1s)
     phis = np.array(phis)
@@ -917,42 +887,51 @@ def larmor(track, core, compute=False):
     def slope(x, A):
         return A*x
 
-    A0 = const.e/2/(3.4625e6*const.e/const.c)/np.pi
+    A0 = const.e/2/(3.4625e6*const.e/const.c)/np.pi*180*mm
     print("Guess for slope: %.2f"%A0)
-    A, dA = curve_fit(slope, xdata=F1s, ydata=np.array(Bs), p0=[A0])
+    A, dA = curve_fit(slope, xdata=F1s/mm, ydata=np.array(Bs)*180, p0=[A0])
     plt.plot(
-        F1s/mm, slope(F1s, A)/mm,
-        "-k", label="Slope fit: %.6f\npredicted: %.6f" % (A, A0),
+        F1s/mm, slope(F1s/mm, A),
+        "-k", label="Slope fit:\ \ \ %.6f\npredicted: %.6f" % (A, A0),
         linewidth=2)
     for label in [*labels_soft, *labels_hard]:
         plt.plot(
-            F1s[indices[label]]/mm, phis[indices[label]]/mm,
+            F1s[indices[label]]/mm, Bs[indices[label]]*180,
             fmt[label], markersize=24,
             label=disp_label[label])
-    plt.plot(
-        F1s/mm, slope(F1s, A)/mm,
-        "-k",
-        linewidth=2)
-    plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
-    plt.axis([4.5, 14.5, 60, 200])
+    #plt.plot(
+    #    F1s/mm, slope(F1s/mm, A),
+    #    "-k",
+    #    linewidth=2)
+    plt.xlabel("$F_1$ [mT$\cdot$m]", fontsize=28)
+#    plt.axis([4.5, 14.5, 60, 200])
     plt.xticks(fontsize=24)
-    plt.ylabel("Minimum recorded $\phi_L$ [$\pi\cdot$mrad]", fontsize=28)
+    plt.ylabel("$\phi_L$ for paraxial particles [degrees]", fontsize=28)
     plt.yticks(fontsize=24)
     plt.legend(loc="upper left", fontsize=24)
     plt.show()
     print("dA: %.2f"%dA)
 
-    plt.figure(figsize=(16, 3))
-    plt.ylabel("Data - fit [$\mu$rad]", fontsize=28)
-    plt.xticks(fontsize=24)
-    plt.yticks(fontsize=20)
-    plt.axis([4.5, 14.5, -3, 1])
-    #plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
-    for label in [*labels_soft, *labels_hard]:
-        plt.plot(F1s[indices[label]]/mm, -(slope(F1s[indices[label]], A) - Bs[indices[label]])/mm/mm, fmt[label], markersize=12)
-    plt.plot([4.5, 14.5], [0, 0], "-k")
-    plt.grid()
-    plt.show()
-
     for lbl in labels:
-        print("%s: %.2f" % (lbl, 1e3*phis[indices[lbl]]))
+        print("%s: %.2f" % (lbl, 180*phis[indices[lbl]]))
+
+    plt.figure(figsize=(15, 6))
+    plt.title(
+    "$\phi_L$ after thin, hard edge field vs. $r_0$",
+    fontsize=32)
+    limit = track.runs.loc["thin_hard", "z_focal_left"] - 0.15
+    s = track.data["thin_hard"]["s"].query("zpos<=@limit").copy()
+    idx = s.index[-1][0]
+    plt.plot(
+        s.loc[0, "r"].values/mm, s.loc[idx, "turn"].values*180,
+        ".k", label="Tracking data")
+    predict = slope(F1s[indices["thin_hard"]]/mm, A0)
+    plt.plot([0,10], [predict, predict], "--k", label="Thin lens approximation")
+    plt.xlabel("Initial radial position $r_0$ [mm]", fontsize=28)
+    plt.axis([0, 10, 12.729, 12.743])
+    plt.xticks(fontsize=24)
+    plt.ylabel("Larmor angle $\phi_L$ [degrees]", fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.legend(loc="upper left", fontsize=24)
+    plt.show()
+    print("dA: %.2f"%dA)
