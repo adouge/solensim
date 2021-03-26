@@ -872,7 +872,7 @@ def larmor(track, core, compute=False):
         ax.grid()
         #ax.plot([0,30], [0,0], "--k")
     #plt.axis([0,31,-0.025,1.025])
-    ax1.set_ylabel("Deviation from min. observed PhiL [%]", fontsize=28)
+    ax1.set_ylabel("Deviation from prediction [\%]", fontsize=28)
     ax1.set_title("Soft edge", fontsize=24)
     ax2.set_title("Hard edge", fontsize=24)
     plt.show()
@@ -926,7 +926,7 @@ def larmor(track, core, compute=False):
         s.loc[0, "r"].values/mm, s.loc[idx, "turn"].values*180,
         ".k", label="Tracking data")
     predict = slope(F1s[indices["thin_hard"]]/mm, A0)
-    plt.plot([0,10], [predict, predict], "--k", label="Thin lens approximation")
+    plt.plot([0,10], [predict, predict], "--k", label="Paraxial approximation")
     plt.xlabel("Initial radial position $r_0$ [mm]", fontsize=28)
     plt.axis([0, 10, 12.729, 12.743])
     plt.xticks(fontsize=24)
