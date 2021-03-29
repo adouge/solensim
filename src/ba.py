@@ -181,7 +181,7 @@ def emittances(track, core, label=None, compute=False):
 
     if compute:
         track.sig_r = 1
-        track.N = 10000
+        track.N = 1000
         for lbl in labels:
             track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
             track.overview_run()
@@ -224,14 +224,14 @@ def emittances(track, core, label=None, compute=False):
         z_sol = track.runs.loc[lbl, "z_solenoid"]
         (a1, a2)[i].plot((eps["z"]-z_sol)*1e2,eps["eps_xy"]*1e6, "--k", label="Own calculation")
         (a1, a2)[i].plot((epsa["z"]-z_sol)*1e2, epsa["eps_xy"]*1e6, "-k", label="ASTRA")
-        (a1, a2)[i].set_xlabel("z [cm]", fontsize=24)
+        (a1, a2)[i].set_xlabel("$z - z_{\mathrm{solenoid}}$ [cm]", fontsize=24)
         (a1, a2)[i].tick_params(labelsize=24)
         (a1, a2)[i].set_xlim([-50,50])
+        (a1, a2)[i].text(-48, 14, "A%d)" % (i+1), fontsize=24)
         #(a1, a2)[i].set_title(["Wide field, soft edge", "Wide field, hard edge"][i], fontsize=28)
-    a1.set_ylabel("[pi*mm*mrad]", fontsize=24)
-    a1.set_ylim([-0.1,8])
-    a1.text(-48, 7, "Not accounting for correlation", fontsize=24)
-    a1.set_yticks([0, 2, 4, 8])
+    a1.set_ylabel("$\\varepsilon_x$ [$\pi\cdot$mm$\cdot$mrad]", fontsize=24)
+    a1.set_ylim([-0.1,15])
+    a1.set_yticks([0, 2.5, 5, 10, 15])
     a1.tick_params(size=10, axis="y")
     #a2.legend(fontsize=28, loc="upper right")
     plt.show()
@@ -245,20 +245,20 @@ def emittances(track, core, label=None, compute=False):
         z_sol = track.runs.loc[lbl, "z_solenoid"]
         (a1, a2)[i].plot((eps["z"]-z_sol)*1e2, eps["eps_4d"]**0.5*1e9, "--k", label="Own calculation")
         (a1, a2)[i].plot((epsa["z"]-z_sol)*1e2, epsa["eps_xy"]*1e9, "-k", label="ASTRA")
-        (a1, a2)[i].set_xlabel("z [cm]", fontsize=24)
+        (a1, a2)[i].set_xlabel("$z - z_{\mathrm{solenoid}}$ [cm]", fontsize=24)
         (a1, a2)[i].tick_params(labelsize=24)
         (a1, a2)[i].set_xlim([-50,50])
-        (a1, a2)[i].set_title(["Wide field, soft edge", "Wide field, hard edge"][i], fontsize=28)
-    a1.set_ylabel("[pi*mm*mrad]*1e-3", fontsize=24)
-    a1.set_ylim([0,0.6])
-    a1.text(-48, 0.5, "Accounting for correlation", fontsize=24)
+        (a1, a2)[i].text(-48, 1.4, "B%d)" % (i+1), fontsize=24)
+        #(a1, a2)[i].set_title(["Wide field, soft edge", "Wide field, hard edge"][i], fontsize=28)
+    a1.set_ylabel("$\\varepsilon_x$ [$\pi\cdot$mm$\cdot$mrad]$\cdot10^{-3}$", fontsize=24)
+    a1.set_ylim([0,1.5])
     a2.legend(fontsize=24, loc="lower right")
     plt.show()
 
-    plt.figure(figsize=(16,6))
-    plt.title("Norm. RMS x,y emittance by field [pi*mrad*mm]*1e-3", fontsize=32)
-    plt.xlabel("Own calculation", fontsize=28)
-    plt.ylabel("ASTRA", fontsize=28)
+    plt.figure(figsize=(16,5))
+    #plt.title("Norm. RMS x,y emittance by field [pi*mrad*mm]*1e-3", fontsize=32)
+    plt.xlabel("$\\varepsilon_x$, own calculation [$\pi\cdot$mm$\cdot$mrad]$\cdot10^{-3}$", fontsize=28)
+    plt.ylabel("$\\varepsilon_x$, ASTRA", fontsize=28)
 
     own = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5*1e9 for lbl in labels]
     astra = [epsas[lbl].loc[epsas[lbl].index[-1], "eps_xy"]*1e9 for lbl in labels]
@@ -268,14 +268,14 @@ def emittances(track, core, label=None, compute=False):
     for label in labels:
         eps = track.data[label]["eps"]
         epsa = epsas[label]
-        plt.plot(eps.loc[eps.index[-1], "eps_4d"]**0.5*1e9, epsa.loc[epsa.index[-1], "eps_xy"]*1e9, fmt[label], label=disp_label[label], markersize=24)
-    x = np.linspace(0, 2.25)
+        plt.plot(eps.loc[eps.index[-1], "eps_4d"]**0.5*1e9, epsa.loc[epsa.index[-1], "eps_xy"]*1e9, fmt[label], label=disp_label[label], markersize=20)
+    x = np.array([0, 7])
     plt.plot(x, slope(x, A), "-k", label="Slope fit", linewidth=2)
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
-    plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.4, 0))
-    plt.axis([0,2.2,-0.1,2.2])
-    plt.text(0.1, 1.9, "Slope: 1-%.2e" % (1-A), fontsize=28)
+    plt.legend(fontsize=24, loc="lower left", bbox_to_anchor=(0.65, -0.01))
+    plt.axis([0,7.025,-0.1,7.2])
+    plt.text(0.1, 6, "Slope: %.6f" % (A), fontsize=28)
     plt.show()
 
     for lbl in labels:
@@ -322,10 +322,10 @@ def emittances(track, core, label=None, compute=False):
 
     #print([track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels])
 
-    plt.figure(figsize=(16,6))
-    plt.title("Norm. RMS trace space emittance [pi*mrad*mm]*1e-3", fontsize=32)
-    plt.ylabel("Own calculation", fontsize=28)
-    plt.xlabel("Theoretical prediction", fontsize=28)
+    plt.figure(figsize=(14,6))
+    plt.title("Transverse emittance, tracking vs. theoretical expectations", fontsize=32)
+    plt.ylabel("$\\varepsilon_x$, tracking [$\pi\cdot$mm$\cdot$mrad]$\cdot10^{-3}$", fontsize=28)
+    plt.xlabel("$\\varepsilon_x$, theoretical prediction [$\pi\cdot$mm$\cdot$mrad]$\cdot10^{-3}$", fontsize=28)
 
     own = [track.data[lbl]["eps"].loc[track.data[lbl]["eps"].index[-1], "eps_4d"]**0.5 for lbl in labels]
     own2 = [track.runs.loc[lbl, "eps_xy_tr"] for lbl in labels]
@@ -336,44 +336,45 @@ def emittances(track, core, label=None, compute=False):
     #print("=====================================")
     #print(np.array(own)/test)
     slope = lambda x, A: A*x
-    A, dA = curve_fit(slope, ydata=own2, xdata=epstheory)
+    A, dA = curve_fit(slope, ydata=own, xdata=epstheory)
     print(A, dA)
     for label in labels:
         eps = track.data[label]["eps"]
         epsa = epsas[label]
-        plt.plot(epstheory[indices[label]]*1e9, track.runs.loc[label, "eps_xy_tr"]*1e9, fmt[label], label=disp_label[label], markersize=24)
+        plt.plot(epstheory[indices[label]]*1e9, eps.loc[eps.index[-1], "eps_4d"]**0.5*1e9, fmt[label], label=disp_label[label], markersize=24)
     x = np.linspace(0, 8)
     plt.plot(x, slope(x, A), "-k", label="Slope fit", linewidth=2)
-    plt.xticks(fontsize=24)
-    plt.yticks(fontsize=24)
-    plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.6, 0))
-    plt.axis([0,7.5,-0.1,7.5])
-    plt.text(0.1, 4.25, "Slope: %.2e" % A, fontsize=24)
+    plt.xticks(fontsize=24, ticks=[0,0.25,1,1.5,3,4,7], labels=["0",0.25,1,1.5,3,4,7])
+    plt.yticks(fontsize=24, ticks=[0.25,1,1.5,3,4,7], labels=[0.25,1,1.5,3,4,7])
+    plt.grid()
+    plt.text(0.3, 6, "A)", fontsize=24)
+    plt.legend(fontsize=28, loc="lower left", bbox_to_anchor=(0.625, 0))
+    plt.axis([0,7.2,0,7.5])
+    plt.text(1.6, 4.25, "Slope: %.3f" % A, fontsize=24)
     plt.show()
 
-    plt.figure(figsize=(15,4))
-    plt.title("Tracking results vs. theoretical predictions", fontsize=30)
+    plt.figure(figsize=(14,4))
+    #plt.title("Tracking results vs. theoretical predictions", fontsize=30)
     diffs = []
     diff0 = (epstheory[indices["thin_soft"]] - eps.loc[eps.index[-1], "eps_4d"]**0.5*A)/epstheory[indices[label]]*100
     for label in labels:
-        diff = (-epstheory[indices[label]] + track.runs.loc[label, "eps_xy_tr"])/epstheory[indices[label]]*100
         eps = track.data[label]["eps"]
+        diff = (-epstheory[indices[label]] + eps.loc[eps.index[-1], "eps_4d"]**0.5)/epstheory[indices[label]]*100
         plt.plot(
-            indices[label] if label in labels_soft else indices[label] - 3,
+            track.runs.loc[label, "FWHM"]*1e2,
             diff,
             fmt[label],
-            markersize=20,
-            label=({"mid_hard": "Hard edge", "mid_soft": "Soft edge"}[label] if label in ["mid_hard", "mid_soft"] else None)
+            markersize=20
         )
         diffs.append(diff)
     #plt.plot([-0.5, 4], [0, 0], "-k")
     diffs = np.array(diffs)
-    #plt.axis([-1,3, -50, -56])
-    plt.legend(loc="lower left", fontsize=22, bbox_to_anchor=(1.5/2.75, 0.4))
-    plt.xlabel("Field width", fontsize=24)
-    plt.xticks(fontsize=22)#, labels=["Thin", "Mid", "Wide"], ticks=[0, 1, 2])
-    plt.ylabel("Deviation [%]", fontsize=24)
-    plt.yticks(fontsize=22)#, ticks=[60,65,70,75])
+    plt.axis([2.5,22.5, -12, 0])
+    plt.xlabel("FWHM [cm]", fontsize=24)
+    plt.xticks(fontsize=22, ticks=[5,10,20])#, labels=["Thin", "Mid", "Wide"], ticks=[0, 1, 2])
+    plt.ylabel("(data-model)/model [\%]", fontsize=28)
+    plt.text(3.5, -4, "B)", fontsize=24)
+    plt.yticks(fontsize=22, ticks=[0,-1, -2, -5, -10])
     plt.grid()
     plt.show()
 
@@ -388,7 +389,7 @@ def emittances(track, core, label=None, compute=False):
 
     print(sig*1e3)
 
-def focusing(track, core, label=None, compute=False, expand=False, sigma=2, order=1):
+def focusing(track, core, label=None, compute=False, expand=False, sigma=2, order=1, ident="A"):
     if label is not None:
         if type(label) == list:
             labels = label
@@ -417,55 +418,56 @@ def focusing(track, core, label=None, compute=False, expand=False, sigma=2, orde
         track.runs["Delta_f"] = track.runs["f_max_observed"] - track.runs["f_min_observed"]
 
 # DF vs. F1
-    plt.figure(figsize=(16, 6))
-    plt.title(
-    "Min/max difference for observed foci vs. F1",
-    fontsize=32)
-
+    plt.figure(figsize=(16, 4))
     for label in labels:
         plt.plot(
-            track.runs.loc[label, "F1"]/mm, track.runs.loc[label, "Delta_f"]*1e2,
+            track.runs.loc[label, "FWHM"]*1e2, track.runs.loc[label, "Delta_f"]*1e2,
             fmt[label], markersize=24,
             label=disp_label[label])
-    plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
-    plt.axis([4.5, 14.5, 0, 12])
-    plt.xticks(fontsize=24)
+    plt.xlabel("FWHM [cm]", fontsize=28)
+    plt.axis([-0.5, 20.5, 0, 10])
+    plt.text(0.25, 8.5, "B)", fontsize=24)
+    plt.xticks(fontsize=24, ticks=[0,5,10,20])
     plt.ylabel("Focal region size [cm]", fontsize=28)
-    plt.yticks(fontsize=24)
-    plt.legend(loc="upper right", fontsize=24)
+    plt.yticks(fontsize=24, ticks=[0, 1, 2.5, 5, 7.5, 10])
+    #plt.legend(loc="lower left", bbox_to_anchor=(0.55, 0), fontsize=22)
+    plt.grid()
     plt.show()
 
 # True F vs. F1
-    plt.figure(figsize=(16, 9))
+    plt.figure(figsize=(16, 6))
     plt.title(
-    "Max. observed focus vs. F1",
+    "Focusing by field",
     fontsize=32)
 
     def slope(x, A):
-        return A*x + 1.5
+        return A*x + 275
 
-    A, dA = curve_fit(slope, xdata=track.runs["F1"], ydata=track.runs["f_max_observed"], p0=[0])
+    A, dA = curve_fit(slope, xdata=track.runs["FWHM"]*1e2, ydata=track.runs["f_max_observed"]*1e2+125, p0=[0])
     for label in labels:
         plt.plot(
-            track.runs.loc[label, "F1"]/mm, track.runs.loc[label, "f_max_observed"],
+            track.runs.loc[label, "FWHM"]*1e2, track.runs.loc[label, "f_max_observed"]*1e2 + 125,
             fmt[label], markersize=24,
             label=disp_label[label])
+    plt.text(0.25, 279.25, "A)", fontsize=24)
+    plt.plot(0, 275, "dk", label="Expected for thin lens", markersize=24)
     plt.plot(
-        track.runs["F1"]/mm, slope(track.runs["F1"], A),
-        "-k", label="Slope fit",
+        np.array([0, *(track.runs["FWHM"]*1e2)]), slope(np.array([0, *(track.runs["FWHM"]*1e2)]), A),
+        "--k", label="Slope: %.6f" % (A),
         linewidth=2)
-    plt.text(10, 1.501, "Slope: %.6fe-3 [mT^-1]" % A, verticalalignment="bottom", fontsize=24)
-    plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
-    plt.axis([4.5, 14.5, 1.50, 1.55])
-    plt.xticks(fontsize=24)
-    plt.ylabel("Maximum observed focal length [m]", fontsize=28)
+    plt.axis([-0.5, 20.5, 274.75, 279.75])
+    plt.grid()
+    plt.xticks(fontsize=24, ticks=[0, 5, 10, 20])
+    #plt.xlabel("FWHM [cm]", fontsize=28)
+    plt.ylabel("Max. observed focus $z_{f}$ [cm]", fontsize=28)
     plt.yticks(fontsize=24)
-    plt.legend(loc="upper left", fontsize=24)
+    plt.legend(loc="lower left", bbox_to_anchor=(0.55, 0), fontsize=24)
     plt.show()
+
 # Df expansion
     fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
     fig.suptitle(
-        "Focal length vs. initial radial position",
+        "Focus position $f$ vs. initial radial position $r_0$",
         fontsize=32)
     if expand or compute:
         for label in labels:
@@ -496,21 +498,22 @@ def focusing(track, core, label=None, compute=False, expand=False, sigma=2, orde
         ax.set_xlim([0, 10])
         #ax.plot([0,30], [0,0], "--k")
     #plt.axis([0,31,-0.025,1.025])
-    ax1.set_ylabel("Deviation from max. observed f [%]", fontsize=28)
+    ax1.set_ylabel("Deviation from $f_0$ [\%]", fontsize=28)
     ax1.set_ylim([np.min(lim), 0.1])
     ax1.set_title("Soft edge", fontsize=24)
+    ax1.text(0, 0.25, "A)", fontsize=28)
     ax2.set_title("Hard edge", fontsize=24)
     plt.show()
 
-    plt.figure(figsize=(16, 5))
+    plt.figure(figsize=(16, 4))
     suffix = {
         1: "st",
         2: "nd",
         3: "rd"
     }
     plt.title(
-        "Residuals from the %d%s order expansion, %s weighing" % (order, suffix[order], ("no" if sigma == 0 else "r%d" % sigma)),
-        fontsize=32
+        "%d%s order expansion, %s weighing" % (order, suffix[order], ("no" if sigma == 0 else "$r^{%d}$" % sigma)),
+        fontsize=28
     )
     diffs = []
     for label in labels:
@@ -528,13 +531,14 @@ def focusing(track, core, label=None, compute=False, expand=False, sigma=2, orde
         )
         diffs.append(diff)
     diffs = np.array(diffs)
-    plt.axis([0,10,-15, 15])
+    plt.axis([0,10,-10, 10])
     #plt.legend(loc="upper left", fontsize=24)
     plt.xlabel("Initial radial position [mm]", fontsize=28)
     plt.xticks(fontsize=24)
-    plt.ylabel("data - model [0.001%]", fontsize=28)
-    plt.yticks(fontsize=24)
+    plt.ylabel("(data-model)/data [$10^{-5}$]", fontsize=28)
+    plt.yticks(ticks=[-10,-5,0,5,10], fontsize=24)
     plt.grid()
+    plt.text(0, 10.5, "%s)" % ident, fontsize=28)
     plt.show()
 
     print("TABLE:")
@@ -542,7 +546,7 @@ def focusing(track, core, label=None, compute=False, expand=False, sigma=2, orde
     for label in labels:
         print("%s & $%.2f$" % (disp_label[label], track.data[label]["exp_coeff"][0]))
 
-def aberration(track, core, label=None, compute=False, expand=False, sigma=2, order=1):
+def aberration(track, core, label=None, compute=False, expand=False, sigma=0, order=1):
     if label is not None:
         if type(label) == list:
             labels = label
@@ -596,76 +600,76 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
             track.fit_cs_expansion(order=order, sigma_order=sigma)
 
 # Df expansion
-    fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
-    fig.suptitle(
-        "Focal length expansion in the paraxial region by field",
-        fontsize=32)
+#    fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
+#    fig.suptitle(
+#        "Focal length expansion in the paraxial region by field",
+#        fontsize=32)
 
-    lim = []
-    r = np.linspace(0,3, num=100)
-    for label in labels:
-        fits = track.data[label]["fits"]
-        c = track.data[label]["exp_coeff"]
-        f_real = track.runs.loc[label, "f"]
-        if label in labels_soft:
-            axis = ax1
-        else:
-            axis = ax2
-        zsol = track.runs.loc[label, "z_solenoid"]
-        axis.plot(fits["r0"]*1e3, ((fits["z_f"]-zsol)/f_real-1)*100, fmt[label], markersize=8, label=disp_label[label])
-        y = (track.model.f_expansion(r/1e3, f_real, *c)/f_real-1)*100
-        axis.plot(r, y, "-k")
-        lim.append(np.min(y))
+#    lim = []
+#    r = np.linspace(0,3, num=100)
+#    for label in labels:
+#        fits = track.data[label]["fits"]
+#        c = track.data[label]["exp_coeff"]
+#        f_real = track.runs.loc[label, "f"]
+#        if label in labels_soft:
+#            axis = ax1
+#        else:
+#            axis = ax2
+#        zsol = track.runs.loc[label, "z_solenoid"]
+#        axis.plot(fits["r0"]*1e3, ((fits["z_f"]-zsol)/f_real-1)*100, fmt[label], markersize=8, label=disp_label[label])
+#        y = (track.model.f_expansion(r/1e3, f_real, *c)/f_real-1)*100
+#        axis.plot(r, y, "-k")
+#        lim.append(np.min(y))
 
-    for ax in (ax1, ax2):
-        ax.tick_params(axis='both', which='major', labelsize=24)
-        ax.set_xlabel("Initial radial position [mm]", fontsize=28)
-        ax.plot(0,0,"-k",label="Expansion fit")
-        ax.legend(loc="lower left", fontsize=24)
-        ax.grid()
-        ax.set_xlim([0, 3])
+#    for ax in (ax1, ax2):
+#        ax.tick_params(axis='both', which='major', labelsize=24)
+#        ax.set_xlabel("Initial radial position [mm]", fontsize=28)
+#        ax.plot(0,0,"-k",label="Expansion fit")
+#        ax.legend(loc="lower left", fontsize=24)
+#        ax.grid()
+#        ax.set_xlim([0, 3])
         #ax.plot([0,30], [0,0], "--k")
     #plt.axis([0,31,-0.025,1.025])
-    ax1.set_ylabel("Deviation from max. observed f [%]", fontsize=28)
-    ax1.set_ylim([np.min(lim), 0.05])
-    ax1.set_title("Soft edge", fontsize=24)
-    ax2.set_title("Hard edge", fontsize=24)
-    plt.show()
+#    ax1.set_ylabel("Deviation from max. observed f [%]", fontsize=28)
+#    ax1.set_ylim([np.min(lim), 0.05])
+#    ax1.set_title("Soft edge", fontsize=24)
+#    ax2.set_title("Hard edge", fontsize=24)
+#    plt.show()
 
-    plt.figure(figsize=(16, 5))
-    suffix = {
-        1: "st",
-        2: "nd",
-        3: "rd"
-    }
-    plt.title(
-        "Residuals from the 1st order expansion, no weighing",
-        fontsize=32
-    )
-    diffs = []
-    for label in labels:
-        fits = track.data[label]["fits"]
-        c = track.data[label]["exp_coeff"]
-        f_real = track.runs.loc[label, "f"]
-        modeled = track.model.f_expansion(fits["r0"], f_real, *c)
-        y = fits["z_f"] - track.runs.loc[label, "z_solenoid"]
-        diff = (y - modeled)/y*100
-        plt.plot(
-            fits["r0"]*1e3,
-            diff*1e3,
-            fmt[label], label=disp_label[label],
-            markersize=8
-        )
-        diffs.append(diff)
-    diffs = np.array(diffs)
-    plt.axis([0,3,-12, 12])
+#    plt.figure(figsize=(16, 5))
+#    suffix = {
+#        1: "st",
+#        2: "nd",
+#        3: "rd"
+#    }
+#    plt.title(
+#        "Residuals from the 1st order expansion, no weighing",
+#        fontsize=32
+#    )
+#    diffs = []
+#    for label in labels:
+#        fits = track.data[label]["fits"]
+#        c = track.data[label]["exp_coeff"]
+#        f_real = track.runs.loc[label, "f"]
+#        modeled = track.model.f_expansion(fits["r0"], f_real, *c)
+#        y = fits["z_f"] - track.runs.loc[label, "z_solenoid"]
+#        diff = (y - modeled)/y*100
+#        plt.plot(
+#            fits["r0"]*1e3,
+#            diff*1e3,
+#            fmt[label], label=disp_label[label],
+#            markersize=8
+#        )
+#        diffs.append(diff)
+#    diffs = np.array(diffs)
+#    plt.axis([0,3,-12, 12])
     #plt.legend(loc="upper left", fontsize=24)
-    plt.xlabel("Initial radial position [mm]", fontsize=28)
-    plt.xticks(fontsize=24)
-    plt.ylabel("data - model [0.001%]", fontsize=28)
-    plt.yticks(fontsize=24, ticks=[-8, -4, 0, 4, 8])
-    plt.grid()
-    plt.show()
+#    plt.xlabel("Initial radial position [mm]", fontsize=28)
+#    plt.xticks(fontsize=24)
+#    plt.ylabel("data - model [0.001%]", fontsize=28)
+#    plt.yticks(fontsize=24, ticks=[-8, -4, 0, 4, 8])
+#    plt.grid()
+#    plt.show()
 
 # C2 vs. F1
     def cs_model(F3, F4):
@@ -674,23 +678,23 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
         c_s = const.e**2 / 4 / pz**2 * R**4 * (F3 + const.e**2 / 3 / pz**2 * F4)
         return c_s*1.5
 
-    plt.figure(figsize=(16, 6))
-    plt.title(
-    "First order expansion coefficient vs. F1",
-    fontsize=32)
+#    plt.figure(figsize=(16, 6))
+#    plt.title(
+#    "First order expansion coefficient by field",
+#    fontsize=32)
 
-    for label in labels:
-        plt.plot(
-            track.runs.loc[label, "F1"]/mm, track.runs.loc[label, "c2"],
-            fmt[label], markersize=24,
-            label=disp_label[label])
-    plt.xlabel("F1 [mT$\cdot$m]", fontsize=28)
-    #plt.axis([4.5, 14.5, 0, 12])
-    plt.xticks(fontsize=24)
-    plt.ylabel("C2 [m^-2]", fontsize=28)
-    plt.yticks(fontsize=24)
-    plt.legend(loc="upper right", fontsize=24)
-    plt.show()
+#    for label in labels:
+#        plt.plot(
+#            track.runs.loc[label, "FWHM"]*1e2, track.runs.loc[label, "c2"],
+#            fmt[label], markersize=24,
+#            label=disp_label[label])
+#    plt.xlabel("FWHM [cm]", fontsize=28)
+#    #plt.axis([4.5, 14.5, 0, 12])
+#    plt.xticks(fontsize=24)
+#    plt.ylabel("$c_2$ [m$^{-2}$]", fontsize=28)
+#    plt.yticks(fontsize=24)
+#    plt.legend(loc="upper right", fontsize=24)
+#    plt.show()
 
 # C2 vs. F1
     def cs_model(F3, F2):
@@ -708,35 +712,37 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
         return A*x# + B
 
     #(A, B), (dA, dB) = curve_fit(model, ydata=cs_theory, xdata=[track.runs.loc[lbl, "c2"] for lbl in labels])
-    A, dA = curve_fit(model, ydata=cs_theory, xdata=[track.runs.loc[lbl, "c2"] for lbl in labels])
+    A, dA = curve_fit(model, xdata=cs_theory, ydata=[track.runs.loc[lbl, "c2"] for lbl in labels])
 
-    plt.figure(figsize=(16, 6))
+    plt.figure(figsize=(16, 5))
     plt.title(
-    "C2, theoretical vs. tracking results",
+    "$c_2$, tracking results vs. theory",
     fontsize=32)
 
     for label in labels:
         plt.plot(
-            track.runs.loc[label, "c2"],
             cs_theory[indices[label]],
-            fmt[label], markersize=24,
+            track.runs.loc[label, "c2"],
+            fmt[label], markersize=20,
             label=disp_label[label])
     x = np.linspace(track.runs["c2"].min(), track.runs["c2"].max())
     plt.plot(
         x,
         model(x, A),
         "-k",
-        label="Slope fit",
+#        label="Slope fit",
         linewidth=2
     )
     print([A, dA])
-    plt.text(0, 700, "Slope: 1 + %.2e +- %.2e" % (A-1, dA), fontsize=24, verticalalignment="top")
-    plt.xlabel("Measured C2 [m^-2]", fontsize=28)
-    plt.axis([-25, 800, -25, 800])
-    plt.xticks(fontsize=24)
-    plt.ylabel("Theoretical C2 [m^-2]", fontsize=28)
-    plt.yticks(fontsize=24)
-    plt.legend(loc="center left", bbox_to_anchor=(0.5,0.5), fontsize=24)
+    plt.text(5,550, "A)", fontsize=24, verticalalignment="bottom")
+    plt.text(170, 400, "Slope: %.6f" % (A), fontsize=24, verticalalignment="bottom")
+    plt.ylabel("$c_2$ from tracking [m$^{-2}$]", fontsize=28)
+    plt.axis([-0, 700, -0, 700])
+    plt.xlabel("Expected $c_2$ [m$^{-2}$]", fontsize=28)
+    plt.xticks(fontsize=24, ticks=[0,25,100,150,300,400,650])
+    plt.yticks(fontsize=24, ticks=[25,100,150,300,400,650])
+    plt.legend(loc="center left", bbox_to_anchor=(45/70,0.5), fontsize=24)
+    plt.grid()
     plt.show()
 
     print("TABLE:")
@@ -745,29 +751,30 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=2, or
         print("%s & $%.2f$" % (disp_label[label], track.data[label]["exp_coeff"][0]))
 
     plt.figure(figsize=(16, 4))
-    plt.title(
-        "Theoretical predictions vs. tracking results",
-        fontsize=32
-    )
+#    plt.title(
+#        "Theoretical predictions vs. tracking results",
+#        fontsize=32
+#    )
     diffs = []
     for label in labels:
-        diff = (cs_theory[indices[label]] - track.runs.loc[label, "c2"])/cs_theory[indices[label]]*100
+        diff = (track.runs.loc[label, "c2"]-cs_theory[indices[label]])/cs_theory[indices[label]]*100
         plt.plot(
-            indices[label] if label in labels_soft else indices[label] - 3,
+            track.runs.loc[label, "FWHM"]*1e2,
             diff,
             fmt[label],
-            markersize=20,
-            label=({"mid_hard": "Hard edge", "mid_soft": "Soft edge"}[label] if label in ["mid_hard", "mid_soft"] else None)
+            markersize=20
+            #label=({"mid_hard": "Hard edge", "mid_soft": "Soft edge"}[label] if label in ["mid_hard", "mid_soft"] else None)
         )
         diffs.append(diff)
-    plt.plot([-0.5, 4], [0, 0], "-k")
+    plt.plot([4, 21], [0, 0], "-k")
+    plt.text(4.75,-4, "B)", fontsize=24, horizontalalignment="right")
     diffs = np.array(diffs)
-    plt.axis([-0.5,2.5, -8, 8])
-    plt.legend(loc="lower left", fontsize=24, bbox_to_anchor=(1.5/2.75, 0.5))
-    plt.xlabel("Field width", fontsize=28)
-    plt.xticks(fontsize=24, labels=["Thin", "Mid", "Wide"], ticks=[0, 1, 2])
-    plt.ylabel("Model - Tracking [%]", fontsize=28)
-    plt.yticks(fontsize=24, ticks=[-6, -4, -2,0,2,4,6])
+    plt.axis([4,21, -7, 3])
+    #plt.legend(loc="lower left", fontsize=24, bbox_to_anchor=(1.5/2.75, 0.5))
+    plt.xlabel("FWHM [cm]", fontsize=28)
+    plt.xticks(fontsize=24, ticks=[5, 10, 20])
+    plt.ylabel("$\Delta c_2 / c_2^{\mathrm{theory}}$ [\%]", fontsize=28)
+    plt.yticks(fontsize=24, ticks=[-6, -2, 0,1, 2])
     plt.grid()
     plt.show()
 
@@ -781,7 +788,7 @@ def larmor(track, core, compute=False):
 
     fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
     fig.suptitle(
-        "Larmor angle vs. initial radial position",
+        "$\Delta\phi_L$ vs. initial $r$",
         fontsize=32)
 
     F1s = []
@@ -807,7 +814,7 @@ def larmor(track, core, compute=False):
             track.baseline_f = 1.5
 
             track.use_dat(
-                "plugins/astra/workspace/fields/"+label+".dat",
+                "plugins/astra/workspace/fields/" + label + ".dat",
                 normalize=True, label=label)
             track.overview_run(beam_2d=True, beam="uniform")
             track.get_focal_region()
@@ -826,9 +833,11 @@ def larmor(track, core, compute=False):
         closest = s.loc[0, "r"].idxmin()
         phi0 = straighten_out(s.loc[(idx, closest), "turn"])
         phis.append(phi0)
+
         def parabola(r, A, B, pot=2):
-            phi = A*r**pot + B
+            phi = A * r**pot + B
             return phi
+
         if label in labels_hard:
             axis = ax2
         else:
@@ -872,15 +881,15 @@ def larmor(track, core, compute=False):
         ax.grid()
         #ax.plot([0,30], [0,0], "--k")
     #plt.axis([0,31,-0.025,1.025])
-    ax1.set_ylabel("Deviation from prediction [\%]", fontsize=28)
+    ax1.set_ylabel("Deviation from $\phi_L(0)$ [\%]", fontsize=28)
     ax1.set_title("Soft edge", fontsize=24)
     ax2.set_title("Hard edge", fontsize=24)
     plt.show()
 
-    plt.figure(figsize=(16, 9))
+    plt.figure(figsize=(14, 8))
     plt.title(
     "Larmor angle for paraxial particles vs. $F_1$",
-    fontsize=32)
+    fontsize=36)
     F1s = np.array(F1s)
     phis = np.array(phis)
 
@@ -897,41 +906,41 @@ def larmor(track, core, compute=False):
     for label in [*labels_soft, *labels_hard]:
         plt.plot(
             F1s[indices[label]]/mm, Bs[indices[label]]*180,
-            fmt[label], markersize=24,
+            fmt[label], markersize=28,
             label=disp_label[label])
     #plt.plot(
     #    F1s/mm, slope(F1s/mm, A),
     #    "-k",
     #    linewidth=2)
-    plt.xlabel("$F_1$ [mT$\cdot$m]", fontsize=28)
-#    plt.axis([4.5, 14.5, 60, 200])
-    plt.xticks(fontsize=24)
-    plt.ylabel("$\phi_L$ for paraxial particles [degrees]", fontsize=28)
-    plt.yticks(fontsize=24)
-    plt.legend(loc="upper left", fontsize=24)
+    plt.xlabel("$F_1$ [mT$\cdot$m]", fontsize=32)
+    plt.axis([4.5, 15, 11, 36])
+    plt.xticks(fontsize=28)
+    plt.ylabel("$\phi_L$ for paraxial particles [degrees]", fontsize=32)
+    plt.yticks(fontsize=28)
+    plt.legend(loc="lower left", bbox_to_anchor=(0.55,0), fontsize=28)
     plt.show()
     print("dA: %.2f"%dA)
 
     for lbl in labels:
         print("%s: %.2f" % (lbl, 180*phis[indices[lbl]]))
 
-    plt.figure(figsize=(15, 6))
+    plt.figure(figsize=(12, 4))
     plt.title(
-    "$\phi_L$ after thin, hard edge field vs. $r_0$",
-    fontsize=32)
+    "Larmor angle after thin, hard edge field vs. $r_0$",
+    fontsize=30)
     limit = track.runs.loc["thin_hard", "z_focal_left"] - 0.15
     s = track.data["thin_hard"]["s"].query("zpos<=@limit").copy()
     idx = s.index[-1][0]
     plt.plot(
         s.loc[0, "r"].values/mm, s.loc[idx, "turn"].values*180,
-        ".k", label="Tracking data")
+        ".k", label="Tracking data", markersize=10)
     predict = slope(F1s[indices["thin_hard"]]/mm, A0)
-    plt.plot([0,10], [predict, predict], "--k", label="Paraxial approximation")
-    plt.xlabel("Initial radial position $r_0$ [mm]", fontsize=28)
-    plt.axis([0, 10, 12.729, 12.743])
+    plt.plot([0,10], [predict, predict], "--k", label="Paraxial approximation", linewidth=2)
+    plt.xlabel("Initial radial position $r_0$ [mm]", fontsize=30)
+    plt.axis([0, 10, 12.7295, 12.742])
     plt.xticks(fontsize=24)
-    plt.ylabel("Larmor angle $\phi_L$ [degrees]", fontsize=28)
+    plt.ylabel("$\phi_L$ [degrees]", fontsize=30)
     plt.yticks(fontsize=24)
-    plt.legend(loc="upper left", fontsize=24)
+    plt.legend(loc="upper left", fontsize=30)
     plt.show()
     print("dA: %.2f"%dA)
