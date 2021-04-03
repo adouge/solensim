@@ -181,7 +181,7 @@ def emittances(track, core, label=None, compute=False):
 
     if compute:
         track.sig_r = 1
-        track.N = 1000
+        track.N = 10000
         for lbl in labels:
             track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
             track.overview_run()
@@ -557,7 +557,7 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=0, or
 
     if compute:
         track.sig_r = 1
-        track.N = 1000
+        track.N = 10000
         for lbl in labels:
             track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
             track.overview_run()
