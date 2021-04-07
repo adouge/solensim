@@ -58,7 +58,7 @@ for i in range(3):
     indices[labels_soft[i]] = i
     indices[labels_hard[i]] = i+3
 
-def generate_field(p, zmax, title, core, f=1.25, E=3.5):
+def generate_field(p, zmax, title, core, f=1.5, E=3.5):
     core.FM = "biswas"
     core.bcalc_zmax = zmax
     z = core.get_z()
@@ -75,14 +75,14 @@ def generate_field(p, zmax, title, core, f=1.25, E=3.5):
     plt.title(title, fontsize=24)
     plt.plot(z*100, Bz*1000, "-k")
     plt.axis([-maxZ, maxZ, 0, 1.1*maxB])
-    plt.xlabel("On-axis position [cm]", fontsize=22)
-    plt.xticks(fontsize=18)
-    plt.yticks(fontsize=18)
-    plt.ylabel("On-axis field [mT]", fontsize=22)
-    lefttext = "f: %.2f @ %.1f MeV\nFWHM: %.0f mm" % (f, E, FWHM)
-    righttext = "F1: %.2f m*mT  \nF2: %.1f m*mT2" % (F1, F2)
-    plt.text(-0.95*maxZ, maxB*1.05, lefttext, fontsize=20, verticalalignment="top", horizontalalignment="left")
-    plt.text(0.95*maxZ, maxB*1.05, righttext, fontsize=20, verticalalignment="top", horizontalalignment="right")
+    plt.xlabel("Axial position relative to solenoid [cm]", fontsize=24)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=24)
+    plt.ylabel("Axial longitudinal field [mT]", fontsize=24)
+    lefttext = "$f_\mathrm{TL}$: %.1f m\nFWHM: %.0f mm" % (f, FWHM)
+    righttext = "$F_1$: %.3f m$\cdot$mT\n$F_2$: %.1f m$\cdot$mT$^2$" % (F1, F2)
+    plt.text(-0.95*maxZ, maxB*1.05, lefttext, fontsize=24, verticalalignment="top", horizontalalignment="left")
+    plt.text(0.25*maxZ, maxB*1.05, righttext, fontsize=24, verticalalignment="top", horizontalalignment="left")
     plt.show()
     field = pd.DataFrame(np.array([z, Bz]).transpose(), columns=["z", "Bz"])
     return field
@@ -557,7 +557,7 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=0, or
 
     if compute:
         track.sig_r = 1
-        track.N = 10000
+        track.N = 1000
         for lbl in labels:
             track.use_dat("plugins/astra/workspace/fields/"+lbl+".dat", normalize=True, label=lbl)
             track.overview_run()
@@ -769,7 +769,7 @@ def aberration(track, core, label=None, compute=False, expand=False, sigma=0, or
     plt.plot([4, 21], [0, 0], "-k")
     plt.text(4.75,-4, "B)", fontsize=24, horizontalalignment="right")
     diffs = np.array(diffs)
-    plt.axis([4,21, -7, 3])
+    plt.axis([4,21, -7.5, 3])
     #plt.legend(loc="lower left", fontsize=24, bbox_to_anchor=(1.5/2.75, 0.5))
     plt.xlabel("FWHM [cm]", fontsize=28)
     plt.xticks(fontsize=24, ticks=[5, 10, 20])
